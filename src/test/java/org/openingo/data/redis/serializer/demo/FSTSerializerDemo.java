@@ -30,7 +30,6 @@ package org.openingo.data.redis.serializer.demo;
 import org.junit.Test;
 import org.openingo.data.redis.serializer.demo.entity.User;
 import org.openingo.spring.extension.data.redis.serializer.FstSerializer;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * FSTSerializerDemo

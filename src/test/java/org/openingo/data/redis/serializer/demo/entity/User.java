@@ -27,8 +27,9 @@
 
 package org.openingo.data.redis.serializer.demo.entity;
 
-import java.io.Serializable;
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * User

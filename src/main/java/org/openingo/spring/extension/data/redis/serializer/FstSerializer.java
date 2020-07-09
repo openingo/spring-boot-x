@@ -27,14 +27,15 @@
 
 package org.openingo.spring.extension.data.redis.serializer;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;
 import org.openingo.jdkits.ValidateKit;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.SerializationException;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 /**
  * FstSerializer

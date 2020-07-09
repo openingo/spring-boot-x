@@ -27,14 +27,6 @@
 
 package org.openingo.spring.extension.data.redis.naming;
 
-import org.openingo.jdkits.ListKit;
-import org.openingo.jdkits.ValidateKit;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * DefaultKeyNamingPolicy
  *

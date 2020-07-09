@@ -27,8 +27,9 @@
 
 package org.openingo.spring.annotation;
 
-import java.lang.annotation.*;
 import org.springframework.context.annotation.Import;
+
+import java.lang.annotation.*;
 
 /**
  * EnableExtension

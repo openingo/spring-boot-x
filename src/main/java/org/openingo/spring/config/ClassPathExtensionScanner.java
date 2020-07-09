@@ -27,11 +27,12 @@
 
 package org.openingo.spring.config;
 
-import java.util.Set;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
+
+import java.util.Set;
 
 /**
  * ClassPathExtensionScanner

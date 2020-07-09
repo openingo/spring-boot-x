@@ -27,7 +27,6 @@
 
 package org.springframework.boot;
 
-import org.openingo.jdkits.ClassKit;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**

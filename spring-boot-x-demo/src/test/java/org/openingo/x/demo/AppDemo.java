@@ -3,7 +3,6 @@ package org.openingo.x.demo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openingo.jdkits.ClassKit;
-import org.openingo.jdkits.HashKit;
 import org.openingo.spring.extension.data.redis.RedisTemplateX;
 import org.openingo.spring.extension.data.redis.naming.DefaultKeyNamingPolicy;
 import org.openingo.spring.extension.data.redis.serializer.FstSerializer;

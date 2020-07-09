@@ -29,9 +29,6 @@ package org.openingo.x;
 
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
 
-import java.util.Collection;
-import java.util.List;
-
 /**
  * KeyNamingPolicy
  *

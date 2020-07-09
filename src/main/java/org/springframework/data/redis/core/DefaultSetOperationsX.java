@@ -27,11 +27,8 @@
 
 package org.springframework.data.redis.core;
 
-import com.sun.istack.internal.NotNull;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;

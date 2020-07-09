@@ -27,19 +27,8 @@
 
 package org.openingo.spring.annotation;
 
-import org.openingo.spring.config.ExtensionScannerConfigurer;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
-import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
-import org.springframework.core.annotation.AnnotationAttributes;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternUtils;
-import org.springframework.core.type.AnnotationMetadata;
 
 /**
  * ExtensionScanner
