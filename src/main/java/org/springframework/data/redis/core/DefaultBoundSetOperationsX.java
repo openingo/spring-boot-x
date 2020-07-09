@@ -27,12 +27,27 @@
 
 package org.springframework.data.redis.core;
 
+import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * DefaultBoundSetOperationsX
  *
  * @author Qicz
  */
-public class DefaultBoundSetOperationsX<V> extends DefaultBoundSetOperations<String, V> {
+public class DefaultBoundSetOperationsX<V> extends DefaultBoundSetOperations<String, V> implements IBoundHashOperationsX {
+
+    IKeyNamingPolicy keyNamingPolicy;
+
+    String originKey;
+
+    private String getKey(String key) {
+        return this.keyNamingPolicy.getKeyName(key);
+    }
+
+    public void setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
+        this.keyNamingPolicy = keyNamingPolicy;
+    }
 
     /**
      * Constructs a new <code>DefaultBoundSetOperations</code> instance.
@@ -42,5 +57,22 @@ public class DefaultBoundSetOperationsX<V> extends DefaultBoundSetOperations<Str
      */
     public DefaultBoundSetOperationsX(String key, RedisOperations<String, V> operations) {
         super(key, operations);
+        this.originKey = key;
+        this.rename(key);
+    }
+
+    /**
+     * Get origin Key
+     *
+     * @return origin key
+     */
+    @Override
+    public String getOriginKey() {
+        return this.originKey;
+    }
+
+    @Override
+    public void rename(String newKey) {
+        super.rename(this.getKey(newKey));
     }
 }

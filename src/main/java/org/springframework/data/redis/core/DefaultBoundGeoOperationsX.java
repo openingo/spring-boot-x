@@ -27,19 +27,30 @@
 
 package org.springframework.data.redis.core;
 
-import org.openingo.jdkits.ClassKit;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.geo.GeoResults;
+import org.springframework.data.redis.connection.RedisGeoCommands;
 
 /**
  * DefaultBoundGeoOperationsX
  *
  * @author Qicz
  */
-public class DefaultBoundGeoOperationsX<V> extends DefaultBoundGeoOperations<String, V> {
+public class DefaultBoundGeoOperationsX<V> extends DefaultBoundGeoOperations<String, V> implements IBoundHashOperationsX {
 
-    @Autowired
     IKeyNamingPolicy keyNamingPolicy;
+
+    String originKey;
+
+    private String getKey(String key) {
+        return this.keyNamingPolicy.getKeyName(key);
+    }
+
+    public DefaultBoundGeoOperationsX setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
+        this.keyNamingPolicy = keyNamingPolicy;
+        return this;
+    }
 
     /**
      * Constructs a new {@code DefaultBoundGeoOperations}.
@@ -48,7 +59,18 @@ public class DefaultBoundGeoOperationsX<V> extends DefaultBoundGeoOperations<Str
      */
     public DefaultBoundGeoOperationsX(String key, RedisOperations<String, V> operations) {
         super(key, operations);
-        this.rename(keyNamingPolicy.getKeyName(key));
+        this.originKey = key;
+        this.rename(key);
+    }
+
+    /**
+     * Get origin Key
+     *
+     * @return origin key
+     */
+    @Override
+    public String getOriginKey() {
+        return this.originKey;
     }
 
     /**
@@ -59,6 +81,11 @@ public class DefaultBoundGeoOperationsX<V> extends DefaultBoundGeoOperations<Str
      */
     @Override
     public void rename(String newKey) {
-        super.rename(keyNamingPolicy.getKeyName(newKey));
+        super.rename(this.getKey(newKey));
+    }
+
+    @Override
+    public GeoResults<RedisGeoCommands.GeoLocation<V>> radius(String key, V member, double radius) {
+        return super.radius(this.getKey(key), member, radius);
     }
 }

@@ -27,6 +27,14 @@
 
 package org.openingo.spring.extension.data.redis.naming;
 
+import org.openingo.jdkits.ListKit;
+import org.openingo.jdkits.ValidateKit;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * DefaultKeyNamingPolicy
  *
@@ -36,6 +44,26 @@ public class DefaultKeyNamingPolicy implements IKeyNamingPolicy {
 
     @Override
     public String getKeyName(String key) {
-        return key;
+        return "zzzzzz"+key;
+    }
+
+    @Override
+    public String[] getKeyNames(String... keys) {
+        if (ValidateKit.isNull(keys)) {
+            return new String[]{};
+        }
+        String[] keyNames = new String[keys.length];
+        for (int i = 0; i < keys.length; i++) {
+            keyNames[i] = this.getKeyName(keys[i]);
+        }
+        return keyNames;
+    }
+
+    @Override
+    public List<String> getKeyNames(Collection<String> keys) {
+        if (ValidateKit.isNull(keys)) {
+            return ListKit.emptyArrayList();
+        }
+        return keys.stream().map(key -> this.getKeyName(key)).collect(Collectors.toList());
     }
 }

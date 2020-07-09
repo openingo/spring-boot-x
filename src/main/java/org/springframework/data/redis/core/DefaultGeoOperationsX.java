@@ -27,6 +27,8 @@
 
 package org.springframework.data.redis.core;
 
+import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.*;
 import org.springframework.data.redis.connection.RedisGeoCommands;
 
@@ -39,6 +41,16 @@ import java.util.Map;
  * @author Qicz
  */
 public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.String, M> {
+
+    IKeyNamingPolicy keyNamingPolicy;
+
+    private String getKey(String key) {
+        return this.keyNamingPolicy.getKeyName(key);
+    }
+
+    public void setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
+        this.keyNamingPolicy = keyNamingPolicy;
+    }
 
     /**
      * Creates new {@link DefaultGeoOperations}.
@@ -61,7 +73,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public Long add(String key, Point point, M member) {
-        return super.add(key, point, member);
+        return super.add(this.getKey(key), point, member);
     }
 
     /**
@@ -75,7 +87,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public Long add(String key, RedisGeoCommands.GeoLocation<M> location) {
-        return super.add(key, location);
+        return super.add(this.getKey(key), location);
     }
 
     /**
@@ -89,7 +101,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public Long add(String key, Map<M, Point> memberCoordinateMap) {
-        return super.add(key, memberCoordinateMap);
+        return super.add(this.getKey(key), memberCoordinateMap);
     }
 
     /**
@@ -103,7 +115,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public Long add(String key, Iterable<RedisGeoCommands.GeoLocation<M>> geoLocations) {
-        return super.add(key, geoLocations);
+        return super.add(this.getKey(key), geoLocations);
     }
 
     /**
@@ -118,7 +130,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public Distance distance(String key, M member1, M member2) {
-        return super.distance(key, member1, member2);
+        return super.distance(this.getKey(key), member1, member2);
     }
 
     /**
@@ -134,7 +146,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public Distance distance(String key, M member1, M member2, Metric metric) {
-        return super.distance(key, member1, member2, metric);
+        return super.distance(this.getKey(key), member1, member2, metric);
     }
 
     /**
@@ -148,7 +160,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public List<String> hash(String key, M... members) {
-        return super.hash(key, members);
+        return super.hash(this.getKey(key), members);
     }
 
     /**
@@ -162,7 +174,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public List<Point> position(String key, M... members) {
-        return super.position(key, members);
+        return super.position(this.getKey(key), members);
     }
 
     /**
@@ -176,7 +188,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public GeoResults<RedisGeoCommands.GeoLocation<M>> radius(String key, Circle within) {
-        return super.radius(key, within);
+        return super.radius(this.getKey(key), within);
     }
 
     /**
@@ -191,7 +203,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public GeoResults<RedisGeoCommands.GeoLocation<M>> radius(String key, Circle within, RedisGeoCommands.GeoRadiusCommandArgs args) {
-        return super.radius(key, within, args);
+        return super.radius(this.getKey(key), within, args);
     }
 
     /**
@@ -207,7 +219,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public GeoResults<RedisGeoCommands.GeoLocation<M>> radius(String key, M member, double radius) {
-        return super.radius(key, member, radius);
+        return super.radius(this.getKey(key), member, radius);
     }
 
     /**
@@ -223,7 +235,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public GeoResults<RedisGeoCommands.GeoLocation<M>> radius(String key, M member, Distance distance) {
-        return super.radius(key, member, distance);
+        return super.radius(this.getKey(key), member, distance);
     }
 
     /**
@@ -240,7 +252,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public GeoResults<RedisGeoCommands.GeoLocation<M>> radius(String key, M member, Distance distance, RedisGeoCommands.GeoRadiusCommandArgs args) {
-        return super.radius(key, member, distance, args);
+        return super.radius(this.getKey(key), member, distance, args);
     }
 
     /**
@@ -253,6 +265,6 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public Long remove(String key, M... members) {
-        return super.remove(key, members);
+        return super.remove(this.getKey(key), members);
     }
 }

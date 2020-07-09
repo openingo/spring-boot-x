@@ -27,6 +27,14 @@
 
 package org.springframework.data.redis.core;
 
+import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * DefaultHashOperationsX
  *
@@ -34,7 +42,92 @@ package org.springframework.data.redis.core;
  */
 public class DefaultHashOperationsX<HK, HV> extends DefaultHashOperations<String, HK, HV> {
 
+    IKeyNamingPolicy keyNamingPolicy;
+
+    private String getKey(String key) {
+        return this.keyNamingPolicy.getKeyName(key);
+    }
+
+    public void setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
+        this.keyNamingPolicy = keyNamingPolicy;
+    }
+
     public DefaultHashOperationsX(RedisTemplate<String, ?> template) {
         super(template);
+    }
+
+    @Override
+    public Set<HK> keys(String key) {
+        return super.keys(this.getKey(key));
+    }
+
+    @Override
+    public HV get(String key, Object hashKey) {
+        return super.get(this.getKey(key), hashKey);
+    }
+
+    @Override
+    public Boolean hasKey(String key, Object hashKey) {
+        return super.hasKey(this.getKey(key), hashKey);
+    }
+
+    @Override
+    public Long increment(String key, HK hashKey, long delta) {
+        return super.increment(this.getKey(key), hashKey, delta);
+    }
+
+    @Override
+    public Double increment(String key, HK hashKey, double delta) {
+        return super.increment(this.getKey(key), hashKey, delta);
+    }
+
+    @Override
+    public Long size(String key) {
+        return super.size(this.getKey(key));
+    }
+
+    @Override
+    public Long lengthOfValue(String key, HK hashKey) {
+        return super.lengthOfValue(this.getKey(key), hashKey);
+    }
+
+    @Override
+    public void putAll(String key, Map<? extends HK, ? extends HV> m) {
+        super.putAll(this.getKey(key), m);
+    }
+
+    @Override
+    public List<HV> multiGet(String key, Collection<HK> fields) {
+        return super.multiGet(this.getKey(key), fields);
+    }
+
+    @Override
+    public void put(String key, HK hashKey, HV value) {
+        super.put(this.getKey(key), hashKey, value);
+    }
+
+    @Override
+    public Boolean putIfAbsent(String key, HK hashKey, HV value) {
+        return super.putIfAbsent(this.getKey(key), hashKey, value);
+    }
+
+    @Override
+    public List<HV> values(String key) {
+        return super.values(this.getKey(key));
+    }
+
+    @Override
+    public Long delete(String key, Object... hashKeys) {
+        return super.delete(this.getKey(key), hashKeys);
+    }
+
+    @Override
+    public Map<HK, HV> entries(String key) {
+        return super.entries(this.getKey(key));
+    }
+
+    @Override
+    public Cursor<Map.Entry<HK, HV>> scan(String key, ScanOptions options) {
+        return super.scan(this.getKey(key), options);
     }
 }

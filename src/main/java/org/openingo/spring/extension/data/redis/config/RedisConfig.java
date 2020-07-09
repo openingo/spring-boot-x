@@ -28,7 +28,11 @@
 package org.openingo.spring.extension.data.redis.config;
 
 import org.openingo.spring.extension.data.redis.RedisTemplateX;
+import org.openingo.spring.extension.data.redis.naming.DefaultKeyNamingPolicy;
+import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -45,5 +49,14 @@ public class RedisConfig {
     @Bean
     public <V> RedisTemplateX<V> redisTemplateX() {
         return new RedisTemplateX<>();
+    }
+
+    /**
+     * @return the default key naming policy
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public IKeyNamingPolicy keyNamingPolicy() {
+        return new DefaultKeyNamingPolicy();
     }
 }

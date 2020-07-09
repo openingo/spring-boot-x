@@ -27,10 +27,11 @@
 
 package org.springframework.data.redis.core;
 
+import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.RedisClusterNode;
 import org.springframework.data.redis.connection.RedisConnection;
 
-import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -39,6 +40,16 @@ import java.util.Set;
  * @author Qicz
  */
 public class DefaultClusterOperationsX<V> extends DefaultClusterOperations<String, V> {
+
+    IKeyNamingPolicy keyNamingPolicy;
+
+    private String getKey(String key) {
+        return this.keyNamingPolicy.getKeyName(key);
+    }
+
+    public void setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
+        this.keyNamingPolicy = keyNamingPolicy;
+    }
 
     /**
      * Creates new {@link DefaultClusterOperations} delegating to the given {@link RedisTemplate}.
@@ -59,6 +70,8 @@ public class DefaultClusterOperationsX<V> extends DefaultClusterOperations<Strin
      */
     @Override
     public Set<String> keys(RedisClusterNode node, String pattern) {
-        return super.keys(node, pattern);
+        // TODO valiate
+        return super.keys(node, this.getKey(pattern));
     }
+
 }

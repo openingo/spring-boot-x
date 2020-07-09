@@ -27,6 +27,9 @@
 
 package org.springframework.data.redis.core;
 
+import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * DefaultHyperLogLogOperationsX
  *
@@ -34,7 +37,36 @@ package org.springframework.data.redis.core;
  */
 public class DefaultHyperLogLogOperationsX<V> extends DefaultHyperLogLogOperations<String, V> {
 
+    IKeyNamingPolicy keyNamingPolicy;
+
+    private String getKey(String key) {
+        return this.keyNamingPolicy.getKeyName(key);
+    }
+
+    private String[] getKeys(String... keys) {
+        return this.keyNamingPolicy.getKeyNames(keys);
+    }
+
+    public void setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
+        this.keyNamingPolicy = keyNamingPolicy;
+    }
+
     public DefaultHyperLogLogOperationsX(RedisTemplate<String, V> template) {
         super(template);
+    }
+
+    @Override
+    public Long size(String... keys) {
+        return super.size(this.getKeys(keys));
+    }
+
+    @Override
+    public Long union(String destination, String... sourceKeys) {
+        return super.union(this.getKey(destination), this.getKeys(sourceKeys));
+    }
+
+    @Override
+    public void delete(String key) {
+        super.delete(this.getKey(key));
     }
 }

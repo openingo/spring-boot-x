@@ -27,6 +27,7 @@
 
 package org.openingo.spring.extension.data.redis;
 
+import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.*;
 import org.springframework.lang.Nullable;
@@ -40,6 +41,9 @@ public class RedisTemplateX<V> {
 
     @Autowired
     RedisTemplate<String, V> redisTemplate;
+
+    @Autowired
+    IKeyNamingPolicy keyNamingPolicy;
 
     // cache singleton objects (where possible)
     private @Nullable ValueOperations<String, V> valueOps;

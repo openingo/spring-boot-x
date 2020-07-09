@@ -27,6 +27,9 @@
 
 package org.openingo.spring.extension.data.redis.naming;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * IKeyNamingPolicy
  *
@@ -35,4 +38,8 @@ package org.openingo.spring.extension.data.redis.naming;
 public interface IKeyNamingPolicy {
 
     String getKeyName(String key);
+
+    String[] getKeyNames(String... keys);
+
+    List<String> getKeyNames(Collection<String> keys);
 }
