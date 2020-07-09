@@ -25,25 +25,39 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.extension.data.redis.config;
+package org.springframework.boot;
 
-import org.openingo.spring.extension.data.redis.RedisTemplateX;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.openingo.jdkits.ClassKit;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * RedisConfig
+ * SpringApplicationX
  *
  * @author Qicz
  */
-@Configuration
-@ConditionalOnClass(RedisTemplate.class)
-public class RedisConfig {
+public class SpringApplicationX extends SpringApplication {
 
-    @Bean
-    public <V> RedisTemplateX<V> redisTemplateX() {
-        return new RedisTemplateX<>();
+    private static SpringApplicationX springApplicationX;
+
+    public SpringApplicationX(Class<?>... primarySources) {
+        super(primarySources);
+    }
+
+    public static ConfigurableApplicationContext runX(Class<?> primarySource, String... args) {
+        return runX(new Class[]{primarySource}, args);
+    }
+
+    public static ConfigurableApplicationContext runX(Class<?>[] primarySources, String[] args) {
+        springApplicationX = new SpringApplicationX(primarySources);
+        return springApplicationX.run(args);
+    }
+
+    /**
+     * the SpringApplication MainApplicationClass's package name
+     *
+     * @return application's package Name
+     */
+    public String getApplicationPackage() {
+        return this.getMainApplicationClass().getPackage().getName();
     }
 }

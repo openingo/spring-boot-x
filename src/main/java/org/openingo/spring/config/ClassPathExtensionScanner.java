@@ -38,6 +38,7 @@ import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
  *
  * @author zhucongqi
  */
+@Deprecated
 public class ClassPathExtensionScanner extends ClassPathBeanDefinitionScanner {
 
     /**

@@ -25,25 +25,22 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.extension.data.redis.config;
-
-import org.openingo.spring.extension.data.redis.RedisTemplateX;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
+package org.springframework.data.redis.core;
 
 /**
- * RedisConfig
+ * DefaultBoundListOperationsX
  *
  * @author Qicz
  */
-@Configuration
-@ConditionalOnClass(RedisTemplate.class)
-public class RedisConfig {
+public class DefaultBoundListOperationsX<V> extends DefaultBoundListOperations<String, V> {
 
-    @Bean
-    public <V> RedisTemplateX<V> redisTemplateX() {
-        return new RedisTemplateX<>();
+    /**
+     * Constructs a new <code>DefaultBoundListOperations</code> instance.
+     *
+     * @param key
+     * @param operations
+     */
+    public DefaultBoundListOperationsX(String key, RedisOperations<String, V> operations) {
+        super(key, operations);
     }
 }

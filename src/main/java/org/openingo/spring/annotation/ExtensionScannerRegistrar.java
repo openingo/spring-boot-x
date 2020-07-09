@@ -44,6 +44,7 @@ import org.springframework.core.type.AnnotationMetadata;
  *
  * @author Qicz
  */
+@Deprecated
 public class ExtensionScannerRegistrar implements ImportBeanDefinitionRegistrar, ResourceLoaderAware {
 
     /**

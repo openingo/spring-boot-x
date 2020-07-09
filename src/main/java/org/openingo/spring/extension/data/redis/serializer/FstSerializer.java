@@ -44,10 +44,6 @@ import org.springframework.data.redis.serializer.SerializationException;
 @ConditionalOnClass(RedisTemplate.class)
 public class FstSerializer<T> implements ISerializer<T> {
 
-    public static FstSerializer<Object> defaultFstSerializer() {
-        return new FstSerializer<>();
-    }
-
     @Override
     public byte[] serialize(Object t) throws SerializationException {
         try {

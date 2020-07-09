@@ -27,11 +27,7 @@
 
 package org.openingo.spring.extension.config;
 
-import org.openingo.spring.extension.data.redis.RedisTemplateX;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
 
 /**
  * ExtensionConfig

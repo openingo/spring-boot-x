@@ -25,25 +25,16 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.extension.data.redis.config;
-
-import org.openingo.spring.extension.data.redis.RedisTemplateX;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
+package org.springframework.data.redis.core;
 
 /**
- * RedisConfig
+ * DefaultHyperLogLogOperationsX
  *
  * @author Qicz
  */
-@Configuration
-@ConditionalOnClass(RedisTemplate.class)
-public class RedisConfig {
+public class DefaultHyperLogLogOperationsX<V> extends DefaultHyperLogLogOperations<String, V> {
 
-    @Bean
-    public <V> RedisTemplateX<V> redisTemplateX() {
-        return new RedisTemplateX<>();
+    public DefaultHyperLogLogOperationsX(RedisTemplate<String, V> template) {
+        super(template);
     }
 }

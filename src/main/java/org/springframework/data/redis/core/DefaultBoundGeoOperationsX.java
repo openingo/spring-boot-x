@@ -25,25 +25,40 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.extension.data.redis.config;
+package org.springframework.data.redis.core;
 
-import org.openingo.spring.extension.data.redis.RedisTemplateX;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.openingo.jdkits.ClassKit;
+import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * RedisConfig
+ * DefaultBoundGeoOperationsX
  *
  * @author Qicz
  */
-@Configuration
-@ConditionalOnClass(RedisTemplate.class)
-public class RedisConfig {
+public class DefaultBoundGeoOperationsX<V> extends DefaultBoundGeoOperations<String, V> {
 
-    @Bean
-    public <V> RedisTemplateX<V> redisTemplateX() {
-        return new RedisTemplateX<>();
+    @Autowired
+    IKeyNamingPolicy keyNamingPolicy;
+
+    /**
+     * Constructs a new {@code DefaultBoundGeoOperations}.
+     *  @param key        must not be {@literal null}.
+     * @param operations must not be {@literal null}.
+     */
+    public DefaultBoundGeoOperationsX(String key, RedisOperations<String, V> operations) {
+        super(key, operations);
+        this.rename(keyNamingPolicy.getKeyName(key));
+    }
+
+    /**
+     * Renames the key. <br>
+     * <b>Note:</b> The new name for empty collections will be propagated on add of first element.
+     *
+     * @param newKey new key. Must not be {@literal null}.
+     */
+    @Override
+    public void rename(String newKey) {
+        super.rename(keyNamingPolicy.getKeyName(newKey));
     }
 }

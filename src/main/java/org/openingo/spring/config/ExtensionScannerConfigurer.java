@@ -43,6 +43,7 @@ import static org.springframework.util.Assert.notNull;
  *
  * @author Qicz
  */
+@Deprecated
 public class ExtensionScannerConfigurer implements BeanDefinitionRegistryPostProcessor, InitializingBean, ApplicationContextAware, BeanNameAware {
 
     private String extensionPackage = "org.openingo.spring.extension.*.*";

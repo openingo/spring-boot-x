@@ -25,25 +25,40 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.extension.data.redis.config;
+package org.springframework.data.redis.core;
 
-import org.openingo.spring.extension.data.redis.RedisTemplateX;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.connection.RedisClusterNode;
+import org.springframework.data.redis.connection.RedisConnection;
+
+import java.util.Collection;
+import java.util.Set;
 
 /**
- * RedisConfig
+ * DefaultClusterOperationsX
  *
  * @author Qicz
  */
-@Configuration
-@ConditionalOnClass(RedisTemplate.class)
-public class RedisConfig {
+public class DefaultClusterOperationsX<V> extends DefaultClusterOperations<String, V> {
 
-    @Bean
-    public <V> RedisTemplateX<V> redisTemplateX() {
-        return new RedisTemplateX<>();
+    /**
+     * Creates new {@link DefaultClusterOperations} delegating to the given {@link RedisTemplate}.
+     *
+     * @param template must not be {@literal null}.
+     */
+    public DefaultClusterOperationsX(RedisTemplate<String, V> template) {
+        super(template);
+    }
+
+    /**
+     * Get all keys located at given node.
+     *
+     * @param node    must not be {@literal null}.
+     * @param pattern
+     * @return never {@literal null}.
+     * @see RedisConnection#keys(byte[])
+     */
+    @Override
+    public Set<String> keys(RedisClusterNode node, String pattern) {
+        return super.keys(node, pattern);
     }
 }
