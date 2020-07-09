@@ -25,8 +25,10 @@
  * SOFTWARE.
  */
 
-package org.springframework.boot;
+package org.openingo.spring.boot;
 
+import org.openingo.spring.config.SpringApplicationConfig;
+import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
@@ -34,29 +36,18 @@ import org.springframework.context.ConfigurableApplicationContext;
  *
  * @author Qicz
  */
-public class SpringApplicationX extends SpringApplication {
+public class SpringApplicationX {
 
-    private static SpringApplicationX springApplicationX;
-
-    public SpringApplicationX(Class<?>... primarySources) {
-        super(primarySources);
+    public static SpringApplicationX run(Class<?> primarySource, String... args) {
+        return run(new Class[]{primarySource}, args);
     }
 
-    public static ConfigurableApplicationContext runX(Class<?> primarySource, String... args) {
-        return runX(new Class[]{primarySource}, args);
-    }
-
-    public static ConfigurableApplicationContext runX(Class<?>[] primarySources, String[] args) {
-        springApplicationX = new SpringApplicationX(primarySources);
-        return springApplicationX.run(args);
-    }
-
-    /**
-     * the SpringApplication MainApplicationClass's package name
-     *
-     * @return application's package Name
-     */
-    public String getApplicationPackage() {
-        return this.getMainApplicationClass().getPackage().getName();
+    public static SpringApplicationX run(Class<?>[] primarySources, String[] args) {
+        SpringApplication springApplication = new SpringApplication(primarySources);
+        ConfigurableApplicationContext applicationContext = springApplication.run(args);
+        SpringApplicationX springApplicationX = new SpringApplicationX();
+        // init application config
+        SpringApplicationConfig.init(springApplication, applicationContext);
+        return springApplicationX;
     }
 }

@@ -2,13 +2,12 @@ package org.openingo.x.demo;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openingo.jdkits.ClassKit;
+import org.openingo.spring.config.SpringApplicationConfig;
 import org.openingo.spring.extension.data.redis.RedisTemplateX;
 import org.openingo.spring.extension.data.redis.naming.DefaultKeyNamingPolicy;
 import org.openingo.spring.extension.data.redis.serializer.FstSerializer;
 import org.openingo.x.App;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplicationX;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.ContextConfiguration;
@@ -50,15 +49,6 @@ public class AppDemo {
     }
 
     @Test
-    public void testClassPackage() {
-        Class<? extends SpringApplicationX> aClass = new SpringApplicationX().getClass();
-        String name = aClass.getPackage().getName();
-        String packageName = ClassKit.getPackageName(aClass);
-        System.out.println(name);
-        System.out.println(packageName);
-    }
-
-    @Test
     public void testNaming() {
 
         List<String> keyNames = new DefaultKeyNamingPolicy().getKeyNames(Arrays.asList("a", "b"));
@@ -69,5 +59,10 @@ public class AppDemo {
     public void testFst() {
         byte[] zcqs = new FstSerializer<>().serialize("zcq");
         System.out.println(new String(zcqs));
+    }
+
+    @Test
+    public void testApplicationConfig() {
+        System.out.println(SpringApplicationConfig.applicationPackage);
     }
 }
