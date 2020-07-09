@@ -42,7 +42,6 @@ import java.io.ByteArrayOutputStream;
  *
  * @author Qicz
  */
-@ConditionalOnClass(RedisTemplate.class)
 public class FstSerializer<T> implements ISerializer<T> {
 
     @Override
