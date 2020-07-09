@@ -27,6 +27,7 @@
 
 package org.springframework.data.redis.core;
 
+import com.sun.istack.internal.NotNull;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -45,8 +46,9 @@ public class DefaultBoundListOperationsX<V> extends DefaultBoundListOperations<S
         return this.keyNamingPolicy.getKeyName(key);
     }
 
-    public void setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
+    public DefaultBoundListOperationsX<V> setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
         this.keyNamingPolicy = keyNamingPolicy;
+        return this;
     }
 
     /**

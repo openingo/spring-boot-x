@@ -27,6 +27,7 @@
 
 package org.springframework.data.redis.core;
 
+import com.sun.istack.internal.NotNull;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -52,8 +53,9 @@ public class DefaultSetOperationsX<V> extends DefaultSetOperations<String, V> {
         return this.keyNamingPolicy.getKeyNames(keys);
     }
 
-    public void setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
+    public DefaultSetOperationsX<V> setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
         this.keyNamingPolicy = keyNamingPolicy;
+        return this;
     }
 
     public DefaultSetOperationsX(RedisTemplate<String, V> template) {

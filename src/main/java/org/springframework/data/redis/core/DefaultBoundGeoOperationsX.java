@@ -27,6 +27,7 @@
 
 package org.springframework.data.redis.core;
 
+import com.sun.istack.internal.NotNull;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.GeoResults;
@@ -47,7 +48,7 @@ public class DefaultBoundGeoOperationsX<V> extends DefaultBoundGeoOperations<Str
         return this.keyNamingPolicy.getKeyName(key);
     }
 
-    public DefaultBoundGeoOperationsX setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
+    public DefaultBoundGeoOperationsX<V> setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
         this.keyNamingPolicy = keyNamingPolicy;
         return this;
     }
@@ -61,6 +62,7 @@ public class DefaultBoundGeoOperationsX<V> extends DefaultBoundGeoOperations<Str
         super(key, operations);
         this.originKey = key;
         this.rename(key);
+        keyNamingPolicy = null;
     }
 
     /**

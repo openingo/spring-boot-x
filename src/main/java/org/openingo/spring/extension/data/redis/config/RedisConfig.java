@@ -30,12 +30,15 @@ package org.openingo.spring.extension.data.redis.config;
 import org.openingo.spring.extension.data.redis.RedisTemplateX;
 import org.openingo.spring.extension.data.redis.naming.DefaultKeyNamingPolicy;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.openingo.spring.extension.data.redis.serializer.FstSerializer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
  * RedisConfig
@@ -46,9 +49,37 @@ import org.springframework.data.redis.core.RedisTemplate;
 @ConditionalOnClass(RedisTemplate.class)
 public class RedisConfig {
 
+    /**
+     * @param <V>
+     * @return the default redis template
+     */
     @Bean
+    @ConditionalOnMissingBean
     public <V> RedisTemplateX<V> redisTemplateX() {
         return new RedisTemplateX<>();
+    }
+
+    /**
+     * @param redisConnectionFactory
+     * @param <V>
+     * @return RedisTemplate using FST for values and StringRedisSerializer for keys
+     */
+    @Bean
+    public <V> RedisTemplate<String, V> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, V> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(this.valueSerializer());
+        return redisTemplate;
+    }
+
+    /**
+     * @return the default value serializer
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public <V> RedisSerializer<V> valueSerializer() {
+        return new FstSerializer<>();
     }
 
     /**

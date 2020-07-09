@@ -25,55 +25,22 @@
  * SOFTWARE.
  */
 
-package org.springframework.data.redis.core;
+package org.openingo.x;
 
-import com.sun.istack.internal.NotNull;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
- * DefaultBoundHashOperationsX
+ * KeyNamingPolicy
  *
  * @author Qicz
  */
-public class DefaultBoundHashOperationsX<HK, HV> extends DefaultBoundHashOperations<String, HK, HV> implements IBoundHashOperationsX {
-
-    IKeyNamingPolicy keyNamingPolicy;
-
-    String originKey;
-
-    private String getKey(String key) {
-        return this.keyNamingPolicy.getKeyName(key);
-    }
-
-    public DefaultBoundHashOperationsX<HK, HV> setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
-        this.keyNamingPolicy = keyNamingPolicy;
-        return this;
-    }
-
-    /**
-     * Constructs a new <code>DefaultBoundHashOperations</code> instance.
-     *
-     * @param key
-     * @param operations
-     */
-    public DefaultBoundHashOperationsX(String key, RedisOperations<String, ?> operations) {
-        super(key, operations);
-        this.originKey = key;
-        this.rename(key);
-    }
-
-    /**
-     * Get origin Key
-     * @return origin key
-     */
-    @Override
-    public String getOriginKey() {
-        return this.originKey;
-    }
+public class KeyNamingPolicy implements IKeyNamingPolicy {
 
     @Override
-    public void rename(String newKey) {
-        super.rename(this.getKey(newKey));
+    public String getKeyName(String key) {
+        return "qicz:"+key;
     }
 }

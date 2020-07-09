@@ -45,7 +45,7 @@ import org.springframework.data.redis.serializer.SerializationException;
 public class FstSerializer<T> implements ISerializer<T> {
 
     @Override
-    public byte[] serialize(Object t) throws SerializationException {
+    public byte[] serialize(T t) throws SerializationException {
         try {
             ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
             FSTObjectOutput fstOut = new FSTObjectOutput(bytesOut);

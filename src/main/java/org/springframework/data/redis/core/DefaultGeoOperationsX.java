@@ -27,6 +27,9 @@
 
 package org.springframework.data.redis.core;
 
+import com.sun.istack.internal.NotNull;
+import lombok.Data;
+import lombok.experimental.Accessors;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.*;
@@ -48,8 +51,9 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
         return this.keyNamingPolicy.getKeyName(key);
     }
 
-    public void setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
+    public DefaultGeoOperationsX<M> setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
         this.keyNamingPolicy = keyNamingPolicy;
+        return this;
     }
 
     /**

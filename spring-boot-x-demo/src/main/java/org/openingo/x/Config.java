@@ -25,55 +25,35 @@
  * SOFTWARE.
  */
 
-package org.springframework.data.redis.core;
+package org.openingo.x;
 
-import com.sun.istack.internal.NotNull;
+import org.openingo.spring.extension.data.redis.RedisTemplateX;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.openingo.spring.extension.data.redis.serializer.FstSerializer;
+import org.openingo.spring.extension.data.redis.serializer.ISerializer;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
- * DefaultBoundHashOperationsX
+ * Config
  *
  * @author Qicz
  */
-public class DefaultBoundHashOperationsX<HK, HV> extends DefaultBoundHashOperations<String, HK, HV> implements IBoundHashOperationsX {
+@Configuration
+public class Config {
 
-    IKeyNamingPolicy keyNamingPolicy;
-
-    String originKey;
-
-    private String getKey(String key) {
-        return this.keyNamingPolicy.getKeyName(key);
+    @Bean
+    public RedisSerializer<String> valueSerializer() {
+        return new StringRedisSerializer();
     }
 
-    public DefaultBoundHashOperationsX<HK, HV> setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
-        this.keyNamingPolicy = keyNamingPolicy;
-        return this;
-    }
-
-    /**
-     * Constructs a new <code>DefaultBoundHashOperations</code> instance.
-     *
-     * @param key
-     * @param operations
-     */
-    public DefaultBoundHashOperationsX(String key, RedisOperations<String, ?> operations) {
-        super(key, operations);
-        this.originKey = key;
-        this.rename(key);
-    }
-
-    /**
-     * Get origin Key
-     * @return origin key
-     */
-    @Override
-    public String getOriginKey() {
-        return this.originKey;
-    }
-
-    @Override
-    public void rename(String newKey) {
-        super.rename(this.getKey(newKey));
+    @Bean
+    public IKeyNamingPolicy keyNamingPolicy() {
+        return new KeyNamingPolicy();
     }
 }

@@ -59,70 +59,72 @@ public class RedisTemplateX<V> {
 
     public GeoOperations<String, V> opsForGeo() {
         if (this.geoOps == null) {
-            this.geoOps = new DefaultGeoOperationsX<>(this.redisTemplate);
+            this.geoOps = new DefaultGeoOperationsX<>(this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
         }
         return this.geoOps;
     }
 
     public BoundGeoOperations<String, V> boundGeoOps(String key) {
-        return new DefaultBoundGeoOperationsX<>(key, this.redisTemplate);
+        return new DefaultBoundGeoOperationsX<>(key, this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
     }
 
     public <HK, HV> BoundHashOperations<String, HK, HV> boundHashOps(String key) {
-        return new DefaultBoundHashOperationsX<>(key, this.redisTemplate);
+        DefaultBoundHashOperationsX<HK, HV> objectObjectDefaultBoundHashOperationsX = new DefaultBoundHashOperationsX<>(key, this.redisTemplate);
+        return objectObjectDefaultBoundHashOperationsX.setKeyNamingPolicy(this.keyNamingPolicy);
     }
 
     public <HK, HV> HashOperations<String, HK, HV> opsForHash() {
-        return new DefaultHashOperationsX<>(this.redisTemplate);
+        DefaultHashOperationsX<HK, HV> objectObjectDefaultHashOperationsX = new DefaultHashOperationsX<>(this.redisTemplate);
+        return objectObjectDefaultHashOperationsX.setKeyNamingPolicy(this.keyNamingPolicy);
     }
 
     public HyperLogLogOperations<String, V> opsForHyperLogLog() {
         if (this.hllOps == null) {
-            this.hllOps = new DefaultHyperLogLogOperationsX<>(this.redisTemplate);
+            this.hllOps = new DefaultHyperLogLogOperationsX<>(this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
         }
         return this.hllOps;
     }
 
     public ListOperations<String, V> opsForList() {
         if (this.listOps == null) {
-            this.listOps = new DefaultListOperationsX<>(this.redisTemplate);
+            this.listOps = new DefaultListOperationsX<>(this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
         }
         return this.listOps;
     }
 
     public BoundListOperations<String, V> boundListOps(String key) {
-        return new DefaultBoundListOperationsX<>(key, this.redisTemplate);
+        return new DefaultBoundListOperationsX<>(key, this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
     }
 
     public BoundSetOperations<String, V> boundSetOps(String key) {
-        return new DefaultBoundSetOperationsX<>(key, this.redisTemplate);
+        return new DefaultBoundSetOperationsX<>(key, this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
     }
 
     public SetOperations<String, V> opsForSet() {
         if (this.setOps == null) {
-            this.setOps = new DefaultSetOperationsX<>(this.redisTemplate);
+            this.setOps = new DefaultSetOperationsX<>(this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
         }
         return this.setOps;
     }
 
     public BoundValueOperations<String, V> boundValueOps(String key) {
-        return new DefaultBoundValueOperationsX<>(key, this.redisTemplate);
+        return new DefaultBoundValueOperationsX<>(key, this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
     }
 
     public ValueOperations<String, V> opsForValue() {
         if (this.valueOps == null) {
-            this.valueOps = new DefaultValueOperationsX<>(this.redisTemplate);
+            this.valueOps = new DefaultValueOperationsX<>(this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
         }
         return this.valueOps;
     }
 
     public BoundZSetOperations<String, V> boundZSetOps(String key) {
-        return new DefaultBoundZSetOperationsX<>(key, this.redisTemplate);
+        return new DefaultBoundZSetOperationsX<>(key, this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
     }
 
     public ZSetOperations<String, V> opsForZSet() {
         if (this.zSetOps == null) {
-            this.zSetOps = new DefaultZSetOperationsX<>(this.redisTemplate);
+            this.zSetOps = new DefaultZSetOperationsX<>(this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
         }
         return this.zSetOps;
     }

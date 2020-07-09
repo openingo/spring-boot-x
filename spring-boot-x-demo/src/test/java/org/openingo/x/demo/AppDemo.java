@@ -6,6 +6,7 @@ import org.openingo.jdkits.ClassKit;
 import org.openingo.jdkits.HashKit;
 import org.openingo.spring.extension.data.redis.RedisTemplateX;
 import org.openingo.spring.extension.data.redis.naming.DefaultKeyNamingPolicy;
+import org.openingo.spring.extension.data.redis.serializer.FstSerializer;
 import org.openingo.x.App;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplicationX;
@@ -28,7 +29,7 @@ import java.util.List;
 public class AppDemo {
 
     @Autowired
-    RedisTemplateX redisTemplateX;
+    RedisTemplateX<String> redisTemplateX;
 
     @Test
     public void ok() {
@@ -43,7 +44,8 @@ public class AppDemo {
     @Test
     public void testValue() {
         ValueOperations<String, String> valueOperations = this.redisTemplateX.opsForValue();
-        valueOperations.set("zcq", "Qicz"+ HashKit.generateSaltForSha256());
+        valueOperations.set("zcq", "Qicz");
+        valueOperations.append("zcq", "123");
         String zcq = valueOperations.get("zcq");
         System.out.println(zcq);
     }
@@ -62,5 +64,11 @@ public class AppDemo {
 
         List<String> keyNames = new DefaultKeyNamingPolicy().getKeyNames(Arrays.asList("a", "b"));
         System.out.println(keyNames);
+    }
+
+    @Test
+    public void testFst() {
+        byte[] zcqs = new FstSerializer<>().serialize("zcq");
+        System.out.println(new String(zcqs));
     }
 }
