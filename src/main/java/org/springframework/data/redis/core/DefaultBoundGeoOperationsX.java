@@ -60,7 +60,6 @@ public class DefaultBoundGeoOperationsX<V> extends DefaultBoundGeoOperations<Str
         super(key, operations);
         this.originKey = key;
         this.rename(key);
-        keyNamingPolicy = null;
     }
 
     /**
