@@ -2,7 +2,7 @@ package org.openingo.x.demo;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openingo.spring.config.SpringApplicationConfig;
+import org.openingo.spring.boot.SpringApplicationX;
 import org.openingo.spring.extension.data.redis.RedisTemplateX;
 import org.openingo.spring.extension.data.redis.naming.DefaultKeyNamingPolicy;
 import org.openingo.spring.extension.data.redis.serializer.FstSerializer;
@@ -59,10 +59,5 @@ public class AppDemo {
     public void testFst() {
         byte[] zcqs = new FstSerializer<>().serialize("zcq");
         System.out.println(new String(zcqs));
-    }
-
-    @Test
-    public void testApplicationConfig() {
-        System.out.println(SpringApplicationConfig.applicationPackage);
     }
 }

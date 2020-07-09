@@ -15,5 +15,7 @@ public class App {
 
     public static void main(String[] args) {
         SpringApplicationX.run(App.class, args);
+
+        SpringApplicationX.applicationInfo();
     }
 }
