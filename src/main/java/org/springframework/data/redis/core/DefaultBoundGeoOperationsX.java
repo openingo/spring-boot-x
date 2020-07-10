@@ -27,13 +27,9 @@
 
 package org.springframework.data.redis.core;
 
-import org.openingo.spring.extension.data.redis.RedisTemplateX;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
 import org.springframework.data.geo.GeoResults;
 import org.springframework.data.redis.connection.RedisGeoCommands;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * DefaultBoundGeoOperationsX

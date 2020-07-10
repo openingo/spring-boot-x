@@ -27,11 +27,7 @@
 
 package org.springframework.data.redis.core;
 
-import org.openingo.spring.extension.data.redis.RedisTemplateX;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * DefaultBoundListOperationsX

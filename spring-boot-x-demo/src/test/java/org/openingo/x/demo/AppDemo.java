@@ -2,7 +2,6 @@ package org.openingo.x.demo;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openingo.spring.boot.SpringApplicationX;
 import org.openingo.spring.extension.data.redis.RedisTemplateX;
 import org.openingo.spring.extension.data.redis.naming.DefaultKeyNamingPolicy;
 import org.openingo.spring.extension.data.redis.serializer.FstSerializer;

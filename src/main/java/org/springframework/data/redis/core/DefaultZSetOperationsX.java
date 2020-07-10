@@ -31,7 +31,6 @@ import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
 import org.springframework.data.redis.connection.RedisZSetCommands;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 /**
