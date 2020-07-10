@@ -31,7 +31,9 @@ import org.openingo.jdkits.ListKit;
 import org.openingo.jdkits.ValidateKit;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -41,8 +43,18 @@ import java.util.stream.Collectors;
  */
 public interface IKeyNamingPolicy {
 
+    /**
+     * Get naming key
+     * @param key
+     * @return naming key
+     */
     String getKeyName(String key);
 
+    /**
+     * Get naming keys
+     * @param keys
+     * @return naming keys
+     */
     default String[] getKeyNames(String... keys) {
         if (ValidateKit.isNull(keys)) {
             return new String[]{};
@@ -54,10 +66,28 @@ public interface IKeyNamingPolicy {
         return keyNames;
     }
 
+    /**
+     * Get naming keys
+     * @param keys
+     * @return naming keys
+     */
     default List<String> getKeyNames(Collection<String> keys) {
         if (ValidateKit.isNull(keys)) {
             return ListKit.emptyArrayList();
         }
         return keys.stream().map(this::getKeyName).collect(Collectors.toList());
+    }
+
+    /**
+     * Map keys naming
+     * @param map
+     * @return a new map, the map 's keys renamed.
+     */
+    default <V> Map<? extends String, ? extends V> mapKeyNaming(Map<? extends String, ? extends V> map) {
+        Map<String, V> mapCp = new HashMap<>(map.size());
+        map.keySet().forEach(k -> {
+            mapCp.put(this.getKeyName(k), map.get(k));
+        });
+        return mapCp;
     }
 }

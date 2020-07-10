@@ -32,7 +32,7 @@ package org.springframework.data.redis.core;
  *
  * @author Qicz
  */
-public interface IBoundHashOperationsX {
+public interface IBoundOperationsX {
 
     /**
      * Get origin Key

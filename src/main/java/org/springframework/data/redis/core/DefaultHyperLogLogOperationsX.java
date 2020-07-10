@@ -34,39 +34,32 @@ import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
  *
  * @author Qicz
  */
-public class DefaultHyperLogLogOperationsX<V> extends DefaultHyperLogLogOperations<String, V> {
+public class DefaultHyperLogLogOperationsX<V> extends DefaultHyperLogLogOperations<String, V> implements IKeyNamingPolicy {
 
     IKeyNamingPolicy keyNamingPolicy;
 
-    private String getKey(String key) {
-        return this.keyNamingPolicy.getKeyName(key);
-    }
-
-    private String[] getKeys(String... keys) {
-        return this.keyNamingPolicy.getKeyNames(keys);
-    }
-
-    public DefaultHyperLogLogOperationsX<V> setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
-        this.keyNamingPolicy = keyNamingPolicy;
-        return this;
-    }
-
-    public DefaultHyperLogLogOperationsX(RedisTemplate<String, V> template) {
+    public DefaultHyperLogLogOperationsX(RedisTemplate<String, V> template, IKeyNamingPolicy keyNamingPolicy) {
         super(template);
+        this.keyNamingPolicy = keyNamingPolicy;
     }
 
     @Override
     public Long size(String... keys) {
-        return super.size(this.getKeys(keys));
+        return super.size(this.getKeyNames(keys));
     }
 
     @Override
     public Long union(String destination, String... sourceKeys) {
-        return super.union(this.getKey(destination), this.getKeys(sourceKeys));
+        return super.union(this.getKeyName(destination), this.getKeyNames(sourceKeys));
     }
 
     @Override
     public void delete(String key) {
-        super.delete(this.getKey(key));
+        super.delete(this.getKeyName(key));
+    }
+
+    @Override
+    public String getKeyName(String key) {
+        return this.keyNamingPolicy.getKeyName(key);
     }
 }

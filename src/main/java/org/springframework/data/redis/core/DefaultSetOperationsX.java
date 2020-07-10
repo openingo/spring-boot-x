@@ -38,144 +38,137 @@ import java.util.Set;
  *
  * @author Qicz
  */
-public class DefaultSetOperationsX<V> extends DefaultSetOperations<String, V> {
+public class DefaultSetOperationsX<V> extends DefaultSetOperations<String, V> implements IKeyNamingPolicy {
 
     IKeyNamingPolicy keyNamingPolicy;
 
-    private String getKey(String key) {
-        return this.keyNamingPolicy.getKeyName(key);
-    }
-
-    private List<String> getKeys(Collection<String> keys) {
-        return this.keyNamingPolicy.getKeyNames(keys);
-    }
-
-    public DefaultSetOperationsX<V> setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
-        this.keyNamingPolicy = keyNamingPolicy;
-        return this;
-    }
-
-    public DefaultSetOperationsX(RedisTemplate<String, V> template) {
+    public DefaultSetOperationsX(RedisTemplate<String, V> template, IKeyNamingPolicy keyNamingPolicy) {
         super(template);
+        this.keyNamingPolicy = keyNamingPolicy;
     }
 
     @Override
     public Long add(String key, V... values) {
-        return super.add(this.getKey(key), values);
+        return super.add(this.getKeyName(key), values);
     }
 
     @Override
     public Set<V> difference(String key, String otherKey) {
-        return super.difference(this.getKey(key), this.getKey(otherKey));
+        return super.difference(this.getKeyName(key), this.getKeyName(otherKey));
     }
 
     @Override
     public Set<V> difference(String key, Collection<String> otherKeys) {
-        return super.difference(this.getKey(key), this.getKeys(otherKeys));
+        return super.difference(this.getKeyName(key), this.getKeyNames(otherKeys));
     }
 
     @Override
     public Long differenceAndStore(String key, String otherKey, String destKey) {
-        return super.differenceAndStore(this.getKey(key), this.getKey(otherKey), this.getKey(destKey));
+        return super.differenceAndStore(this.getKeyName(key), this.getKeyName(otherKey), this.getKeyName(destKey));
     }
 
     @Override
     public Long differenceAndStore(String key, Collection<String> otherKeys, String destKey) {
-        return super.differenceAndStore(this.getKey(key), this.getKeys(otherKeys), this.getKey(destKey));
+        return super.differenceAndStore(this.getKeyName(key), this.getKeyNames(otherKeys), this.getKeyName(destKey));
     }
 
     @Override
     public Set<V> intersect(String key, String otherKey) {
-        return super.intersect(this.getKey(key), this.getKey(otherKey));
+        return super.intersect(this.getKeyName(key), this.getKeyName(otherKey));
     }
 
     @Override
     public Set<V> intersect(String key, Collection<String> otherKeys) {
-        return super.intersect(this.getKey(key), this.getKeys(otherKeys));
+        return super.intersect(this.getKeyName(key), this.getKeyNames(otherKeys));
     }
 
     @Override
     public Long intersectAndStore(String key, String otherKey, String destKey) {
-        return super.intersectAndStore(this.getKey(key), this.getKey(otherKey), this.getKey(destKey));
+        return super.intersectAndStore(this.getKeyName(key), this.getKeyName(otherKey), this.getKeyName(destKey));
     }
 
     @Override
     public Long intersectAndStore(String key, Collection<String> otherKeys, String destKey) {
-        return super.intersectAndStore(this.getKey(key), this.getKeys(otherKeys), this.getKey(destKey));
+        return super.intersectAndStore(this.getKeyName(key), this.getKeyNames(otherKeys), this.getKeyName(destKey));
     }
 
     @Override
     public Boolean isMember(String key, Object o) {
-        return super.isMember(this.getKey(key), o);
+        return super.isMember(this.getKeyName(key), o);
     }
 
     @Override
     public Set<V> members(String key) {
-        return super.members(this.getKey(key));
+        return super.members(this.getKeyName(key));
     }
 
     @Override
     public Boolean move(String key, V value, String destKey) {
-        return super.move(this.getKey(key), value, this.getKey(destKey));
+        return super.move(this.getKeyName(key), value, this.getKeyName(destKey));
     }
 
     @Override
     public V randomMember(String key) {
-        return super.randomMember(this.getKey(key));
+        return super.randomMember(this.getKeyName(key));
     }
 
     @Override
     public Set<V> distinctRandomMembers(String key, long count) {
-        return super.distinctRandomMembers(this.getKey(key), count);
+        return super.distinctRandomMembers(this.getKeyName(key), count);
     }
 
     @Override
     public List<V> randomMembers(String key, long count) {
-        return super.randomMembers(this.getKey(key), count);
+        return super.randomMembers(this.getKeyName(key), count);
     }
 
     @Override
     public Long remove(String key, Object... values) {
-        return super.remove(this.getKey(key), values);
+        return super.remove(this.getKeyName(key), values);
     }
 
     @Override
     public V pop(String key) {
-        return super.pop(this.getKey(key));
+        return super.pop(this.getKeyName(key));
     }
 
     @Override
     public List<V> pop(String key, long count) {
-        return super.pop(this.getKey(key), count);
+        return super.pop(this.getKeyName(key), count);
     }
 
     @Override
     public Long size(String key) {
-        return super.size(this.getKey(key));
+        return super.size(this.getKeyName(key));
     }
 
     @Override
     public Set<V> union(String key, String otherKey) {
-        return super.union(this.getKey(key), this.getKey(otherKey));
+        return super.union(this.getKeyName(key), this.getKeyName(otherKey));
     }
 
     @Override
     public Set<V> union(String key, Collection<String> otherKeys) {
-        return super.union(this.getKey(key), this.getKeys(otherKeys));
+        return super.union(this.getKeyName(key), this.getKeyNames(otherKeys));
     }
 
     @Override
     public Long unionAndStore(String key, String otherKey, String destKey) {
-        return super.unionAndStore(this.getKey(key), this.getKey(otherKey), this.getKey(destKey));
+        return super.unionAndStore(this.getKeyName(key), this.getKeyName(otherKey), this.getKeyName(destKey));
     }
 
     @Override
     public Long unionAndStore(String key, Collection<String> otherKeys, String destKey) {
-        return super.unionAndStore(this.getKey(key), this.getKeys(otherKeys), this.getKey(destKey));
+        return super.unionAndStore(this.getKeyName(key), this.getKeyNames(otherKeys), this.getKeyName(destKey));
     }
 
     @Override
     public Cursor<V> scan(String key, ScanOptions options) {
-        return super.scan(this.getKey(key), options);
+        return super.scan(this.getKeyName(key), options);
+    }
+
+    @Override
+    public String getKeyName(String key) {
+        return this.keyNamingPolicy.getKeyName(key);
     }
 }

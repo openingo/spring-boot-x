@@ -39,95 +39,92 @@ import java.util.Set;
  *
  * @author Qicz
  */
-public class DefaultHashOperationsX<HK, HV> extends DefaultHashOperations<String, HK, HV> {
+public class DefaultHashOperationsX<HK, HV> extends DefaultHashOperations<String, HK, HV> implements IKeyNamingPolicy {
 
     IKeyNamingPolicy keyNamingPolicy;
 
-    private String getKey(String key) {
-        return this.keyNamingPolicy.getKeyName(key);
-    }
-
-    public DefaultHashOperationsX<HK, HV> setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
-        this.keyNamingPolicy = keyNamingPolicy;
-        return this;
-    }
-
-    public DefaultHashOperationsX(RedisTemplate<String, ?> template) {
+    public DefaultHashOperationsX(RedisTemplate<String, ?> template, IKeyNamingPolicy keyNamingPolicy) {
         super(template);
+        this.keyNamingPolicy = keyNamingPolicy;
     }
 
     @Override
     public Set<HK> keys(String key) {
-        return super.keys(this.getKey(key));
+        return super.keys(this.getKeyName(key));
     }
 
     @Override
     public HV get(String key, Object hashKey) {
-        return super.get(this.getKey(key), hashKey);
+        return super.get(this.getKeyName(key), hashKey);
     }
 
     @Override
     public Boolean hasKey(String key, Object hashKey) {
-        return super.hasKey(this.getKey(key), hashKey);
+        return super.hasKey(this.getKeyName(key), hashKey);
     }
 
     @Override
     public Long increment(String key, HK hashKey, long delta) {
-        return super.increment(this.getKey(key), hashKey, delta);
+        return super.increment(this.getKeyName(key), hashKey, delta);
     }
 
     @Override
     public Double increment(String key, HK hashKey, double delta) {
-        return super.increment(this.getKey(key), hashKey, delta);
+        return super.increment(this.getKeyName(key), hashKey, delta);
     }
 
     @Override
     public Long size(String key) {
-        return super.size(this.getKey(key));
+        return super.size(this.getKeyName(key));
     }
 
     @Override
     public Long lengthOfValue(String key, HK hashKey) {
-        return super.lengthOfValue(this.getKey(key), hashKey);
+        return super.lengthOfValue(this.getKeyName(key), hashKey);
     }
 
     @Override
     public void putAll(String key, Map<? extends HK, ? extends HV> m) {
-        super.putAll(this.getKey(key), m);
+        super.putAll(this.getKeyName(key), m);
     }
 
     @Override
     public List<HV> multiGet(String key, Collection<HK> fields) {
-        return super.multiGet(this.getKey(key), fields);
+        return super.multiGet(this.getKeyName(key), fields);
     }
 
     @Override
     public void put(String key, HK hashKey, HV value) {
-        super.put(this.getKey(key), hashKey, value);
+        super.put(this.getKeyName(key), hashKey, value);
     }
 
     @Override
     public Boolean putIfAbsent(String key, HK hashKey, HV value) {
-        return super.putIfAbsent(this.getKey(key), hashKey, value);
+        return super.putIfAbsent(this.getKeyName(key), hashKey, value);
     }
 
     @Override
     public List<HV> values(String key) {
-        return super.values(this.getKey(key));
+        return super.values(this.getKeyName(key));
     }
 
     @Override
     public Long delete(String key, Object... hashKeys) {
-        return super.delete(this.getKey(key), hashKeys);
+        return super.delete(this.getKeyName(key), hashKeys);
     }
 
     @Override
     public Map<HK, HV> entries(String key) {
-        return super.entries(this.getKey(key));
+        return super.entries(this.getKeyName(key));
     }
 
     @Override
     public Cursor<Map.Entry<HK, HV>> scan(String key, ScanOptions options) {
-        return super.scan(this.getKey(key), options);
+        return super.scan(this.getKeyName(key), options);
+    }
+
+    @Override
+    public String getKeyName(String key) {
+        return this.keyNamingPolicy.getKeyName(key);
     }
 }

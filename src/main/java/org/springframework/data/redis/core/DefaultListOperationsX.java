@@ -38,130 +38,127 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Qicz
  */
-public class DefaultListOperationsX<V> extends DefaultListOperations<String, V> {
+public class DefaultListOperationsX<V> extends DefaultListOperations<String, V> implements IKeyNamingPolicy {
 
     IKeyNamingPolicy keyNamingPolicy;
 
-    private String getKey(String key) {
-        return this.keyNamingPolicy.getKeyName(key);
-    }
-
-    public DefaultListOperationsX<V> setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
-        this.keyNamingPolicy = keyNamingPolicy;
-        return this;
-    }
-
-    public DefaultListOperationsX(RedisTemplate<String, V> template) {
+    public DefaultListOperationsX(RedisTemplate<String, V> template, IKeyNamingPolicy keyNamingPolicy) {
         super(template);
+        this.keyNamingPolicy = keyNamingPolicy;
     }
 
     @Override
     public V index(String key, long index) {
-        return super.index(this.getKey(key), index);
+        return super.index(this.getKeyName(key), index);
     }
 
     @Override
     public V leftPop(String key) {
-        return super.leftPop(this.getKey(key));
+        return super.leftPop(this.getKeyName(key));
     }
 
     @Override
     public V leftPop(String key, long timeout, TimeUnit unit) {
-        return super.leftPop(this.getKey(key), timeout, unit);
+        return super.leftPop(this.getKeyName(key), timeout, unit);
     }
 
     @Override
     public Long leftPush(String key, V value) {
-        return super.leftPush(this.getKey(key), value);
+        return super.leftPush(this.getKeyName(key), value);
     }
 
     @Override
     public Long leftPushAll(String key, V... values) {
-        return super.leftPushAll(this.getKey(key), values);
+        return super.leftPushAll(this.getKeyName(key), values);
     }
 
     @Override
     public Long leftPushAll(String key, Collection<V> values) {
-        return super.leftPushAll(this.getKey(key), values);
+        return super.leftPushAll(this.getKeyName(key), values);
     }
 
     @Override
     public Long leftPushIfPresent(String key, V value) {
-        return super.leftPushIfPresent(this.getKey(key), value);
+        return super.leftPushIfPresent(this.getKeyName(key), value);
     }
 
     @Override
     public Long leftPush(String key, V pivot, V value) {
-        return super.leftPush(this.getKey(key), pivot, value);
+        return super.leftPush(this.getKeyName(key), pivot, value);
     }
 
     @Override
     public Long size(String key) {
-        return super.size(this.getKey(key));
+        return super.size(this.getKeyName(key));
     }
 
     @Override
     public List<V> range(String key, long start, long end) {
-        return super.range(this.getKey(key), start, end);
+        return super.range(this.getKeyName(key), start, end);
     }
 
     @Override
     public Long remove(String key, long count, Object value) {
-        return super.remove(this.getKey(key), count, value);
+        return super.remove(this.getKeyName(key), count, value);
     }
 
     @Override
     public V rightPop(String key) {
-        return super.rightPop(this.getKey(key));
+        return super.rightPop(this.getKeyName(key));
     }
 
     @Override
     public V rightPop(String key, long timeout, TimeUnit unit) {
-        return super.rightPop(this.getKey(key), timeout, unit);
+        return super.rightPop(this.getKeyName(key), timeout, unit);
     }
 
     @Override
     public Long rightPush(String key, V value) {
-        return super.rightPush(this.getKey(key), value);
+        return super.rightPush(this.getKeyName(key), value);
     }
 
     @Override
     public Long rightPushAll(String key, V... values) {
-        return super.rightPushAll(this.getKey(key), values);
+        return super.rightPushAll(this.getKeyName(key), values);
     }
 
     @Override
     public Long rightPushAll(String key, Collection<V> values) {
-        return super.rightPushAll(this.getKey(key), values);
+        return super.rightPushAll(this.getKeyName(key), values);
     }
 
     @Override
     public Long rightPushIfPresent(String key, V value) {
-        return super.rightPushIfPresent(this.getKey(key), value);
+        return super.rightPushIfPresent(this.getKeyName(key), value);
     }
 
     @Override
     public Long rightPush(String key, V pivot, V value) {
-        return super.rightPush(this.getKey(key), pivot, value);
+        return super.rightPush(this.getKeyName(key), pivot, value);
     }
 
     @Override
     public V rightPopAndLeftPush(String sourceKey, String destinationKey) {
-        return super.rightPopAndLeftPush(this.getKey(sourceKey), this.getKey(destinationKey));
+        return super.rightPopAndLeftPush(this.getKeyName(sourceKey), this.getKeyName(destinationKey));
     }
 
     @Override
     public V rightPopAndLeftPush(String sourceKey, String destinationKey, long timeout, TimeUnit unit) {
-        return super.rightPopAndLeftPush(this.getKey(sourceKey), this.getKey(destinationKey), timeout, unit);
+        return super.rightPopAndLeftPush(this.getKeyName(sourceKey), this.getKeyName(destinationKey), timeout, unit);
     }
 
     @Override
     public void set(String key, long index, V value) {
-        super.set(this.getKey(key), index, value);
+        super.set(this.getKeyName(key), index, value);
     }
 
     @Override
     public void trim(String key, long start, long end) {
-        super.trim(this.getKey(key), start, end);
+        super.trim(this.getKeyName(key), start, end);
+    }
+
+    @Override
+    public String getKeyName(String key) {
+        return this.keyNamingPolicy.getKeyName(key);
     }
 }

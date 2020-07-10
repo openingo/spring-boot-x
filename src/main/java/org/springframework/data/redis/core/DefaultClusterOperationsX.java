@@ -38,26 +38,19 @@ import java.util.Set;
  *
  * @author Qicz
  */
-public class DefaultClusterOperationsX<V> extends DefaultClusterOperations<String, V> {
+public class DefaultClusterOperationsX<V> extends DefaultClusterOperations<String, V> implements IKeyNamingPolicy  {
 
     IKeyNamingPolicy keyNamingPolicy;
-
-    private String getKey(String key) {
-        return this.keyNamingPolicy.getKeyName(key);
-    }
-
-    public DefaultClusterOperationsX<V> setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
-        this.keyNamingPolicy = keyNamingPolicy;
-        return this;
-    }
 
     /**
      * Creates new {@link DefaultClusterOperations} delegating to the given {@link RedisTemplate}.
      *
      * @param template must not be {@literal null}.
+     * @param keyNamingPolicy key naming policy
      */
-    public DefaultClusterOperationsX(RedisTemplate<String, V> template) {
+    public DefaultClusterOperationsX(RedisTemplate<String, V> template, IKeyNamingPolicy keyNamingPolicy) {
         super(template);
+        this.keyNamingPolicy = keyNamingPolicy;
     }
 
     /**
@@ -71,7 +64,11 @@ public class DefaultClusterOperationsX<V> extends DefaultClusterOperations<Strin
     @Override
     public Set<String> keys(RedisClusterNode node, String pattern) {
         // TODO valiate
-        return super.keys(node, this.getKey(pattern));
+        return super.keys(node, this.getKeyName(pattern));
     }
 
+    @Override
+    public String getKeyName(String key) {
+        return this.keyNamingPolicy.getKeyName(key);
+    }
 }

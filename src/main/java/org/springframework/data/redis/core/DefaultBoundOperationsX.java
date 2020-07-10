@@ -34,29 +34,22 @@ import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
  *
  * @author Qicz
  */
-public class DefaultBoundHashOperationsX<HK, HV> extends DefaultBoundHashOperations<String, HK, HV> implements IBoundHashOperationsX {
+public class DefaultBoundOperationsX<HK, HV> extends DefaultBoundHashOperations<String, HK, HV> implements IBoundOperationsX, IKeyNamingPolicy  {
 
     IKeyNamingPolicy keyNamingPolicy;
 
     String originKey;
-
-    private String getKey(String key) {
-        return this.keyNamingPolicy.getKeyName(key);
-    }
-
-    public DefaultBoundHashOperationsX<HK, HV> setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
-        this.keyNamingPolicy = keyNamingPolicy;
-        return this;
-    }
 
     /**
      * Constructs a new <code>DefaultBoundHashOperations</code> instance.
      *
      * @param key
      * @param operations
+     * @param keyNamingPolicy key naming policy
      */
-    public DefaultBoundHashOperationsX(String key, RedisOperations<String, ?> operations) {
+    public DefaultBoundOperationsX(String key, RedisOperations<String, ?> operations, IKeyNamingPolicy keyNamingPolicy) {
         super(key, operations);
+        this.keyNamingPolicy = keyNamingPolicy;
         this.originKey = key;
         this.rename(key);
     }
@@ -72,6 +65,11 @@ public class DefaultBoundHashOperationsX<HK, HV> extends DefaultBoundHashOperati
 
     @Override
     public void rename(String newKey) {
-        super.rename(this.getKey(newKey));
+        super.rename(this.getKeyName(newKey));
+    }
+
+    @Override
+    public String getKeyName(String key) {
+        return this.keyNamingPolicy.getKeyName(key);
     }
 }

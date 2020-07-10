@@ -32,6 +32,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.*;
 import org.springframework.lang.Nullable;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * RedisTemplateX< String, V>
  *
@@ -55,77 +58,75 @@ public class RedisTemplateX<V> {
     private @Nullable HyperLogLogOperations<String, V> hllOps;
 
     public ClusterOperations<String, V> opsForCluster() {
-        return new DefaultClusterOperationsX<>(this.redisTemplate);
+        return new DefaultClusterOperationsX<>(this.redisTemplate, this.keyNamingPolicy);
     }
 
     public GeoOperations<String, V> opsForGeo() {
         if (this.geoOps == null) {
-            this.geoOps = new DefaultGeoOperationsX<>(this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
+            this.geoOps = new DefaultGeoOperationsX<>(this.redisTemplate, this.keyNamingPolicy);
         }
         return this.geoOps;
     }
 
     public BoundGeoOperations<String, V> boundGeoOps(String key) {
-        return new DefaultBoundGeoOperationsX<>(key, this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
+        return new DefaultBoundGeoOperationsX<>(key, this.redisTemplate, this.keyNamingPolicy);
     }
 
     public <HK, HV> BoundHashOperations<String, HK, HV> boundHashOps(String key) {
-        DefaultBoundHashOperationsX<HK, HV> objectObjectDefaultBoundHashOperationsX = new DefaultBoundHashOperationsX<>(key, this.redisTemplate);
-        return objectObjectDefaultBoundHashOperationsX.setKeyNamingPolicy(this.keyNamingPolicy);
+        return new DefaultBoundOperationsX<>(key, this.redisTemplate, this.keyNamingPolicy);
     }
 
     public <HK, HV> HashOperations<String, HK, HV> opsForHash() {
-        DefaultHashOperationsX<HK, HV> objectObjectDefaultHashOperationsX = new DefaultHashOperationsX<>(this.redisTemplate);
-        return objectObjectDefaultHashOperationsX.setKeyNamingPolicy(this.keyNamingPolicy);
+        return new DefaultHashOperationsX<>(this.redisTemplate, this.keyNamingPolicy);
     }
 
     public HyperLogLogOperations<String, V> opsForHyperLogLog() {
         if (this.hllOps == null) {
-            this.hllOps = new DefaultHyperLogLogOperationsX<>(this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
+            this.hllOps = new DefaultHyperLogLogOperationsX<>(this.redisTemplate, this.keyNamingPolicy);
         }
         return this.hllOps;
     }
 
     public ListOperations<String, V> opsForList() {
         if (this.listOps == null) {
-            this.listOps = new DefaultListOperationsX<>(this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
+            this.listOps = new DefaultListOperationsX<>(this.redisTemplate, this.keyNamingPolicy);
         }
         return this.listOps;
     }
 
     public BoundListOperations<String, V> boundListOps(String key) {
-        return new DefaultBoundListOperationsX<>(key, this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
+        return new DefaultBoundListOperationsX<>(key, this.redisTemplate, this.keyNamingPolicy);
     }
 
     public BoundSetOperations<String, V> boundSetOps(String key) {
-        return new DefaultBoundSetOperationsX<>(key, this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
+        return new DefaultBoundSetOperationsX<>(key, this.redisTemplate, this.keyNamingPolicy);
     }
 
     public SetOperations<String, V> opsForSet() {
         if (this.setOps == null) {
-            this.setOps = new DefaultSetOperationsX<>(this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
+            this.setOps = new DefaultSetOperationsX<>(this.redisTemplate, this.keyNamingPolicy);
         }
         return this.setOps;
     }
 
     public BoundValueOperations<String, V> boundValueOps(String key) {
-        return new DefaultBoundValueOperationsX<>(key, this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
+        return new DefaultBoundValueOperationsX<>(key, this.redisTemplate, this.keyNamingPolicy);
     }
 
     public ValueOperations<String, V> opsForValue() {
         if (this.valueOps == null) {
-            this.valueOps = new DefaultValueOperationsX<>(this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
+            this.valueOps = new DefaultValueOperationsX<>(this.redisTemplate, this.keyNamingPolicy);
         }
         return this.valueOps;
     }
 
     public BoundZSetOperations<String, V> boundZSetOps(String key) {
-        return new DefaultBoundZSetOperationsX<>(key, this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
+        return new DefaultBoundZSetOperationsX<>(key, this.redisTemplate, this.keyNamingPolicy);
     }
 
     public ZSetOperations<String, V> opsForZSet() {
         if (this.zSetOps == null) {
-            this.zSetOps = new DefaultZSetOperationsX<>(this.redisTemplate).setKeyNamingPolicy(this.keyNamingPolicy);
+            this.zSetOps = new DefaultZSetOperationsX<>(this.redisTemplate, this.keyNamingPolicy);
         }
         return this.zSetOps;
     }

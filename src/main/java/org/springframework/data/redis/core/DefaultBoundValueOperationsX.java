@@ -34,29 +34,22 @@ import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
  *
  * @author Qicz
  */
-public class DefaultBoundValueOperationsX<V> extends DefaultBoundValueOperations<String, V> implements IBoundHashOperationsX{
+public class DefaultBoundValueOperationsX<V> extends DefaultBoundValueOperations<String, V> implements IBoundOperationsX, IKeyNamingPolicy  {
 
     IKeyNamingPolicy keyNamingPolicy;
 
     String originKey;
-
-    private String getKey(String key) {
-        return this.keyNamingPolicy.getKeyName(key);
-    }
-
-    public DefaultBoundValueOperationsX<V> setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
-        this.keyNamingPolicy = keyNamingPolicy;
-        return this;
-    }
 
     /**
      * Constructs a new {@link DefaultBoundValueOperations} instance.
      *
      * @param key
      * @param operations
+     * @param keyNamingPolicy key naming policy
      */
-    public DefaultBoundValueOperationsX(String key, RedisOperations<String, V> operations) {
+    public DefaultBoundValueOperationsX(String key, RedisOperations<String, V> operations, IKeyNamingPolicy keyNamingPolicy) {
         super(key, operations);
+        this.keyNamingPolicy = keyNamingPolicy;
         this.originKey = key;
         this.rename(key);
     }
@@ -73,6 +66,11 @@ public class DefaultBoundValueOperationsX<V> extends DefaultBoundValueOperations
 
     @Override
     public void rename(String newKey) {
-        super.rename(this.getKey(newKey));
+        super.rename(this.getKeyName(newKey));
+    }
+
+    @Override
+    public String getKeyName(String key) {
+        return this.keyNamingPolicy.getKeyName(key);
     }
 }

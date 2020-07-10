@@ -39,26 +39,19 @@ import java.util.Map;
  *
  * @author Qicz
  */
-public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.String, M> {
+public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.String, M> implements IKeyNamingPolicy {
 
     IKeyNamingPolicy keyNamingPolicy;
-
-    private String getKey(String key) {
-        return this.keyNamingPolicy.getKeyName(key);
-    }
-
-    public DefaultGeoOperationsX<M> setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
-        this.keyNamingPolicy = keyNamingPolicy;
-        return this;
-    }
 
     /**
      * Creates new {@link DefaultGeoOperations}.
      *
      * @param template must not be {@literal null}.
+     * @param keyNamingPolicy key naming policy
      */
-    public DefaultGeoOperationsX(RedisTemplate<String, M> template) {
+    public DefaultGeoOperationsX(RedisTemplate<String, M> template, IKeyNamingPolicy keyNamingPolicy) {
         super(template);
+        this.keyNamingPolicy = keyNamingPolicy;
     }
 
     /**
@@ -73,7 +66,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public Long add(String key, Point point, M member) {
-        return super.add(this.getKey(key), point, member);
+        return super.add(this.getKeyName(key), point, member);
     }
 
     /**
@@ -87,7 +80,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public Long add(String key, RedisGeoCommands.GeoLocation<M> location) {
-        return super.add(this.getKey(key), location);
+        return super.add(this.getKeyName(key), location);
     }
 
     /**
@@ -101,7 +94,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public Long add(String key, Map<M, Point> memberCoordinateMap) {
-        return super.add(this.getKey(key), memberCoordinateMap);
+        return super.add(this.getKeyName(key), memberCoordinateMap);
     }
 
     /**
@@ -115,7 +108,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public Long add(String key, Iterable<RedisGeoCommands.GeoLocation<M>> geoLocations) {
-        return super.add(this.getKey(key), geoLocations);
+        return super.add(this.getKeyName(key), geoLocations);
     }
 
     /**
@@ -130,7 +123,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public Distance distance(String key, M member1, M member2) {
-        return super.distance(this.getKey(key), member1, member2);
+        return super.distance(this.getKeyName(key), member1, member2);
     }
 
     /**
@@ -146,7 +139,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public Distance distance(String key, M member1, M member2, Metric metric) {
-        return super.distance(this.getKey(key), member1, member2, metric);
+        return super.distance(this.getKeyName(key), member1, member2, metric);
     }
 
     /**
@@ -160,7 +153,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public List<String> hash(String key, M... members) {
-        return super.hash(this.getKey(key), members);
+        return super.hash(this.getKeyName(key), members);
     }
 
     /**
@@ -174,7 +167,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public List<Point> position(String key, M... members) {
-        return super.position(this.getKey(key), members);
+        return super.position(this.getKeyName(key), members);
     }
 
     /**
@@ -188,7 +181,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public GeoResults<RedisGeoCommands.GeoLocation<M>> radius(String key, Circle within) {
-        return super.radius(this.getKey(key), within);
+        return super.radius(this.getKeyName(key), within);
     }
 
     /**
@@ -203,7 +196,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public GeoResults<RedisGeoCommands.GeoLocation<M>> radius(String key, Circle within, RedisGeoCommands.GeoRadiusCommandArgs args) {
-        return super.radius(this.getKey(key), within, args);
+        return super.radius(this.getKeyName(key), within, args);
     }
 
     /**
@@ -219,7 +212,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public GeoResults<RedisGeoCommands.GeoLocation<M>> radius(String key, M member, double radius) {
-        return super.radius(this.getKey(key), member, radius);
+        return super.radius(this.getKeyName(key), member, radius);
     }
 
     /**
@@ -235,7 +228,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public GeoResults<RedisGeoCommands.GeoLocation<M>> radius(String key, M member, Distance distance) {
-        return super.radius(this.getKey(key), member, distance);
+        return super.radius(this.getKeyName(key), member, distance);
     }
 
     /**
@@ -252,7 +245,7 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public GeoResults<RedisGeoCommands.GeoLocation<M>> radius(String key, M member, Distance distance, RedisGeoCommands.GeoRadiusCommandArgs args) {
-        return super.radius(this.getKey(key), member, distance, args);
+        return super.radius(this.getKeyName(key), member, distance, args);
     }
 
     /**
@@ -265,6 +258,11 @@ public class DefaultGeoOperationsX<M> extends DefaultGeoOperations<java.lang.Str
      */
     @Override
     public Long remove(String key, M... members) {
-        return super.remove(this.getKey(key), members);
+        return super.remove(this.getKeyName(key), members);
+    }
+
+    @Override
+    public String getKeyName(String key) {
+        return this.keyNamingPolicy.getKeyName(key);
     }
 }

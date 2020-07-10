@@ -27,37 +27,34 @@
 
 package org.springframework.data.redis.core;
 
+import org.openingo.spring.extension.data.redis.RedisTemplateX;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
 import org.springframework.data.geo.GeoResults;
 import org.springframework.data.redis.connection.RedisGeoCommands;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * DefaultBoundGeoOperationsX
  *
  * @author Qicz
  */
-public class DefaultBoundGeoOperationsX<V> extends DefaultBoundGeoOperations<String, V> implements IBoundHashOperationsX {
+public class DefaultBoundGeoOperationsX<V> extends DefaultBoundGeoOperations<String, V> implements IBoundOperationsX, IKeyNamingPolicy {
 
     IKeyNamingPolicy keyNamingPolicy;
 
     String originKey;
 
-    private String getKey(String key) {
-        return this.keyNamingPolicy.getKeyName(key);
-    }
-
-    public DefaultBoundGeoOperationsX<V> setKeyNamingPolicy(IKeyNamingPolicy keyNamingPolicy) {
-        this.keyNamingPolicy = keyNamingPolicy;
-        return this;
-    }
-
     /**
      * Constructs a new {@code DefaultBoundGeoOperations}.
      *  @param key        must not be {@literal null}.
      * @param operations must not be {@literal null}.
+     * @param keyNamingPolicy
      */
-    public DefaultBoundGeoOperationsX(String key, RedisOperations<String, V> operations) {
+    public DefaultBoundGeoOperationsX(String key, RedisOperations<String, V> operations, IKeyNamingPolicy keyNamingPolicy) {
         super(key, operations);
+        this.keyNamingPolicy = keyNamingPolicy;
         this.originKey = key;
         this.rename(key);
     }
@@ -80,11 +77,16 @@ public class DefaultBoundGeoOperationsX<V> extends DefaultBoundGeoOperations<Str
      */
     @Override
     public void rename(String newKey) {
-        super.rename(this.getKey(newKey));
+        super.rename(this.getKeyName(newKey));
     }
 
     @Override
     public GeoResults<RedisGeoCommands.GeoLocation<V>> radius(String key, V member, double radius) {
-        return super.radius(this.getKey(key), member, radius);
+        return super.radius(this.getKeyName(key), member, radius);
+    }
+
+    @Override
+    public String getKeyName(String key) {
+        return this.keyNamingPolicy.getKeyName(key);
     }
 }
