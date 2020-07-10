@@ -31,18 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.openingo.jdkits.JacksonKit;
 import org.openingo.jdkits.SystemClockKit;
 import org.openingo.spring.boot.SpringApplicationX;
-import org.openingo.spring.constants.Constants;
 import org.openingo.spring.extension.http.reporter.HttpRequestReporter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ansi.AnsiColor;
-import org.springframework.boot.ansi.AnsiOutput;
-import org.springframework.boot.ansi.AnsiStyle;
-import org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.stereotype.Component;
@@ -52,8 +42,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Map;
 
 /**
@@ -108,6 +96,5 @@ public class HttpRequestInterceptor implements HandlerInterceptor {
         } finally {
             this.httpRequestTimer.remove();
         }
-
     }
 }
