@@ -25,22 +25,19 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.annotation;
+package org.openingo.x.demo;
 
-import org.openingo.spring.constants.PackageConstants;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.aspectj.lang.annotation.Pointcut;
 
 /**
- * ExtensionScanner
+ * DyClass
  *
  * @author Qicz
  */
-@Configuration
-@ComponentScan(PackageConstants.EXTENSION_PACKAGE)
-public class ExtensionScanner {
+public class DyClass {
 
-    public ExtensionScanner() {
-        System.out.println("😁"+this.getClass());
+    @Pointcut
+    public void dy() {
+        System.out.println("dy invoking...😝");
     }
 }

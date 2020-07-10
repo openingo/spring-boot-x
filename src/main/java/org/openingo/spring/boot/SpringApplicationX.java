@@ -29,6 +29,7 @@ package org.openingo.spring.boot;
 
 import org.openingo.spring.constants.EnvsConstants;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.SpringBootVersion;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -108,7 +109,17 @@ public final class SpringApplicationX {
     /**
      * Spring Application mainApplicationClass's package name
      */
-    public static String applicationPackage = null;
+    public static String applicationPackage = "org.opening.x";
+
+    /**
+     * Spring Boot Version
+     */
+    public static String springBootVersion = SpringBootVersion.getVersion();
+
+    /**
+     * Spring Boot Version
+     */
+    public static String springBootVersionX = SpringBootVersionX.getVersion();
 
     /**
      * check current spring application active profile contain 'debug/dev' or not

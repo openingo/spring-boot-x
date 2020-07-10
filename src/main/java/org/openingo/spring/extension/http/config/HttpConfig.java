@@ -25,22 +25,27 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.annotation;
+package org.openingo.spring.extension.http.config;
 
-import org.openingo.spring.constants.PackageConstants;
-import org.springframework.context.annotation.ComponentScan;
+import org.openingo.spring.extension.http.interceptor.HttpRequestInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * ExtensionScanner
+ * HttpConfig
  *
  * @author Qicz
  */
 @Configuration
-@ComponentScan(PackageConstants.EXTENSION_PACKAGE)
-public class ExtensionScanner {
+public class HttpConfig implements WebMvcConfigurer {
 
-    public ExtensionScanner() {
-        System.out.println("😁"+this.getClass());
+    @Autowired
+    HttpRequestInterceptor httpRequestInterceptor;
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(this.httpRequestInterceptor).addPathPatterns("/**");
     }
 }

@@ -25,22 +25,23 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.annotation;
+package org.openingo.x.controller;
 
-import org.openingo.spring.constants.PackageConstants;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.openingo.x.entity.User;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
- * ExtensionScanner
+ * UserController
  *
  * @author Qicz
  */
-@Configuration
-@ComponentScan(PackageConstants.EXTENSION_PACKAGE)
-public class ExtensionScanner {
+@RestController
+public class UserController {
 
-    public ExtensionScanner() {
-        System.out.println("😁"+this.getClass());
+    @GetMapping("/user")
+    public String user(@RequestBody User user) {
+        return "ok";
     }
 }

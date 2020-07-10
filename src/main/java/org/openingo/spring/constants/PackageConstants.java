@@ -25,22 +25,17 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.annotation;
-
-import org.openingo.spring.constants.PackageConstants;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+package org.openingo.spring.constants;
 
 /**
- * ExtensionScanner
+ * PackageConstants
  *
  * @author Qicz
  */
-@Configuration
-@ComponentScan(PackageConstants.EXTENSION_PACKAGE)
-public class ExtensionScanner {
+public final class PackageConstants {
 
-    public ExtensionScanner() {
-        System.out.println("😁"+this.getClass());
-    }
+    private PackageConstants(){}
+
+    // extension package
+    public static final String EXTENSION_PACKAGE = "org.openingo.spring.extension";
 }

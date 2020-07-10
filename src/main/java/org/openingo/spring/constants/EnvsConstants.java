@@ -34,6 +34,8 @@ package org.openingo.spring.constants;
  */
 public final class EnvsConstants {
 
+    private EnvsConstants(){}
+
     // debug profile: application-debug.yml
     public final static String DEBUG = "debug";
 

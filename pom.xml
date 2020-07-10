@@ -66,7 +66,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <spring-boot.version>2.1.8.RELEASE</spring-boot.version>
         <lombok.version>1.18.8</lombok.version>
-        <jdkits.version>2.0</jdkits.version>
+        <jdkits.version>2.0.1</jdkits.version>
         <fst.version>2.57</fst.version>
     </properties>
 
@@ -123,6 +123,16 @@
         <dependency>
             <groupId>de.ruedigermoeller</groupId>
             <artifactId>fst</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -206,6 +216,19 @@
                     <useReleaseProfile>false</useReleaseProfile>
                     <releaseProfiles>release</releaseProfiles>
                     <goals>deploy</goals>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Implementation-Title>${project.name}</Implementation-Title>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                            <Built-By>Qicz: zcq@openingo.org</Built-By>
+                        </manifestEntries>
+                    </archive>
                 </configuration>
             </plugin>
         </plugins>

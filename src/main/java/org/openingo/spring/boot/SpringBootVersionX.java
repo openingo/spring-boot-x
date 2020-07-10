@@ -25,22 +25,21 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.annotation;
+package org.openingo.spring.boot;
 
-import org.openingo.spring.constants.PackageConstants;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+public final class SpringBootVersionX {
 
-/**
- * ExtensionScanner
- *
- * @author Qicz
- */
-@Configuration
-@ComponentScan(PackageConstants.EXTENSION_PACKAGE)
-public class ExtensionScanner {
+	private SpringBootVersionX() {
+	}
 
-    public ExtensionScanner() {
-        System.out.println("😁"+this.getClass());
-    }
+	/**
+	 * Return the full version string of the present Spring Boot codebase, or {@code null}
+	 * if it cannot be determined.
+	 * @return the version of Spring Boot or {@code null}
+	 * @see Package#getImplementationVersion()
+	 */
+	public static String getVersion() {
+		Package pkg = SpringBootVersionX.class.getPackage();
+		return (pkg != null) ? pkg.getImplementationVersion() : null;
+	}
 }

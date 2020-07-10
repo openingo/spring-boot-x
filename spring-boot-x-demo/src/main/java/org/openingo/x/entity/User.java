@@ -25,22 +25,17 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.annotation;
+package org.openingo.x.entity;
 
-import org.openingo.spring.constants.PackageConstants;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import lombok.Data;
 
 /**
- * ExtensionScanner
+ * User
  *
  * @author Qicz
  */
-@Configuration
-@ComponentScan(PackageConstants.EXTENSION_PACKAGE)
-public class ExtensionScanner {
+@Data
+public class User {
 
-    public ExtensionScanner() {
-        System.out.println("😁"+this.getClass());
-    }
+    String name;
 }
