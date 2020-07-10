@@ -28,6 +28,7 @@
 package org.openingo.spring.extension.http.interceptor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.openingo.spring.boot.SpringApplicationX;
 import org.openingo.spring.extension.http.reporter.HttpRequestReporter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
@@ -48,7 +49,7 @@ public class HttpRequestInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        return true;
+        return ((HandlerMethod) handler).getBean().getClass().getPackage().getName().contains(SpringApplicationX.applicationPackage);
     }
 
     @Override
