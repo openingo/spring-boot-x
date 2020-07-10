@@ -27,113 +27,107 @@
 
 package org.openingo.spring.extension.http.reporter;
 
-import org.openingo.jdkits.IPKit;
-import org.openingo.jdkits.JacksonKit;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.openingo.jdkits.ValidateKit;
-import org.openingo.spring.boot.SpringApplicationX;
+import org.openingo.spring.constants.Constants;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.util.ContentCachingRequestWrapper;
-import org.springframework.web.util.WebUtils;
 
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * HttpRequest Reporter
  *
  * @author Qicz
  */
+@Data
+@Slf4j
 public final class HttpRequestReporter {
 
+	private HandlerMethod handler;
+	private ServletServerHttpRequest request;
+	private Long processingTime;
+	private Object body;
+
 	private HttpRequestReporter(){}
+
+	public static HttpRequestReporter getInstance() {
+		return new HttpRequestReporter();
+	}
 	
 	private static int maxOutputLengthOfParaValue = 512;
 
-	public static final StringBuilder report(HandlerMethod handler, HttpServletRequest request) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("\n--------------------------------------------------------------------------------\n");
-		sb.append("SpringApplicationX - (" + SpringApplicationX.springBootVersionX + ") request report \n");
-		sb.append("IP  : ").append(IPKit.getRequestIP(request)).append(" ").append("\n");
-		Class<?> cc = handler.getBean().getClass();
-		sb.append("Class  : ").append(cc.getName()).append(".(").append(cc.getSimpleName()).append(".java:1)").append("\n");
-		sb.append("Url  : ").append(request.getRequestURL()).append(" ").append("\n");
-		sb.append("Logic  : ").append(handler.getMethod().getName()).append("\n");
-		sb.append("Datetime  : ").append(LocalDateTime.now()).append(" ").append("\n");
-		sb.append("Method  : ").append(request.getMethod()).append("\n");
+	/**
+	 * Current Request report
+	 */
+	public void report() {
+		StringBuilder reporterMaker = new StringBuilder();
+		reporterMaker.append("\n--------------------------------------------------------------------------------\n");
+		reporterMaker.append(Constants.SPRING_APPLICATION_X).append(" request report \n");
+		//sb.append("IP  : ").append(IPKit.getRequestIP(request)).append(" ").append("\n");
+		Class<?> bean = this.handler.getBean().getClass();
+		reporterMaker.append("Controller  : ").append(bean.getName()).append(".(").append(bean.getSimpleName()).append(".java:1)").append("\n");
+		reporterMaker.append("URI  : ").append(this.request.getURI()).append(" ").append("\n");
+		reporterMaker.append("Handler(Action)  : ").append(this.handler.getMethod().getName()).append("\n");
+		reporterMaker.append("Method  : ").append(this.request.getMethod()).append("\n");
+		reporterMaker.append("Request Time  : ").append(LocalDateTime.now()).append(" ").append("\n");
+		reporterMaker.append("Processing Time  : ").append(this.processingTime/1000.0).append("s\n");
 
 		// print all headers
-		StringBuilder headerBuf = new StringBuilder();
-		Enumeration<String> headerNames = request.getHeaderNames();
-		while (headerNames.hasMoreElements()) {
-			String key = headerNames.nextElement();
-			String value = request.getHeader(key);
-			if (headerBuf.length() > 0) {
-				headerBuf.append("\n");
-			}
-			headerBuf.append("   ").append(key).append("=").append(value);
-		}
-		sb.append("Header(s)  : \n").append(headerBuf).append("\n");
+		reporterMaker.append("Header(s)  : ").append(this.request.getHeaders()).append("\n");
 
-		// TODO print all body params
-		Object[] pointArgs = new Object[]{};
-		Stream<?> stream = ValidateKit.isEmpty(pointArgs) ? Stream.empty() : Arrays.asList(pointArgs).stream();
-		List<Object> bodyParams = stream
-				.filter(arg -> (!(arg instanceof HttpServletRequest) && !(arg instanceof HttpServletResponse)))
-				.collect(Collectors.toList());
-		if (ValidateKit.isNotNull(bodyParams)) {
-			Object bodyData = bodyParams.get(0);
-			if (bodyData instanceof File || bodyData instanceof MultipartFile) {
-				sb.append("bodyParams  : ").append("<File>").append("\n");
-			} else {
-				sb.append("bodyParams[JSON]  : ").append(JacksonKit.toJson(bodyData)).append("\n");
-			}
+		// print all body params
+		reporterMaker.append("Body  : ");
+		if (ValidateKit.isNotNull(this.body)) {
+			reporterMaker.append(this.body).append("\n");
+		} else {
+			reporterMaker.append("<File>").append("\n");
 		}
 
-		String urlParams = request.getQueryString();
-		if (urlParams != null) {
-			sb.append("UrlParams  : ").append(urlParams).append("\n");
+		HttpServletRequest servletRequest = this.request.getServletRequest();
+		String urlQuery = servletRequest.getQueryString();
+		if (ValidateKit.isNotNull(urlQuery)) {
+			reporterMaker.append("UrlQuery  : ").append(urlQuery).append("\n");
 		}
 
 		// print all parameters
-		Enumeration<String> e = request.getParameterNames();
+		Enumeration<String> e = servletRequest.getParameterNames();
 		if (e.hasMoreElements()) {
-			sb.append("Parameter  : ");
+			reporterMaker.append("Parameter  : ");
 			while (e.hasMoreElements()) {
 				String name = e.nextElement();
-				String[] values = request.getParameterValues(name);
+				String[] values = servletRequest.getParameterValues(name);
 				if (values.length == 1) {
-					sb.append(name).append("=");
+					reporterMaker.append(name).append("=");
 					if (values[0] != null && values[0].length() > maxOutputLengthOfParaValue) {
-						sb.append(values[0], 0, maxOutputLengthOfParaValue).append("...");
+						reporterMaker.append(values[0], 0, maxOutputLengthOfParaValue).append("...");
 					} else {
-						sb.append(values[0]);
+						reporterMaker.append(values[0]);
 					}
-				}
-				else {
-					sb.append(name).append("[]={");
-					for (int i=0; i<values.length; i++) {
+				} else {
+					reporterMaker.append(name).append("[]={");
+					for (int i=0; i < values.length; i++) {
 						if (i > 0)
-							sb.append(",");
-						sb.append(values[i]);
+							reporterMaker.append(",");
+						reporterMaker.append(values[i]);
 					}
-					sb.append("}");
+					reporterMaker.append("}");
 				}
-				sb.append("  ");
+				reporterMaker.append(", ");
 			}
-			sb.append("\n");
+			reporterMaker.append("\n");
 		}
 
-		sb.append("--------------------------------------------------------------------------------\n");
-		return sb;
+		reporterMaker.append("--------------------------------------------------------------------------------\n");
+		//PrintStream out = System.out;
+		//out.println(AnsiOutput.toString(AnsiColor.GREEN, Constants.SPRING_APPLICATION_X));
+		if (log.isInfoEnabled() || log.isDebugEnabled()) {
+			log.info(reporterMaker.toString());
+		} else {
+			System.out.println(reporterMaker);
+		}
 	}
 }

@@ -68,7 +68,7 @@ public final class SpringApplicationX {
      */
     public static ConfigurableApplicationContext run(Class<?>[] primarySources, String[] args) {
         SpringApplicationX.springApplication = new SpringApplication(primarySources);
-        SpringApplicationX.applicationContext = springApplication.run(args);
+        SpringApplicationX.applicationContext = SpringApplicationX.springApplication.run(args);
         SpringApplicationX.springApplicationX = new SpringApplicationX();
         // init application X
         initSpringApplicationX();

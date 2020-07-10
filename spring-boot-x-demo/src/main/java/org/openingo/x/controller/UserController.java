@@ -29,6 +29,7 @@ package org.openingo.x.controller;
 
 import org.openingo.x.entity.User;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,6 +43,11 @@ public class UserController {
 
     @GetMapping("/user")
     public String user(@RequestBody User user) {
+        return "ok";
+    }
+
+    @GetMapping("/user1/{name}")
+    public String user1(@PathVariable("name") String name) {
         return "ok";
     }
 }

@@ -25,29 +25,16 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.extension.http.config;
-
-import org.openingo.spring.extension.http.interceptor.HttpRequestInterceptor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+package org.openingo.spring.constants;
 
 /**
- * HttpConfig
+ * Constants
  *
  * @author Qicz
  */
-@Configuration
-@ConditionalOnClass(WebMvcConfigurer.class)
-public class HttpConfig implements WebMvcConfigurer {
+public final class Constants {
 
-    @Autowired
-    HttpRequestInterceptor httpRequestInterceptor;
+    private Constants(){}
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(this.httpRequestInterceptor).addPathPatterns("/**");
-    }
+    public static final String SPRING_APPLICATION_X = ":: SpringApplicationX ::";
 }

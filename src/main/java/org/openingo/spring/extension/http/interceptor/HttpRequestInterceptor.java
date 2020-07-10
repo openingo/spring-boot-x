@@ -28,8 +28,23 @@
 package org.openingo.spring.extension.http.interceptor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.openingo.jdkits.JacksonKit;
+import org.openingo.jdkits.SystemClockKit;
 import org.openingo.spring.boot.SpringApplicationX;
+import org.openingo.spring.constants.Constants;
 import org.openingo.spring.extension.http.reporter.HttpRequestReporter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ansi.AnsiColor;
+import org.springframework.boot.ansi.AnsiOutput;
+import org.springframework.boot.ansi.AnsiStyle;
+import org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -37,6 +52,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Map;
 
 /**
  * HttpRequestInterceptor
@@ -47,26 +65,49 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 public class HttpRequestInterceptor implements HandlerInterceptor {
 
+    @Autowired
+    MappingJackson2HttpMessageConverter httpMessageConverter;
+
+    final ThreadLocal<Long> httpRequestTimer = new ThreadLocal();
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        return ((HandlerMethod) handler).getBean().getClass().getPackage().getName().contains(SpringApplicationX.applicationPackage);
+        this.httpRequestTimer.set(SystemClockKit.now());
+        return true;
     }
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-
+        // nothing
     }
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        StringBuilder report = HttpRequestReporter.report((HandlerMethod) handler, request);
-        if (log.isInfoEnabled() || log.isDebugEnabled()) {
-            log.info(report.toString());
-        } else {
-            System.out.println(report);
+        try {
+            long processingTime = SystemClockKit.now() - this.httpRequestTimer.get();
+            if (handler instanceof HandlerMethod
+                    && (((HandlerMethod) handler).getBean().getClass().getPackage().getName().contains(SpringApplicationX.applicationPackage))) {
+                HttpRequestReporter httpRequestReporter = HttpRequestReporter.getInstance();
+                // current handler
+                httpRequestReporter.setHandler(((HandlerMethod) handler));
+                 // current request processing time
+                httpRequestReporter.setProcessingTime(processingTime);
+                ServletServerHttpRequest serverHttpRequest = new ServletServerHttpRequest(request);
+                httpRequestReporter.setRequest(serverHttpRequest);
+                try {
+                    // body
+                    Object body = httpMessageConverter.read(Map.class, serverHttpRequest);
+                    httpRequestReporter.setBody(JacksonKit.toJson(body));
+                } catch (Exception e) {
+                    log.error(e.toString());
+                }
+
+                // fire report
+                httpRequestReporter.report();
+            }
+        } finally {
+            this.httpRequestTimer.remove();
         }
-//        if (null != ex) {
-//            log.error(ex.toString());
-//        }
+
     }
 }
