@@ -29,6 +29,7 @@ package org.openingo.spring.extension.http.reporter;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.openingo.jdkits.IPKit;
 import org.openingo.jdkits.ValidateKit;
 import org.openingo.spring.constants.Constants;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -64,10 +65,11 @@ public final class HttpRequestReporter {
 	 * Current Request report
 	 */
 	public void report() {
+		HttpServletRequest servletRequest = this.request.getServletRequest();
 		StringBuilder reporterMaker = new StringBuilder();
 		reporterMaker.append("\n--------------------------------------------------------------------------------\n");
-		reporterMaker.append(Constants.SPRING_APPLICATION_X).append(" request report \n");
-		//sb.append("IP  : ").append(IPKit.getRequestIP(request)).append(" ").append("\n");
+		reporterMaker.append(Constants.SPRING_APPLICATION_X).append(" Request Report \n");
+		reporterMaker.append("Client IP  : ").append(IPKit.getRequestIP(servletRequest)).append(" ").append("\n");
 		Class<?> bean = this.handler.getBean().getClass();
 		reporterMaker.append("Controller  : ").append(bean.getName()).append(".(").append(bean.getSimpleName()).append(".java:1)").append("\n");
 		reporterMaker.append("URI  : ").append(this.request.getURI()).append(" ").append("\n");
@@ -87,7 +89,6 @@ public final class HttpRequestReporter {
 			reporterMaker.append("<File>").append("\n");
 		}
 
-		HttpServletRequest servletRequest = this.request.getServletRequest();
 		String urlQuery = servletRequest.getQueryString();
 		if (ValidateKit.isNotNull(urlQuery)) {
 			reporterMaker.append("UrlQuery  : ").append(urlQuery).append("\n");
