@@ -2,5 +2,7 @@ openingo:
   request:
     log:
       enable: true
-  redisx:
+  redis:
+    enable: true
+  extension:
     enable: true

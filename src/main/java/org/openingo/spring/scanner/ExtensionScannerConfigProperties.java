@@ -25,22 +25,22 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.annotation;
+package org.openingo.spring.scanner;
 
-import org.openingo.spring.constants.PackageConstants;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import lombok.Data;
+import org.openingo.spring.constants.PropertiesConstants;
+import org.openingo.spring.extension.config.ExtensionConfigProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
- * ExtensionScanner
+ * ExtensionConfigProperties
  *
  * @author Qicz
  */
-@Configuration
-@ComponentScan(PackageConstants.EXTENSION_PACKAGE)
-public class ExtensionScanner {
+@Data
+@Component
+@ConfigurationProperties(prefix = PropertiesConstants.EXTENSION_CONFIG_PROPERTIES_PREFIX)
+public class ExtensionScannerConfigProperties extends ExtensionConfigProperties {
 
-    public ExtensionScanner() {
-        System.out.println("😁"+this.getClass());
-    }
 }

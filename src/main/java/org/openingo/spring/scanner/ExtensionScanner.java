@@ -25,22 +25,30 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.annotation;
+package org.openingo.spring.scanner;
 
-import org.openingo.spring.scanner.ExtensionScanner;
-import org.springframework.context.annotation.Import;
-
-import java.lang.annotation.*;
+import org.openingo.spring.constants.Constants;
+import org.openingo.spring.constants.PackageConstants;
+import org.openingo.spring.constants.PropertiesConstants;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
 /**
- * EnableExtension
+ * ExtensionScanner
  *
  * @author Qicz
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@Documented
-@Import(ExtensionScanner.class)
-public @interface EnableExtension {
+@Configuration
+@ConditionalOnProperty(
+        prefix = PropertiesConstants.EXTENSION_CONFIG_PROPERTIES_PREFIX,
+        name = PropertiesConstants.ENABLE,
+        havingValue = Constants.TRUE
+)
+@ComponentScan(PackageConstants.EXTENSION_PACKAGE)
+public class ExtensionScanner {
 
+    public ExtensionScanner() {
+        System.out.println("😁"+this.getClass());
+    }
 }
