@@ -122,6 +122,11 @@ public final class HttpRequestReporter {
 			reporterMaker.append("\n");
 		}
 
+		// response data
+		if (ValidateKit.isNotNull(this.responseData)) {
+			reporterMaker.append("Response  : ").append(this.responseData).append("\n");
+		}
+
 		reporterMaker.append("--------------------------------------------------------------------------------\n");
 		//PrintStream out = System.out;
 		//out.println(AnsiOutput.toString(AnsiColor.GREEN, Constants.SPRING_APPLICATION_X));

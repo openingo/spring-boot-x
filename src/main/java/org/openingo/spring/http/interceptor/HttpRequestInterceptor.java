@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.openingo.jdkits.JacksonKit;
 import org.openingo.jdkits.SystemClockKit;
 import org.openingo.jdkits.ValidateKit;
+import org.openingo.spring.http.kit.HttpDataKit;
 import org.openingo.spring.http.reporter.HttpRequestReporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -54,7 +55,7 @@ public class HttpRequestInterceptor implements HandlerInterceptor {
     @Autowired
     MappingJackson2HttpMessageConverter converter;
 
-    final ThreadLocal<Long> httpRequestTimer = new ThreadLocal();
+    final ThreadLocal<Long> httpRequestTimer = new ThreadLocal<>();
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -95,9 +96,10 @@ public class HttpRequestInterceptor implements HandlerInterceptor {
                 }
                 httpRequestReporter.setBody(body);
 
-                // TODO response data
+                // response data
                 // ServletServerHttpResponse servletServerHttpResponse = new ServletServerHttpResponse(response);
                 // httpRequestReporter.setResponse(servletServerHttpResponse);
+                httpRequestReporter.setResponseData(HttpDataKit.getData());
                 // fire report
                 httpRequestReporter.report();
             }

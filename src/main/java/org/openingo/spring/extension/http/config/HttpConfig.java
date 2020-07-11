@@ -29,12 +29,21 @@ package org.openingo.spring.extension.http.config;
 
 import org.openingo.spring.constants.Constants;
 import org.openingo.spring.constants.PropertiesConstants;
+import org.openingo.spring.http.handler.ReturnValueHandler;
 import org.openingo.spring.http.interceptor.HttpRequestInterceptor;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * HttpConfig
@@ -59,5 +68,26 @@ public class HttpConfig  {
     @Bean
     public HttpRequestInterceptor httpRequestInterceptor() {
         return new HttpRequestInterceptor();
+    }
+
+    @Configuration
+    public class ReturnValueConfig implements InitializingBean {
+
+        @Autowired
+        RequestMappingHandlerAdapter requestMappingHandlerAdapter;
+
+        @Override
+        public void afterPropertiesSet() throws Exception {
+            List<HandlerMethodReturnValueHandler> unmodifiableList = requestMappingHandlerAdapter.getReturnValueHandlers();
+            List<HandlerMethodReturnValueHandler> list = new ArrayList<>(unmodifiableList.size());
+            for (HandlerMethodReturnValueHandler returnValueHandler : unmodifiableList) {
+                if (returnValueHandler instanceof RequestResponseBodyMethodProcessor) {
+                    list.add(new ReturnValueHandler(returnValueHandler));
+                } else {
+                    list.add(returnValueHandler);
+                }
+            }
+            requestMappingHandlerAdapter.setReturnValueHandlers(list);
+        }
     }
 }
