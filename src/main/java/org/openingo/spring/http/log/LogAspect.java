@@ -34,6 +34,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.openingo.jdkits.SystemClockKit;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 /**
@@ -41,9 +42,13 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
  *
  * @author Qicz
  */
-@Aspect
+//@ConditionalOnBean
+//@Aspect
 @Slf4j
 public class LogAspect {
+
+    public LogAspect() {
+    }
 
     @Autowired
     MappingJackson2HttpMessageConverter converter;
@@ -61,13 +66,14 @@ public class LogAspect {
     /**
      * this execution statement will dynamic update
      */
-    @Pointcut("execution(public * org.oo..controller.*.*(..))")
+    @Pointcut//("execution(public * org.openingox..controller.*.*(..))")
     public void log() {
     }
 
     @Around("log()")
     public Object around(ProceedingJoinPoint point) throws Throwable {
-        return null;
+        System.out.print("----------------😝");
+        return point.proceed();
 //        this.httpRequestTimer.set(SystemClockKit.now());
 //        Object proceed = point.proceed();
 //        long processingTime = this.getProcessingTime();
