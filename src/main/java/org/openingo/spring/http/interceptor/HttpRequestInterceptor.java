@@ -106,7 +106,10 @@ public class HttpRequestInterceptor implements HandlerInterceptor {
             // response data
             // ServletServerHttpResponse servletServerHttpResponse = new ServletServerHttpResponse(response);
             // httpRequestReporter.setResponse(servletServerHttpResponse);
-            httpRequestReporter.setResponseData(JacksonKit.toJson(HttpDataKit.getData()));
+            Object data = HttpDataKit.getData();
+            if (ValidateKit.isNotNull(data)) {
+                httpRequestReporter.setResponseData(JacksonKit.toJson(data));
+            }
             // fire report
             httpRequestReporter.report();
         }
