@@ -25,7 +25,7 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.extension.http.reporter;
+package org.openingo.spring.http.reporter;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

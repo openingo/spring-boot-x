@@ -29,7 +29,7 @@ package org.openingo.spring.extension.http.config;
 
 import org.openingo.spring.constants.Constants;
 import org.openingo.spring.constants.PropertiesConstants;
-import org.openingo.spring.extension.http.interceptor.HttpRequestInterceptor;
+import org.openingo.spring.http.interceptor.HttpRequestInterceptor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;

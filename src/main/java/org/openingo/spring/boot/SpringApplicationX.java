@@ -114,7 +114,7 @@ public final class SpringApplicationX {
     /**
      * Spring Application mainApplicationClass's package name
      */
-    public static String applicationPackage = "org.opening.x";
+    public static String applicationPackage = null;
 
     /**
      * Spring Boot Version
@@ -141,7 +141,15 @@ public final class SpringApplicationX {
     private static void initSpringApplicationX() {
         SpringApplicationX.environment = applicationContext.getEnvironment();
         SpringApplicationX.isDebugging = isDebugging();
-        SpringApplicationX.mainApplicationClass = springApplication.getMainApplicationClass();
+        SpringApplicationX.initMainApplicationInfo(springApplication.getMainApplicationClass());
+    }
+
+    /**
+     * Init main application info: class and package
+     * @param mainApplicationClass
+     */
+    public static void initMainApplicationInfo(Class<?> mainApplicationClass) {
+        SpringApplicationX.mainApplicationClass = mainApplicationClass;
         SpringApplicationX.applicationPackage = mainApplicationClass.getPackage().getName();
     }
 

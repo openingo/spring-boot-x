@@ -27,13 +27,12 @@
 
 package org.openingo.spring.scanner;
 
-import org.openingo.spring.constants.Constants;
+import org.openingo.spring.boot.SpringApplicationX;
 import org.openingo.spring.constants.PackageConstants;
-import org.openingo.spring.constants.PropertiesConstants;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+
+import javax.crypto.interfaces.PBEKey;
 
 /**
  * ExtensionScanner
@@ -45,6 +44,23 @@ import org.springframework.context.annotation.Configuration;
 public class ExtensionScanner {
 
     public ExtensionScanner() {
-        System.out.println("😁"+this.getClass());
+        System.out.println("😁" + this.getClass());
+        SpringApplicationX.initMainApplicationInfo(this.deduceMainApplicationClass());
+    }
+
+    private Class<?> deduceMainApplicationClass() {
+        try {
+            StackTraceElement[] stackTrace = new RuntimeException().getStackTrace();
+            for (StackTraceElement stackTraceElement : stackTrace) {
+                String className = stackTraceElement.getClassName();
+                if ("main".equals(stackTraceElement.getMethodName())
+                        && !className.contains("junit")) {
+                    return Class.forName(className);
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            // Swallow and continue
+        }
+        return null;
     }
 }

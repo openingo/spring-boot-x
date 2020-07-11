@@ -27,9 +27,6 @@
 
 package org.openingo.spring.config;
 
-import lombok.Data;
-import org.openingo.spring.scanner.ExtensionScanner;
-
 /**
  * ExtensionConfigProperties
  *

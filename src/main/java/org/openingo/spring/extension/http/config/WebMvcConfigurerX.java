@@ -27,7 +27,7 @@
 
 package org.openingo.spring.extension.http.config;
 
-import org.openingo.spring.extension.http.interceptor.HttpRequestInterceptor;
+import org.openingo.spring.http.interceptor.HttpRequestInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;

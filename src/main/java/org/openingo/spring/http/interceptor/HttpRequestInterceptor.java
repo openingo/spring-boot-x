@@ -25,14 +25,17 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.extension.http.interceptor;
+package org.openingo.spring.http.interceptor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.openingo.jdkits.JacksonKit;
+import org.openingo.jdkits.StreamKit;
 import org.openingo.jdkits.SystemClockKit;
 import org.openingo.jdkits.ValidateKit;
-import org.openingo.spring.extension.http.reporter.HttpRequestReporter;
+import org.openingo.spring.http.reporter.HttpRequestReporter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -41,8 +44,12 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -97,13 +104,9 @@ public class HttpRequestInterceptor implements HandlerInterceptor {
                 }
                 httpRequestReporter.setBody(body);
 
-                // response data
-                ServletServerHttpResponse servletServerHttpResponse = new ServletServerHttpResponse(response);
-                httpRequestReporter.setResponse(servletServerHttpResponse);
-                this.converter.write(Object.class, MediaType.ALL, servletServerHttpResponse);
-
-                System.out.println(servletServerHttpResponse.getBody());
-
+                // TODO response data
+                // ServletServerHttpResponse servletServerHttpResponse = new ServletServerHttpResponse(response);
+                // httpRequestReporter.setResponse(servletServerHttpResponse);
                 // fire report
                 httpRequestReporter.report();
             }
