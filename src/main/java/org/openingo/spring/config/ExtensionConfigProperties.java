@@ -25,22 +25,20 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.scanner;
+package org.openingo.spring.config;
 
 import lombok.Data;
-import org.openingo.spring.constants.PropertiesConstants;
-import org.openingo.spring.extension.config.ExtensionConfigProperties;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.openingo.spring.scanner.ExtensionScanner;
 
 /**
  * ExtensionConfigProperties
  *
  * @author Qicz
  */
-@Data
-@Component
-@ConfigurationProperties(prefix = PropertiesConstants.EXTENSION_CONFIG_PROPERTIES_PREFIX)
-public class ExtensionScannerConfigProperties extends ExtensionConfigProperties {
+public class ExtensionConfigProperties {
 
+    /**
+     * enable or not, default enable <tt>true</tt>
+     */
+    private boolean enable = true;
 }

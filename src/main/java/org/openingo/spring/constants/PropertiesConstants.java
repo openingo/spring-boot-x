@@ -36,10 +36,6 @@ public final class PropertiesConstants {
 
     private PropertiesConstants(){}
 
-    // extension config properties prefix
-    public static final String EXTENSION_CONFIG_PROPERTIES_PREFIX = "openingo.extension";
-
-
     // redis config properties prefix
     public static final String REDIS_CONFIG_PROPERTIES_PREFIX = "openingo.redis";
 

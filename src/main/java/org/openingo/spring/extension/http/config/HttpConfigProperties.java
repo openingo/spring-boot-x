@@ -28,8 +28,9 @@
 package org.openingo.spring.extension.http.config;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.openingo.spring.constants.PropertiesConstants;
-import org.openingo.spring.extension.config.ExtensionConfigProperties;
+import org.openingo.spring.config.ExtensionConfigProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +40,7 @@ import org.springframework.stereotype.Component;
  * @author Qicz
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Component
 @ConfigurationProperties(prefix = PropertiesConstants.HTTP_CONFIG_PROPERTIES_PREFIX)
 public class HttpConfigProperties extends ExtensionConfigProperties {

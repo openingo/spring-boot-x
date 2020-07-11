@@ -46,7 +46,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
         prefix = PropertiesConstants.HTTP_CONFIG_PROPERTIES_PREFIX,
         name = PropertiesConstants.ENABLE,
         havingValue = Constants.TRUE,
-        matchIfMissing = true
+        matchIfMissing = true // default enable
 )
 @ConditionalOnClass(WebMvcConfigurer.class)
 public class HttpConfig  {

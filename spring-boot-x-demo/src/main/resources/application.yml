@@ -4,5 +4,3 @@ openingo:
       enable: true
   redis:
     enable: true
-  extension:
-    enable: true

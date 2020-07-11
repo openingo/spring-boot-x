@@ -31,6 +31,7 @@ import org.openingo.spring.constants.Constants;
 import org.openingo.spring.constants.PackageConstants;
 import org.openingo.spring.constants.PropertiesConstants;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -40,11 +41,6 @@ import org.springframework.context.annotation.Configuration;
  * @author Qicz
  */
 @Configuration
-@ConditionalOnProperty(
-        prefix = PropertiesConstants.EXTENSION_CONFIG_PROPERTIES_PREFIX,
-        name = PropertiesConstants.ENABLE,
-        havingValue = Constants.TRUE
-)
 @ComponentScan(PackageConstants.EXTENSION_PACKAGE)
 public class ExtensionScanner {
 

@@ -30,6 +30,7 @@ package org.openingo.spring.extension.http.interceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.openingo.jdkits.JacksonKit;
 import org.openingo.jdkits.SystemClockKit;
+import org.openingo.jdkits.ValidateKit;
 import org.openingo.spring.extension.http.reporter.HttpRequestReporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -82,14 +83,19 @@ public class HttpRequestInterceptor implements HandlerInterceptor {
                 ServletServerHttpRequest serverHttpRequest = new ServletServerHttpRequest(request);
                 httpRequestReporter.setRequest(serverHttpRequest);
                 // body
-                try {
-                    Object body = this.converter.read(Object.class, serverHttpRequest);
-                    if (body instanceof Map) {
-                        httpRequestReporter.setBody(JacksonKit.toJson(body));
+                Object body = null;
+                if (ValidateKit.isNotNull(request.getContentType())) {
+                    body = "<File>";
+                    try {
+                        body = this.converter.read(Object.class, serverHttpRequest);
+                        if (body instanceof Map) {
+                            body = JacksonKit.toJson(body);
+                        }
+                    } catch (Exception e) {
+                        log.error(e.toString());
                     }
-                } catch (Exception e) {
-                    log.error(e.toString());
                 }
+                httpRequestReporter.setBody(body);
 
                 // response data
                 ServletServerHttpResponse servletServerHttpResponse = new ServletServerHttpResponse(response);

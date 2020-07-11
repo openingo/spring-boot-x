@@ -85,11 +85,8 @@ public final class HttpRequestReporter {
 		reporterMaker.append("Header(s)  : ").append(this.request.getHeaders()).append("\n");
 
 		// print all body params
-		reporterMaker.append("Body  : ");
 		if (ValidateKit.isNotNull(this.body)) {
-			reporterMaker.append(this.body).append("\n");
-		} else {
-			reporterMaker.append("<File>").append("\n");
+			reporterMaker.append("Body  : ").append(this.body).append("\n");
 		}
 
 		String urlQuery = servletRequest.getQueryString();
@@ -100,7 +97,7 @@ public final class HttpRequestReporter {
 		// print all parameters
 		Enumeration<String> e = servletRequest.getParameterNames();
 		if (e.hasMoreElements()) {
-			reporterMaker.append("Parameter  : ");
+			reporterMaker.append("Parameter(s)  : ");
 			while (e.hasMoreElements()) {
 				String name = e.nextElement();
 				String[] values = servletRequest.getParameterValues(name);
