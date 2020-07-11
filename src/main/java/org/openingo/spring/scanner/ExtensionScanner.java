@@ -32,8 +32,6 @@ import org.openingo.spring.constants.PackageConstants;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import javax.crypto.interfaces.PBEKey;
-
 /**
  * ExtensionScanner
  *
