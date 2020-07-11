@@ -1,6 +1,6 @@
 openingo:
   request:
-    interceptor:
+    log:
       enable: true
   redisx:
     enable: true

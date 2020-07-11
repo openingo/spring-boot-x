@@ -40,7 +40,7 @@ public final class PropertiesConstants {
     public static final String REDIS_CONFIG_PROPERTIES_PREFIX = "openingo.redisx";
 
     // http config properties prefix
-    public static final String HTTP_CONFIG_PROPERTIES_PREFIX = "openingo.request.interceptor";
+    public static final String HTTP_CONFIG_PROPERTIES_PREFIX = "openingo.request.log";
 
     // enable
     public static final String ENABLE = "enable";
