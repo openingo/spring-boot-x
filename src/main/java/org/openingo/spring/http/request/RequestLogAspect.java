@@ -66,7 +66,7 @@ public class RequestLogAspect {
         }
     }
 
-    @Pointcut("execution(public * *.*..controller.*.*(..))")
+    @Pointcut("execution(public * *.*..controller..*.*(..))")
     public void log() {
     }
 

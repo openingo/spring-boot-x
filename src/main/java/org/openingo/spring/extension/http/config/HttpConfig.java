@@ -52,7 +52,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class HttpConfig  {
 
     @Bean
-    public RequestLogAspect logAspect() {
+    public RequestLogAspect requestLogAspect() {
         return new RequestLogAspect();
     }
 }
