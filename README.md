@@ -34,9 +34,9 @@
 
   ```xml
   <dependency>
-  		<groupId>org.openingo.spring</groupId>
-      <artifactId>spring-boot-x</artifactId>
-      <version>new_version</version>
+    <groupId>org.openingo.spring</groupId>
+    <artifactId>spring-boot-x</artifactId>
+    <version>new_version</version>
   </dependency>
   ```
 
