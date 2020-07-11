@@ -28,6 +28,9 @@
 package org.openingo.spring.http.advice;
 
 import lombok.extern.slf4j.Slf4j;
+import org.openingo.jdkits.http.RespData;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -41,11 +44,12 @@ import javax.servlet.http.HttpServletRequest;
  * @author Qicz
  */
 @Slf4j
+@ConditionalOnBean
 @RestControllerAdvice
 public class ExceptionAdvice {
 
     @ExceptionHandler(Exception.class)
-    public ModelAndView handlerError(HttpServletRequest request, Exception ex) {
+    public Object handlerError(HttpServletRequest request, Exception ex) {
         ModelMap mmp = new ModelMap();
         mmp.addAttribute("ex", ex.getMessage());
         return new ModelAndView("error", mmp);

@@ -29,8 +29,11 @@ package org.openingo.spring.extension.http.config;
 
 import org.openingo.spring.constants.Constants;
 import org.openingo.spring.constants.PropertiesConstants;
+import org.openingo.spring.http.advice.ExceptionAdvice;
+import org.openingo.spring.http.handler.ExceptionHandler;
 import org.openingo.spring.http.handler.ReturnValueHandler;
 import org.openingo.spring.http.interceptor.HttpRequestInterceptor;
+import org.openingo.spring.http.log.LogAspect;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +72,11 @@ public class HttpConfig  {
     @Bean
     public HttpRequestInterceptor httpRequestInterceptor() {
         return new HttpRequestInterceptor();
+    }
+
+    @Bean
+    public LogAspect logAspect() {
+        return new LogAspect();
     }
 
     @Configuration

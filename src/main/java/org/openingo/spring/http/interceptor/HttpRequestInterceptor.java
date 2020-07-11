@@ -42,6 +42,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -94,10 +95,11 @@ public class HttpRequestInterceptor implements HandlerInterceptor {
                 body = "<File>";
                 try {
                     body = this.converter.read(Object.class, serverHttpRequest);
-                    if (body instanceof Map) {
-                        body = JacksonKit.toJson(body);
-                    }
+                    body = JacksonKit.toJson(body);
                 } catch (Exception e) {
+                    if (e instanceof IOException) {
+                        body = null;
+                    }
                     log.error(e.toString());
                 }
             }

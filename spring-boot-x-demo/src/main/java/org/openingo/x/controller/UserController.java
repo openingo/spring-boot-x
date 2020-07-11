@@ -44,6 +44,7 @@ import java.util.Map;
  * @author Qicz
  */
 @RestController
+@SuppressWarnings("all")
 public class UserController {
 
     @Autowired
@@ -71,5 +72,12 @@ public class UserController {
             put("name","qicz");
             put("age", 18);
         }};
+    }
+
+    @GetMapping("/ex")
+    public Map ex() {
+        Map map = null;//new HashMap();
+        map.put("a", "A");
+        return map;
     }
 }
