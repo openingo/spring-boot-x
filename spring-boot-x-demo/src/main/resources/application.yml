@@ -1,0 +1,6 @@
+openingo:
+  request:
+    interceptor:
+      enable: true
+  redisx:
+    enable: true

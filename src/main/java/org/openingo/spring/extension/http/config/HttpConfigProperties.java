@@ -25,23 +25,22 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.constants;
+package org.openingo.spring.extension.http.config;
+
+import lombok.Data;
+import org.openingo.spring.constants.PropertiesConstants;
+import org.openingo.spring.extension.config.ExtensionConfigProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
- * Constants
+ * HttpConfigProperties
  *
  * @author Qicz
  */
-public final class Constants {
+@Data
+@Component
+@ConfigurationProperties(prefix = PropertiesConstants.HTTP_CONFIG_PROPERTIES_PREFIX)
+public class HttpConfigProperties extends ExtensionConfigProperties {
 
-    private Constants(){}
-
-    // application name
-    public static final String SPRING_APPLICATION_X = ":: SpringApplicationX ::";
-
-    // true
-    public static final String TRUE = "true";
-
-    // false
-    public static final String FALSE = "false";
 }

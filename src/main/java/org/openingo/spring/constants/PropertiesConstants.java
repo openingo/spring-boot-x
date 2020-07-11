@@ -28,20 +28,20 @@
 package org.openingo.spring.constants;
 
 /**
- * Constants
+ * PropertiesConstants
  *
  * @author Qicz
  */
-public final class Constants {
+public final class PropertiesConstants {
 
-    private Constants(){}
+    private PropertiesConstants(){}
 
-    // application name
-    public static final String SPRING_APPLICATION_X = ":: SpringApplicationX ::";
+    // redis config properties prefix
+    public static final String REDIS_CONFIG_PROPERTIES_PREFIX = "openingo.redisx";
 
-    // true
-    public static final String TRUE = "true";
+    // http config properties prefix
+    public static final String HTTP_CONFIG_PROPERTIES_PREFIX = "openingo.request.interceptor";
 
-    // false
-    public static final String FALSE = "false";
+    // enable
+    public static final String ENABLE = "enable";
 }

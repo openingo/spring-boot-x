@@ -25,23 +25,22 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.constants;
+package org.openingo.spring.extension.data.redis.config;
+
+import lombok.Data;
+import org.openingo.spring.constants.PropertiesConstants;
+import org.openingo.spring.extension.config.ExtensionConfigProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
- * Constants
+ * RedisConfigProperties
  *
  * @author Qicz
  */
-public final class Constants {
+@Data
+@Component
+@ConfigurationProperties(prefix = PropertiesConstants.REDIS_CONFIG_PROPERTIES_PREFIX)
+public class RedisConfigProperties extends ExtensionConfigProperties {
 
-    private Constants(){}
-
-    // application name
-    public static final String SPRING_APPLICATION_X = ":: SpringApplicationX ::";
-
-    // true
-    public static final String TRUE = "true";
-
-    // false
-    public static final String FALSE = "false";
 }

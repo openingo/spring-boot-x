@@ -25,23 +25,15 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.constants;
+package org.openingo.spring.extension.config;
 
 /**
- * Constants
+ * ExtensionConfigProperties
  *
  * @author Qicz
  */
-public final class Constants {
+public class ExtensionConfigProperties {
 
-    private Constants(){}
-
-    // application name
-    public static final String SPRING_APPLICATION_X = ":: SpringApplicationX ::";
-
-    // true
-    public static final String TRUE = "true";
-
-    // false
-    public static final String FALSE = "false";
+    // enable or not
+    protected boolean enable = true;
 }

@@ -30,12 +30,12 @@ package org.openingo.spring.extension.http.interceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.openingo.jdkits.JacksonKit;
 import org.openingo.jdkits.SystemClockKit;
-import org.openingo.spring.boot.SpringApplicationX;
 import org.openingo.spring.extension.http.reporter.HttpRequestReporter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpRequest;
-import org.springframework.stereotype.Component;
+import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -49,12 +49,11 @@ import java.util.Map;
  *
  * @author Qicz
  */
-@Component
 @Slf4j
 public class HttpRequestInterceptor implements HandlerInterceptor {
 
     @Autowired
-    MappingJackson2HttpMessageConverter httpMessageConverter;
+    MappingJackson2HttpMessageConverter converter;
 
     final ThreadLocal<Long> httpRequestTimer = new ThreadLocal();
 
@@ -73,8 +72,8 @@ public class HttpRequestInterceptor implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         try {
             long processingTime = SystemClockKit.now() - this.httpRequestTimer.get();
-            if (handler instanceof HandlerMethod
-                    && (((HandlerMethod) handler).getBean().getClass().getPackage().getName().contains(SpringApplicationX.applicationPackage))) {
+            if (handler instanceof HandlerMethod/*
+                    && (((HandlerMethod) handler).getBean().getClass().getPackage().getName().contains(SpringApplicationX.applicationPackage))*/) {
                 HttpRequestReporter httpRequestReporter = HttpRequestReporter.getInstance();
                 // current handler
                 httpRequestReporter.setHandler(((HandlerMethod) handler));
@@ -82,13 +81,22 @@ public class HttpRequestInterceptor implements HandlerInterceptor {
                 httpRequestReporter.setProcessingTime(processingTime);
                 ServletServerHttpRequest serverHttpRequest = new ServletServerHttpRequest(request);
                 httpRequestReporter.setRequest(serverHttpRequest);
+                // body
                 try {
-                    // body
-                    Object body = httpMessageConverter.read(Map.class, serverHttpRequest);
-                    httpRequestReporter.setBody(JacksonKit.toJson(body));
+                    Object body = this.converter.read(Object.class, serverHttpRequest);
+                    if (body instanceof Map) {
+                        httpRequestReporter.setBody(JacksonKit.toJson(body));
+                    }
                 } catch (Exception e) {
                     log.error(e.toString());
                 }
+
+                // response data
+                ServletServerHttpResponse servletServerHttpResponse = new ServletServerHttpResponse(response);
+                httpRequestReporter.setResponse(servletServerHttpResponse);
+                this.converter.write(Object.class, MediaType.ALL, servletServerHttpResponse);
+
+                System.out.println(servletServerHttpResponse.getBody());
 
                 // fire report
                 httpRequestReporter.report();

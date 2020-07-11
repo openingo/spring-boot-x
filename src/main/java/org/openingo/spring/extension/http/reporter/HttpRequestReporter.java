@@ -33,6 +33,7 @@ import org.openingo.jdkits.IPKit;
 import org.openingo.jdkits.ValidateKit;
 import org.openingo.spring.constants.Constants;
 import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.method.HandlerMethod;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,8 +51,10 @@ public final class HttpRequestReporter {
 
 	private HandlerMethod handler;
 	private ServletServerHttpRequest request;
+	private ServletServerHttpResponse response;
 	private Long processingTime;
 	private Object body;
+	private Object responseData;
 
 	private HttpRequestReporter(){}
 

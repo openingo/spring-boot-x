@@ -27,12 +27,15 @@
 
 package org.openingo.spring.extension.data.redis.config;
 
+import org.openingo.spring.constants.Constants;
+import org.openingo.spring.constants.PropertiesConstants;
 import org.openingo.spring.extension.data.redis.RedisTemplateX;
 import org.openingo.spring.extension.data.redis.naming.DefaultKeyNamingPolicy;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
 import org.openingo.spring.extension.data.redis.serializer.FstSerializer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -46,6 +49,11 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  * @author Qicz
  */
 @Configuration
+@ConditionalOnProperty(
+        prefix = PropertiesConstants.REDIS_CONFIG_PROPERTIES_PREFIX,
+        name = PropertiesConstants.ENABLE,
+        havingValue = Constants.TRUE
+)
 @ConditionalOnClass(RedisTemplate.class)
 public class RedisConfig {
 

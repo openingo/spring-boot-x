@@ -28,6 +28,11 @@
 package org.openingo.spring.boot;
 
 import org.openingo.spring.constants.EnvsConstants;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringBootVersion;
 import org.springframework.context.ApplicationContext;
@@ -138,6 +143,23 @@ public final class SpringApplicationX {
         SpringApplicationX.isDebugging = isDebugging();
         SpringApplicationX.mainApplicationClass = springApplication.getMainApplicationClass();
         SpringApplicationX.applicationPackage = mainApplicationClass.getPackage().getName();
+    }
+
+    /**
+     * Return the bean instance that uniquely matches the given object type, if any.
+     * <p>This method goes into {@link ListableBeanFactory} by-type lookup territory
+     * but may also be translated into a conventional by-name lookup based on the name
+     * of the given type. For more extensive retrieval operations across sets of beans,
+     * use {@link ListableBeanFactory} and/or {@link BeanFactoryUtils}.
+     * @return an instance of the single bean matching the required type
+     * @throws NoSuchBeanDefinitionException if no bean of the given type was found
+     * @throws NoUniqueBeanDefinitionException if more than one bean of the given type was found
+     * @throws BeansException if the bean could not be created
+     * @since 3.0
+     * @see ListableBeanFactory
+     */
+    public static <T> T getBean(Class<T> clazz) {
+        return SpringApplicationX.applicationContext.getBean(clazz);
     }
 
     /**

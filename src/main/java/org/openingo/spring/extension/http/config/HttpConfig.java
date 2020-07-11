@@ -27,11 +27,13 @@
 
 package org.openingo.spring.extension.http.config;
 
+import org.openingo.spring.constants.Constants;
+import org.openingo.spring.constants.PropertiesConstants;
 import org.openingo.spring.extension.http.interceptor.HttpRequestInterceptor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
@@ -40,14 +42,22 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @author Qicz
  */
 @Configuration
+@ConditionalOnProperty(
+        prefix = PropertiesConstants.HTTP_CONFIG_PROPERTIES_PREFIX,
+        name = PropertiesConstants.ENABLE,
+        havingValue = Constants.TRUE,
+        matchIfMissing = true
+)
 @ConditionalOnClass(WebMvcConfigurer.class)
-public class HttpConfig implements WebMvcConfigurer {
+public class HttpConfig  {
 
-    @Autowired
-    HttpRequestInterceptor httpRequestInterceptor;
+    @Bean
+    public WebMvcConfigurerX webMvcConfigurerX() {
+        return new WebMvcConfigurerX();
+    }
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(this.httpRequestInterceptor).addPathPatterns("/**");
+    @Bean
+    public HttpRequestInterceptor httpRequestInterceptor() {
+        return new HttpRequestInterceptor();
     }
 }

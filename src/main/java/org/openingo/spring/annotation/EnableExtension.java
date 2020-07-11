@@ -40,6 +40,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Documented
 @Import(ExtensionScanner.class)
+//@EnableConfigurationProperties
 public @interface EnableExtension {
 
 }
