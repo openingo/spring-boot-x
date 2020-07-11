@@ -68,43 +68,47 @@ public class HttpRequestInterceptor implements HandlerInterceptor {
         // nothing
     }
 
-    @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+    private Long getProcessingTime() {
         try {
-            long processingTime = SystemClockKit.now() - this.httpRequestTimer.get();
-            if (handler instanceof HandlerMethod/*
-                    && (((HandlerMethod) handler).getBean().getClass().getPackage().getName().contains(SpringApplicationX.applicationPackage))*/) {
-                HttpRequestReporter httpRequestReporter = HttpRequestReporter.getInstance();
-                // current handler
-                httpRequestReporter.setHandler(((HandlerMethod) handler));
-                 // current request processing time
-                httpRequestReporter.setProcessingTime(processingTime);
-                ServletServerHttpRequest serverHttpRequest = new ServletServerHttpRequest(request);
-                httpRequestReporter.setRequest(serverHttpRequest);
-                // body
-                Object body = null;
-                if (ValidateKit.isNotNull(request.getContentType())) {
-                    body = "<File>";
-                    try {
-                        body = this.converter.read(Object.class, serverHttpRequest);
-                        if (body instanceof Map) {
-                            body = JacksonKit.toJson(body);
-                        }
-                    } catch (Exception e) {
-                        log.error(e.toString());
-                    }
-                }
-                httpRequestReporter.setBody(body);
-
-                // response data
-                // ServletServerHttpResponse servletServerHttpResponse = new ServletServerHttpResponse(response);
-                // httpRequestReporter.setResponse(servletServerHttpResponse);
-                httpRequestReporter.setResponseData(HttpDataKit.getData());
-                // fire report
-                httpRequestReporter.report();
-            }
+            return SystemClockKit.now() - this.httpRequestTimer.get();
         } finally {
             this.httpRequestTimer.remove();
+        }
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        long processingTime = this.getProcessingTime();
+        if (handler instanceof HandlerMethod/*
+                    && (((HandlerMethod) handler).getBean().getClass().getPackage().getName().contains(SpringApplicationX.applicationPackage))*/) {
+            HttpRequestReporter httpRequestReporter = HttpRequestReporter.getInstance();
+            // current handler
+            httpRequestReporter.setHandler(((HandlerMethod) handler));
+            // current request processing time
+            httpRequestReporter.setProcessingTime(processingTime);
+            ServletServerHttpRequest serverHttpRequest = new ServletServerHttpRequest(request);
+            httpRequestReporter.setRequest(serverHttpRequest);
+            // body
+            Object body = null;
+            if (ValidateKit.isNotNull(request.getContentType())) {
+                body = "<File>";
+                try {
+                    body = this.converter.read(Object.class, serverHttpRequest);
+                    if (body instanceof Map) {
+                        body = JacksonKit.toJson(body);
+                    }
+                } catch (Exception e) {
+                    log.error(e.toString());
+                }
+            }
+            httpRequestReporter.setBody(body);
+
+            // response data
+            // ServletServerHttpResponse servletServerHttpResponse = new ServletServerHttpResponse(response);
+            // httpRequestReporter.setResponse(servletServerHttpResponse);
+            httpRequestReporter.setResponseData(JacksonKit.toJson(HttpDataKit.getData()));
+            // fire report
+            httpRequestReporter.report();
         }
     }
 }

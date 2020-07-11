@@ -71,14 +71,14 @@ public class HttpConfig  {
     }
 
     @Configuration
-    public class ReturnValueConfig implements InitializingBean {
+    public static class ReturnValueConfig implements InitializingBean {
 
         @Autowired
         RequestMappingHandlerAdapter requestMappingHandlerAdapter;
 
         @Override
         public void afterPropertiesSet() throws Exception {
-            List<HandlerMethodReturnValueHandler> unmodifiableList = requestMappingHandlerAdapter.getReturnValueHandlers();
+            List<HandlerMethodReturnValueHandler> unmodifiableList = this.requestMappingHandlerAdapter.getReturnValueHandlers();
             List<HandlerMethodReturnValueHandler> list = new ArrayList<>(unmodifiableList.size());
             for (HandlerMethodReturnValueHandler returnValueHandler : unmodifiableList) {
                 if (returnValueHandler instanceof RequestResponseBodyMethodProcessor) {
@@ -87,7 +87,7 @@ public class HttpConfig  {
                     list.add(returnValueHandler);
                 }
             }
-            requestMappingHandlerAdapter.setReturnValueHandlers(list);
+            this.requestMappingHandlerAdapter.setReturnValueHandlers(list);
         }
     }
 }

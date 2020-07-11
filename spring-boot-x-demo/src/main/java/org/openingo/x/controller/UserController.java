@@ -35,6 +35,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * UserController
  *
@@ -60,5 +63,13 @@ public class UserController {
     public String save() {
         redisTemplateX.opsForValue().set("name", "Qicz");
         return "ok";
+    }
+
+    @GetMapping("/json")
+    public Map json(){
+        return new HashMap<String, Object>(){{
+            put("name","qicz");
+            put("age", 18);
+        }};
     }
 }
