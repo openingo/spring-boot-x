@@ -59,13 +59,13 @@ public class AD implements ResponseBodyAdvice {
      * Invoked after an {@code HttpMessageConverter} is selected and just before
      * its write method is invoked.
      *
-     * @param body                  the body to be written
+     * @param body                  the bodyData to be written
      * @param returnType            the return type of the controller method
      * @param selectedContentType   the content type selected through content negotiation
      * @param selectedConverterType the converter type selected to write to the response
      * @param request               the current request
      * @param response              the current response
-     * @return the body that was passed in or a modified (possibly new) instance
+     * @return the bodyData that was passed in or a modified (possibly new) instance
      */
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {

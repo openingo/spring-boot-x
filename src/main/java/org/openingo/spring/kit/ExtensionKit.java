@@ -28,7 +28,6 @@
 package org.openingo.spring.kit;
 
 import lombok.extern.slf4j.Slf4j;
-import org.openingo.spring.boot.SpringApplicationX;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;

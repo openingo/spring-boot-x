@@ -36,26 +36,25 @@ public final class HttpDataKit {
 
     private HttpDataKit(){}
 
-    private static final ThreadLocal<Object> responseData = new ThreadLocal<>();
+    private static final ThreadLocal<Object> httpData = new ThreadLocal<>();
 
     /**
-     * Put current request's response data
+     * Put data
      * @param data
      */
     public static void putData(Object data) {
-        HttpDataKit.responseData.set(data);
+        HttpDataKit.httpData.set(data);
     }
 
     /**
-     * Get current request's response data
-     * @return
+     * Get data, remove from threadLocal in time.
      */
     public static Object getData() {
         Object data = null;
         try {
-            data = HttpDataKit.responseData.get();
+            data = HttpDataKit.httpData.get();
         } finally {
-            HttpDataKit.responseData.remove();
+            HttpDataKit.httpData.remove();
         }
         return data;
     }

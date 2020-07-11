@@ -25,16 +25,15 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.http.reporter;
+package org.openingo.spring.http.request;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.openingo.jdkits.IPKit;
 import org.openingo.jdkits.ValidateKit;
 import org.openingo.spring.constants.Constants;
 import org.springframework.http.server.ServletServerHttpRequest;
-import org.springframework.http.server.ServletServerHttpResponse;
-import org.springframework.web.method.HandlerMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -47,19 +46,26 @@ import java.util.Enumeration;
  */
 @Data
 @Slf4j
-public final class HttpRequestReporter {
+public final class RequestReporter {
 
-	private HandlerMethod handler;
 	private ServletServerHttpRequest request;
-	private ServletServerHttpResponse response;
+
+	// current request processing time
 	private Long processingTime;
-	private Object body;
+
+	// current request bodyData data
+	private Object bodyData;
+
+	// response data
 	private Object responseData;
 
-	private HttpRequestReporter(){}
+	// current proceeding join point
+	private ProceedingJoinPoint point;
 
-	public static HttpRequestReporter getInstance() {
-		return new HttpRequestReporter();
+	private RequestReporter(){}
+
+	public static RequestReporter getInstance() {
+		return new RequestReporter();
 	}
 	
 	private static int maxOutputLengthOfParaValue = 512;
@@ -69,71 +75,74 @@ public final class HttpRequestReporter {
 	 */
 	public void report() {
 		HttpServletRequest servletRequest = this.request.getServletRequest();
-		StringBuilder reporterMaker = new StringBuilder();
-		reporterMaker.append("\n--------------------------------------------------------------------------------\n");
-		reporterMaker.append(Constants.SPRING_APPLICATION_X).append(" Request Report \n");
-		reporterMaker.append("Client IP  : ").append(IPKit.getRequestIP(servletRequest)).append(" ").append("\n");
-		Class<?> bean = this.handler.getBean().getClass();
-		reporterMaker.append("Controller  : ").append(bean.getName()).append(".(").append(bean.getSimpleName()).append(".java:1)").append("\n");
-		reporterMaker.append("URI  : ").append(this.request.getURI()).append(" ").append("\n");
-		reporterMaker.append("Handler(Action)  : ").append(this.handler.getMethod().getName()).append("\n");
-		reporterMaker.append("Method  : ").append(this.request.getMethod()).append("\n");
-		reporterMaker.append("Request Time  : ").append(LocalDateTime.now()).append(" ").append("\n");
-		reporterMaker.append("Processing Time  : ").append(this.processingTime/1000.0).append("s\n");
+		StringBuilder reportInfoMaker = new StringBuilder();
+		reportInfoMaker.append("\n****************************************************************\n");
+		reportInfoMaker.append(Constants.SPRING_APPLICATION_X).append(" for current request report information \n");
+		reportInfoMaker.append("****************************************************************\n");
+		//reportInfoMaker.append("================================================================================\n");
+		reportInfoMaker.append("Client IP  : ").append(IPKit.getRequestIP(servletRequest)).append(" ").append("\n");
+		reportInfoMaker.append("Request Time  : ").append(LocalDateTime.now()).append(" ").append("\n");
+		Class<?> target = this.point.getTarget().getClass();
+		reportInfoMaker.append("Controller  : ").append(target.getName()).append(".(").append(target.getSimpleName()).append(".java:1)").append("\n");
+		reportInfoMaker.append("URI  : ").append(this.request.getURI()).append(" ").append("\n");
+		reportInfoMaker.append("Handler(Action)  : ").append(this.point.getSignature().getName()).append("\n");
+		reportInfoMaker.append("Method  : ").append(this.request.getMethod()).append("\n");
+		reportInfoMaker.append("Processing Time  : ").append(this.processingTime/1000.0).append("s\n");
 
 		// print all headers
-		reporterMaker.append("Header(s)  : ").append(this.request.getHeaders()).append("\n");
+		reportInfoMaker.append("Header(s)  : ").append(this.request.getHeaders()).append("\n");
 
-		// print all body params
-		if (ValidateKit.isNotNull(this.body)) {
-			reporterMaker.append("Body  : ").append(this.body).append("\n");
+		// print all bodyData params
+		if (ValidateKit.isNotNull(this.bodyData)) {
+			reportInfoMaker.append("Body  : ").append(this.bodyData).append("\n");
 		}
 
 		String urlQuery = servletRequest.getQueryString();
 		if (ValidateKit.isNotNull(urlQuery)) {
-			reporterMaker.append("UrlQuery  : ").append(urlQuery).append("\n");
+			reportInfoMaker.append("UrlQuery  : ").append(urlQuery).append("\n");
 		}
 
 		// print all parameters
 		Enumeration<String> e = servletRequest.getParameterNames();
 		if (e.hasMoreElements()) {
-			reporterMaker.append("Parameter(s)  : ");
+			reportInfoMaker.append("Parameter(s)  : ");
 			while (e.hasMoreElements()) {
 				String name = e.nextElement();
 				String[] values = servletRequest.getParameterValues(name);
 				if (values.length == 1) {
-					reporterMaker.append(name).append("=");
+					reportInfoMaker.append(name).append("=");
 					if (values[0] != null && values[0].length() > maxOutputLengthOfParaValue) {
-						reporterMaker.append(values[0], 0, maxOutputLengthOfParaValue).append("...");
+						reportInfoMaker.append(values[0], 0, maxOutputLengthOfParaValue).append("...");
 					} else {
-						reporterMaker.append(values[0]);
+						reportInfoMaker.append(values[0]);
 					}
 				} else {
-					reporterMaker.append(name).append("[]={");
+					reportInfoMaker.append(name).append("[]={");
 					for (int i=0; i < values.length; i++) {
-						if (i > 0)
-							reporterMaker.append(",");
-						reporterMaker.append(values[i]);
+						if (i > 0) {
+							reportInfoMaker.append(",");
+						}
+						reportInfoMaker.append(values[i]);
 					}
-					reporterMaker.append("}");
+					reportInfoMaker.append("}");
 				}
-				reporterMaker.append(", ");
+				reportInfoMaker.append(", ");
 			}
-			reporterMaker.append("\n");
+			reportInfoMaker.append("\n");
 		}
 
 		// response data
 		if (ValidateKit.isNotNull(this.responseData)) {
-			reporterMaker.append("Response  : ").append(this.responseData).append("\n");
+			reportInfoMaker.append("Response  : ").append(this.responseData).append("\n");
 		}
 
-		reporterMaker.append("--------------------------------------------------------------------------------\n");
+		reportInfoMaker.append("----------------------------------------------------------------\n");
 		//PrintStream out = System.out;
 		//out.println(AnsiOutput.toString(AnsiColor.GREEN, Constants.SPRING_APPLICATION_X));
 		if (log.isInfoEnabled() || log.isDebugEnabled()) {
-			log.info(reporterMaker.toString());
+			log.info(reportInfoMaker.toString());
 		} else {
-			System.out.println(reporterMaker);
+			System.out.println(reportInfoMaker);
 		}
 	}
 }

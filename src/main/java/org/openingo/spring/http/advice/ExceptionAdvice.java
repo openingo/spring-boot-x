@@ -28,9 +28,7 @@
 package org.openingo.spring.http.advice;
 
 import lombok.extern.slf4j.Slf4j;
-import org.openingo.jdkits.http.RespData;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
