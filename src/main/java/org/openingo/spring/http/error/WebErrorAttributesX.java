@@ -68,7 +68,7 @@ public class WebErrorAttributesX extends DefaultErrorAttributes {
             errorAttributes.put("exception", this.ex.toString());
             HttpThreadLocalDataKit.putData(this.ex);
         }
-        this.reset();
+        this.flush();
         return errorAttributes;
     }
 
@@ -96,7 +96,7 @@ public class WebErrorAttributesX extends DefaultErrorAttributes {
         return super.resolveException(request, response, handler, ex);
     }
 
-    private void reset() {
+    private void flush() {
         this.handler = null;
         this.ex = null;
     }

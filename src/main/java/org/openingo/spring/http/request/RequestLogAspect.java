@@ -35,6 +35,8 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.openingo.jdkits.JacksonKit;
 import org.openingo.jdkits.SystemClockKit;
 import org.openingo.jdkits.ValidateKit;
+import org.openingo.spring.constants.Constants;
+import org.openingo.spring.http.kit.HttpThreadLocalDataKit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -56,14 +58,13 @@ public class RequestLogAspect {
     @Autowired
     MappingJackson2HttpMessageConverter converter;
 
-    final ThreadLocal<Long> httpRequestTimer = new ThreadLocal<>();
+    private void handlerStart() {
+        HttpThreadLocalDataKit.putData(SystemClockKit.now());
+    }
 
-    private Long getProcessingTime() {
-        try {
-            return SystemClockKit.now() - this.httpRequestTimer.get();
-        } finally {
-            this.httpRequestTimer.remove();
-        }
+    private Double getProcessingSeconds() {
+        long startTime = HttpThreadLocalDataKit.getData();
+        return (SystemClockKit.now() - startTime)/1000.0;
     }
 
     @Pointcut("execution(public * *.*..controller..*.*(..))")
@@ -72,14 +73,17 @@ public class RequestLogAspect {
 
     @Around("log()")
     public Object around(ProceedingJoinPoint point) throws Throwable {
-        this.httpRequestTimer.set(SystemClockKit.now());
+        this.handlerStart();
         Object proceed = point.proceed();
-        long processingTime = this.getProcessingTime();
+        double processingTime = this.getProcessingSeconds();
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        RequestReporter httpRequestReporter = RequestReporter.getInstance();
         if (ValidateKit.isNull(request)) {
+            StringBuilder reportInfoBuilder = new StringBuilder(Constants.REQUEST_REPORT_HEADER);
+            reportInfoBuilder.append("Processing Time  : ").append(processingTime).append("s\n");
+            httpRequestReporter.report(reportInfoBuilder.toString());
             return proceed;
         }
-        RequestReporter httpRequestReporter = RequestReporter.getInstance();
         httpRequestReporter.setPoint(point);
         // current request processing time
         httpRequestReporter.setProcessingTime(processingTime);

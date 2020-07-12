@@ -51,7 +51,7 @@ public final class RequestReporter {
 	private ServletServerHttpRequest request;
 
 	// current request processing time
-	private Long processingTime;
+	private Double processingTime;
 
 	// current request bodyData data
 	private Object bodyData;
@@ -83,7 +83,7 @@ public final class RequestReporter {
 		reportInfoBuilder.append("URI  : ").append(this.request.getURI()).append(" ").append("\n");
 		reportInfoBuilder.append("Handler(Action)  : ").append(this.point.getSignature().getName()).append("\n");
 		reportInfoBuilder.append("Method  : ").append(this.request.getMethod()).append("\n");
-		reportInfoBuilder.append("Processing Time  : ").append(this.processingTime/1000.0).append("s\n");
+		reportInfoBuilder.append("Processing Time  : ").append(this.processingTime).append("s\n");
 
 		// print all headers
 		reportInfoBuilder.append("Header(s)  : ").append(this.request.getHeaders()).append("\n");
@@ -133,12 +133,20 @@ public final class RequestReporter {
 		}
 
 		reportInfoBuilder.append("----------------------------------------------------------------\n");
+		this.report(reportInfoBuilder.toString());
+	}
+
+	/**
+	 * Report information
+	 * @param info
+	 */
+	public void report(String info) {
 		//PrintStream out = System.out;
 		//out.println(AnsiOutput.toString(AnsiColor.GREEN, Constants.SPRING_APPLICATION_X));
 		if (log.isInfoEnabled() || log.isDebugEnabled()) {
-			log.info(reportInfoBuilder.toString());
+			log.info(info);
 		} else {
-			System.out.println(reportInfoBuilder);
+			System.out.println(info);
 		}
 	}
 }
