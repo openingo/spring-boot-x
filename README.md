@@ -6,27 +6,51 @@
 
 ### Features
 
-- request log.
+- request log:
 
-  ```bas
-  --------------------------------------------------------------------------------
-  :: SpringApplicationX :: Request Report 
+  ```bash
+  ****************************************************************
+  :: SpringApplicationX :: for current request report information 
+  ****************************************************************
   Client IP  : 127.0.0.1 
+  Request Time  : 2020-07-12T19:24:40.249 
   Controller  : org.openingo.x.controller.UserController.(UserController.java:1)
-  URI  : http://localhost:8080/user1/zcz 
-  Handler(Action)  : user1
+  URI  : http://localhost:8080/json 
+  Handler(Action)  : json
   Method  : GET
-  Request Time  : 2020-07-11T18:13:58.764 
-  Processing Time  : 0.063s
-  Header(s)  : [user-agent:"PostmanRuntime/7.25.0", accept:"*/*", cache-control:"no-cache", postman-token:"50e5a856-3068-4094-867e-844df8e7c98f", host:"localhost:8080", accept-encoding:"gzip, deflate, br", connection:"keep-alive", content-length:"21", Content-Type:"application/json;charset=UTF-8"]
+  Processing Time  : 0.002s
+  Header(s)  : [user-agent:"PostmanRuntime/7.25.0", cache-control:"no-cache", postman-token:"b29a0616-7e31-4150-b022-4bf3680bf771", host:"localhost:8080", accept-encoding:"gzip, deflate, br", connection:"keep-alive", content-length:"21", Content-Type:"application/json;charset=UTF-8"]
   Body  : {"name":"qicz"}
-  Response  : ok
-  --------------------------------------------------------------------------------
+  Response  : {"name":"qicz","age":18}
+  ----------------------------------------------------------------
   ```
 
 - redis template extension, add key naming policy.
 
-- TODO
+- custom `ErrorAttributes`:
+
+  > add current request handler and exception 
+
+  ```json
+  {
+      "timestamp": "2020-07-12T11:24:11.261+0000",
+      "status": 500,
+      "error": "Internal Server Error",
+      "message": "No message available",
+      "path": "/ex",
+      "handler": "public java.util.Map org.openingo.x.controller.UserController.ex()",
+      "exception": "java.lang.NullPointerException",
+      "openingo.error": {
+          "em": "No message available",
+          "error": "Internal Server Error",
+          "ec": 500
+      }
+  }
+  ```
+
+- `SpringApplicationX` more extensions
+
+- others [TODO]
 
 ### How to use?
 
@@ -63,6 +87,24 @@ public class App {
         enable: true
     redis:
       enable: true
+  ```
+
+- ErrorAttributes
+
+  ```java
+  public class DemoErrorAttributes extends WebErrorAttributesX {
+  
+      @Override
+      public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
+          Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
+          Map<String, Object> errorExAttributes = new HashMap<>();
+          errorExAttributes.put(RespData.Config.SC_KEY, errorAttributes.get("status"));
+          errorExAttributes.put(RespData.Config.SM_KEY, errorAttributes.get("message"));
+          errorExAttributes.put("error", errorAttributes.get("error"));
+          errorAttributes.put("openingo.error", errorExAttributes);
+          return errorAttributes;
+      }
+  }
   ```
 
 - demo
