@@ -27,7 +27,7 @@
 
 package org.openingo.spring.http.handler;
 
-import org.springframework.ui.ModelMap;
+import org.openingo.jdkits.ValidateKit;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -58,8 +58,16 @@ public class ExceptionHandler implements HandlerExceptionResolver {
      */
     @Override
     public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        ModelMap mmp = new ModelMap();
-        mmp.addAttribute("ex", ex.getMessage());
-        return new ModelAndView("error", mmp);
+        return new ModelAndView((model, req, resp) -> {
+            String localizedMessage = ex.getLocalizedMessage();
+            StringBuilder messageBuilder = new StringBuilder();
+            messageBuilder.append(handler);
+            messageBuilder.append(":");
+            messageBuilder.append(ex.toString());
+            if (ValidateKit.isNotNull(localizedMessage)) {
+                messageBuilder.append(", message:").append(localizedMessage);
+            }
+            resp.sendError(500, messageBuilder.toString());
+        });
     }
 }

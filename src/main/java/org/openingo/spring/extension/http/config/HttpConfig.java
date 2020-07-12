@@ -29,6 +29,7 @@ package org.openingo.spring.extension.http.config;
 
 import org.openingo.spring.constants.Constants;
 import org.openingo.spring.constants.PropertiesConstants;
+import org.openingo.spring.http.handler.ExceptionHandler;
 import org.openingo.spring.http.request.RequestLogAspect;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -54,5 +55,10 @@ public class HttpConfig  {
     @Bean
     public RequestLogAspect requestLogAspect() {
         return new RequestLogAspect();
+    }
+
+    @Bean
+    public ExceptionHandler exceptionHandler() {
+        return new ExceptionHandler();
     }
 }
