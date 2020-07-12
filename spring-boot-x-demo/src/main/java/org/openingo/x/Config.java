@@ -27,6 +27,7 @@
 
 package org.openingo.x;
 
+import org.openingo.jdkits.http.RespData;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,6 +42,11 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class Config {
 
+    public Config() {
+        RespData.Config.SC_KEY = "ec";
+        RespData.Config.SM_KEY = "em";
+    }
+
     @Bean
     public RedisSerializer<String> valueSerializer() {
         return new StringRedisSerializer();
@@ -49,5 +55,11 @@ public class Config {
     @Bean
     public IKeyNamingPolicy keyNamingPolicy() {
         return new KeyNamingPolicy();
+    }
+
+    // using business application config bean
+    @Bean
+    public DemoErrorAttributes demoErrorAttributes() {
+        return new DemoErrorAttributes();
     }
 }

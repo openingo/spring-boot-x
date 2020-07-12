@@ -29,10 +29,13 @@ package org.openingo.spring.extension.http.config;
 
 import org.openingo.spring.constants.Constants;
 import org.openingo.spring.constants.PropertiesConstants;
-import org.openingo.spring.http.handler.ExceptionHandler;
+import org.openingo.spring.http.error.WebErrorAttributesX;
 import org.openingo.spring.http.request.RequestLogAspect;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.SearchStrategy;
+import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -57,8 +60,12 @@ public class HttpConfig  {
         return new RequestLogAspect();
     }
 
+    /**
+     * Custom Error Attributes
+     */
     @Bean
-    public ExceptionHandler exceptionHandler() {
-        return new ExceptionHandler();
+    @ConditionalOnMissingBean(value = ErrorAttributes.class, search = SearchStrategy.CURRENT)
+    public WebErrorAttributesX webErrorAttributesX() {
+        return new WebErrorAttributesX();
     }
 }

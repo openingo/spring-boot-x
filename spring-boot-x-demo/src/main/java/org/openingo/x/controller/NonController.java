@@ -25,30 +25,16 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.constants;
+package org.openingo.x.controller;
 
 /**
- * Constants
+ * NonController
  *
  * @author Qicz
  */
-public final class Constants {
+public class NonController {
 
-    private Constants(){}
-
-    // application name
-    public static final String SPRING_APPLICATION_X = ":: SpringApplicationX ::";
-
-    // true
-    public static final String TRUE = "true";
-
-    // false
-    public static final String FALSE = "false";
-
-    // http request report header
-    public static final String REQUEST_REPORT_HEADER =
-            "\n****************************************************************\n"
-            + SPRING_APPLICATION_X +
-            " for current request report information \n"
-            + "****************************************************************\n";
+    public void ok() {
+        System.out.println("ok...");
+    }
 }

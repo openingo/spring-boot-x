@@ -75,74 +75,70 @@ public final class RequestReporter {
 	 */
 	public void report() {
 		HttpServletRequest servletRequest = this.request.getServletRequest();
-		StringBuilder reportInfoMaker = new StringBuilder();
-		reportInfoMaker.append("\n****************************************************************\n");
-		reportInfoMaker.append(Constants.SPRING_APPLICATION_X).append(" for current request report information \n");
-		reportInfoMaker.append("****************************************************************\n");
-		//reportInfoMaker.append("================================================================================\n");
-		reportInfoMaker.append("Client IP  : ").append(IPKit.getRequestIP(servletRequest)).append(" ").append("\n");
-		reportInfoMaker.append("Request Time  : ").append(LocalDateTime.now()).append(" ").append("\n");
+		StringBuilder reportInfoBuilder = new StringBuilder(Constants.REQUEST_REPORT_HEADER);
+		reportInfoBuilder.append("Client IP  : ").append(IPKit.getRequestIP(servletRequest)).append(" ").append("\n");
+		reportInfoBuilder.append("Request Time  : ").append(LocalDateTime.now()).append(" ").append("\n");
 		Class<?> target = this.point.getTarget().getClass();
-		reportInfoMaker.append("Controller  : ").append(target.getName()).append(".(").append(target.getSimpleName()).append(".java:1)").append("\n");
-		reportInfoMaker.append("URI  : ").append(this.request.getURI()).append(" ").append("\n");
-		reportInfoMaker.append("Handler(Action)  : ").append(this.point.getSignature().getName()).append("\n");
-		reportInfoMaker.append("Method  : ").append(this.request.getMethod()).append("\n");
-		reportInfoMaker.append("Processing Time  : ").append(this.processingTime/1000.0).append("s\n");
+		reportInfoBuilder.append("Controller  : ").append(target.getName()).append(".(").append(target.getSimpleName()).append(".java:1)").append("\n");
+		reportInfoBuilder.append("URI  : ").append(this.request.getURI()).append(" ").append("\n");
+		reportInfoBuilder.append("Handler(Action)  : ").append(this.point.getSignature().getName()).append("\n");
+		reportInfoBuilder.append("Method  : ").append(this.request.getMethod()).append("\n");
+		reportInfoBuilder.append("Processing Time  : ").append(this.processingTime/1000.0).append("s\n");
 
 		// print all headers
-		reportInfoMaker.append("Header(s)  : ").append(this.request.getHeaders()).append("\n");
+		reportInfoBuilder.append("Header(s)  : ").append(this.request.getHeaders()).append("\n");
 
 		// print all bodyData params
 		if (ValidateKit.isNotNull(this.bodyData)) {
-			reportInfoMaker.append("Body  : ").append(this.bodyData).append("\n");
+			reportInfoBuilder.append("Body  : ").append(this.bodyData).append("\n");
 		}
 
 		String urlQuery = servletRequest.getQueryString();
 		if (ValidateKit.isNotNull(urlQuery)) {
-			reportInfoMaker.append("UrlQuery  : ").append(urlQuery).append("\n");
+			reportInfoBuilder.append("UrlQuery  : ").append(urlQuery).append("\n");
 		}
 
 		// print all parameters
 		Enumeration<String> e = servletRequest.getParameterNames();
 		if (e.hasMoreElements()) {
-			reportInfoMaker.append("Parameter(s)  : ");
+			reportInfoBuilder.append("Parameter(s)  : ");
 			while (e.hasMoreElements()) {
 				String name = e.nextElement();
 				String[] values = servletRequest.getParameterValues(name);
 				if (values.length == 1) {
-					reportInfoMaker.append(name).append("=");
+					reportInfoBuilder.append(name).append("=");
 					if (values[0] != null && values[0].length() > maxOutputLengthOfParaValue) {
-						reportInfoMaker.append(values[0], 0, maxOutputLengthOfParaValue).append("...");
+						reportInfoBuilder.append(values[0], 0, maxOutputLengthOfParaValue).append("...");
 					} else {
-						reportInfoMaker.append(values[0]);
+						reportInfoBuilder.append(values[0]);
 					}
 				} else {
-					reportInfoMaker.append(name).append("[]={");
+					reportInfoBuilder.append(name).append("[]={");
 					for (int i=0; i < values.length; i++) {
 						if (i > 0) {
-							reportInfoMaker.append(",");
+							reportInfoBuilder.append(",");
 						}
-						reportInfoMaker.append(values[i]);
+						reportInfoBuilder.append(values[i]);
 					}
-					reportInfoMaker.append("}");
+					reportInfoBuilder.append("}");
 				}
-				reportInfoMaker.append(", ");
+				reportInfoBuilder.append(", ");
 			}
-			reportInfoMaker.append("\n");
+			reportInfoBuilder.append("\n");
 		}
 
 		// response data
 		if (ValidateKit.isNotNull(this.responseData)) {
-			reportInfoMaker.append("Response  : ").append(this.responseData).append("\n");
+			reportInfoBuilder.append("Response  : ").append(this.responseData).append("\n");
 		}
 
-		reportInfoMaker.append("----------------------------------------------------------------\n");
+		reportInfoBuilder.append("----------------------------------------------------------------\n");
 		//PrintStream out = System.out;
 		//out.println(AnsiOutput.toString(AnsiColor.GREEN, Constants.SPRING_APPLICATION_X));
 		if (log.isInfoEnabled() || log.isDebugEnabled()) {
-			log.info(reportInfoMaker.toString());
+			log.info(reportInfoBuilder.toString());
 		} else {
-			System.out.println(reportInfoMaker);
+			System.out.println(reportInfoBuilder);
 		}
 	}
 }

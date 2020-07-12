@@ -25,30 +25,30 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.constants;
+package org.openingo.x;
+
+import org.openingo.jdkits.http.RespData;
+import org.openingo.spring.http.error.WebErrorAttributesX;
+import org.springframework.web.context.request.WebRequest;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Constants
+ * DemoErrorAttributes
  *
  * @author Qicz
  */
-public final class Constants {
+public class DemoErrorAttributes extends WebErrorAttributesX {
 
-    private Constants(){}
-
-    // application name
-    public static final String SPRING_APPLICATION_X = ":: SpringApplicationX ::";
-
-    // true
-    public static final String TRUE = "true";
-
-    // false
-    public static final String FALSE = "false";
-
-    // http request report header
-    public static final String REQUEST_REPORT_HEADER =
-            "\n****************************************************************\n"
-            + SPRING_APPLICATION_X +
-            " for current request report information \n"
-            + "****************************************************************\n";
+    @Override
+    public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
+        Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
+        Map<String, Object> errorExAttributes = new HashMap<>();
+        errorExAttributes.put(RespData.Config.SC_KEY, errorAttributes.get("status"));
+        errorExAttributes.put(RespData.Config.SM_KEY, errorAttributes.get("message"));
+        errorExAttributes.put("error", errorAttributes.get("error"));
+        errorAttributes.put("openingo.error", errorExAttributes);
+        return errorAttributes;
+    }
 }

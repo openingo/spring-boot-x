@@ -76,6 +76,9 @@ public class RequestLogAspect {
         Object proceed = point.proceed();
         long processingTime = this.getProcessingTime();
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        if (ValidateKit.isNull(request)) {
+            return proceed;
+        }
         RequestReporter httpRequestReporter = RequestReporter.getInstance();
         httpRequestReporter.setPoint(point);
         // current request processing time

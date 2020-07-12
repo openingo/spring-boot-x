@@ -25,21 +25,50 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.http.handler;
+package org.openingo.spring.http.error;
 
+import lombok.extern.slf4j.Slf4j;
 import org.openingo.jdkits.ValidateKit;
-import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.openingo.spring.constants.Constants;
+import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 /**
- * ExceptionHandler
+ * WebErrorAttributesX
  *
  * @author Qicz
  */
-public class ExceptionHandler implements HandlerExceptionResolver {
+@Slf4j
+public class WebErrorAttributesX extends DefaultErrorAttributes {
+
+    private Object handler;
+    private Exception ex;
+
+    /**
+     * Returns a {@link Map} of the error attributes. The map can be used as the model of
+     * an error page {@link ModelAndView}, or returned as a {@link ResponseBody}.
+     * @param webRequest the source request
+     * @param includeStackTrace if stack trace elements should be included
+     * @return a map of error attributes
+     */
+    @Override
+    public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
+        Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
+        if (ValidateKit.isNotNull(this.handler)) {
+            errorAttributes.put("handler", this.handler.toString());
+        }
+        if (ValidateKit.isNotNull(this.ex)) {
+            errorAttributes.put("exception", this.ex.toString());
+        }
+        this.reset();
+        return errorAttributes;
+    }
 
     /**
      * Try to resolve the given exception that got thrown during handler execution,
@@ -58,16 +87,15 @@ public class ExceptionHandler implements HandlerExceptionResolver {
      */
     @Override
     public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        return new ModelAndView((model, req, resp) -> {
-            String localizedMessage = ex.getLocalizedMessage();
-            StringBuilder messageBuilder = new StringBuilder();
-            messageBuilder.append(handler);
-            messageBuilder.append(":");
-            messageBuilder.append(ex.toString());
-            if (ValidateKit.isNotNull(localizedMessage)) {
-                messageBuilder.append(", message:").append(localizedMessage);
-            }
-            resp.sendError(500, messageBuilder.toString());
-        });
+        this.handler = handler;
+        this.ex = ex;
+        StringBuilder errorBuilder = new StringBuilder();
+        log.error(errorBuilder.append(Constants.REQUEST_REPORT_HEADER).toString());
+        return super.resolveException(request, response, handler, ex);
+    }
+
+    private void reset() {
+        this.handler = null;
+        this.ex = null;
     }
 }

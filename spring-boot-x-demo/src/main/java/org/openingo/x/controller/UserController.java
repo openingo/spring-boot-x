@@ -80,4 +80,10 @@ public class UserController {
         map.put("a", "A");
         return map;
     }
+
+    @GetMapping("/non")
+    public String non() {
+        new NonController().ok();
+        return "ok";
+    }
 }
