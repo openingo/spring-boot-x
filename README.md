@@ -101,6 +101,11 @@ public class App {
           errorExAttributes.put(RespData.Config.SC_KEY, errorAttributes.get("status"));
           errorExAttributes.put(RespData.Config.SM_KEY, errorAttributes.get("message"));
           errorExAttributes.put("error", errorAttributes.get("error"));
+          Exception ex = this.getHandlerExecutionException();
+          // check ex instanceof in your application
+          if (ValidateKit.isNotNull(ex)) {
+              errorExAttributes.put("ex", ex.toString());
+          }
           errorAttributes.put("openingo.error", errorExAttributes);
           return errorAttributes;
       }

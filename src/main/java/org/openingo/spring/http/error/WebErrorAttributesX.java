@@ -30,6 +30,7 @@ package org.openingo.spring.http.error;
 import lombok.extern.slf4j.Slf4j;
 import org.openingo.jdkits.ValidateKit;
 import org.openingo.spring.constants.Constants;
+import org.openingo.spring.http.kit.HttpThreadLocalDataKit;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
@@ -65,6 +66,7 @@ public class WebErrorAttributesX extends DefaultErrorAttributes {
         }
         if (ValidateKit.isNotNull(this.ex)) {
             errorAttributes.put("exception", this.ex.toString());
+            HttpThreadLocalDataKit.putData(this.ex);
         }
         this.reset();
         return errorAttributes;
@@ -97,5 +99,12 @@ public class WebErrorAttributesX extends DefaultErrorAttributes {
     private void reset() {
         this.handler = null;
         this.ex = null;
+    }
+
+    /**
+     * @return current handler execution 's exceptions, may be <tt>null</tt>
+     */
+    protected Exception getHandlerExecutionException() {
+        return HttpThreadLocalDataKit.getData();
     }
 }

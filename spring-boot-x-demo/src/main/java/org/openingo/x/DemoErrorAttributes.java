@@ -27,6 +27,7 @@
 
 package org.openingo.x;
 
+import org.openingo.jdkits.ValidateKit;
 import org.openingo.jdkits.http.RespData;
 import org.openingo.spring.http.error.WebErrorAttributesX;
 import org.springframework.web.context.request.WebRequest;
@@ -48,6 +49,11 @@ public class DemoErrorAttributes extends WebErrorAttributesX {
         errorExAttributes.put(RespData.Config.SC_KEY, errorAttributes.get("status"));
         errorExAttributes.put(RespData.Config.SM_KEY, errorAttributes.get("message"));
         errorExAttributes.put("error", errorAttributes.get("error"));
+        Exception ex = this.getHandlerExecutionException();
+        // check ex instanceof in your application
+        if (ValidateKit.isNotNull(ex)) {
+            errorExAttributes.put("ex", ex.toString());
+        }
         errorAttributes.put("openingo.error", errorExAttributes);
         return errorAttributes;
     }

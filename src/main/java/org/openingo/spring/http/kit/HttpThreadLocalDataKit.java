@@ -28,13 +28,13 @@
 package org.openingo.spring.http.kit;
 
 /**
- * HttpDataKit
+ * HttpThreadLocalDataKit
  *
  * @author Qicz
  */
-public final class HttpDataKit {
+public final class HttpThreadLocalDataKit {
 
-    private HttpDataKit(){}
+    private HttpThreadLocalDataKit(){}
 
     private static final ThreadLocal<Object> httpData = new ThreadLocal<>();
 
@@ -43,18 +43,18 @@ public final class HttpDataKit {
      * @param data
      */
     public static void putData(Object data) {
-        HttpDataKit.httpData.set(data);
+        HttpThreadLocalDataKit.httpData.set(data);
     }
 
     /**
      * Get data, remove from threadLocal in time.
      */
-    public static Object getData() {
-        Object data = null;
+    public static <T> T getData() {
+        T data = null;
         try {
-            data = HttpDataKit.httpData.get();
+            data = (T)HttpThreadLocalDataKit.httpData.get();
         } finally {
-            HttpDataKit.httpData.remove();
+            HttpThreadLocalDataKit.httpData.remove();
         }
         return data;
     }
