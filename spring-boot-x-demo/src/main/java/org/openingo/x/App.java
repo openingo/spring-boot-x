@@ -13,9 +13,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @EnableExtension
 public class App {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         SpringApplicationX.run(App.class, args);
-
         SpringApplicationX.applicationInfo();
     }
 }

@@ -27,6 +27,7 @@
 
 package org.openingo.x.controller;
 
+import org.openingo.spring.exception.ServiceException;
 import org.openingo.spring.extension.data.redis.RedisTemplateX;
 import org.openingo.x.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +79,7 @@ public class UserController {
     public Map ex() {
         //Map map = null;//new HashMap();
         //map.put("a", "A");
-        throw new RuntimeException("testing exception");
+        throw new ServiceException("ERROR_CODE", "testing exception");
         //return map;
     }
 

@@ -27,9 +27,12 @@
 
 package org.openingo.x;
 
+import lombok.extern.slf4j.Slf4j;
 import org.openingo.jdkits.ValidateKit;
 import org.openingo.jdkits.http.RespData;
+import org.openingo.spring.exception.ServiceException;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributesX;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.HashMap;
@@ -40,19 +43,35 @@ import java.util.Map;
  *
  * @author Qicz
  */
+@Slf4j
 public class DemoErrorAttributes extends DefaultErrorAttributesX {
+
+    /**
+     * Create a new {@link DefaultErrorAttributesX} instance that included the
+     * "exception" attribute , can not get the "exception" instance and response status.
+     */
+    public DemoErrorAttributes() {
+        super(true, true);
+    }
 
     @Override
     public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
         Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
         Map<String, Object> errorExAttributes = new HashMap<>();
-        errorExAttributes.put(RespData.Config.SC_KEY, this.getStatus());
         errorExAttributes.put(RespData.Config.SM_KEY, errorAttributes.get("message"));
         errorExAttributes.put("error", errorAttributes.get("error"));
-        Exception ex = this.getHandlerExecutionException();
-        // check ex instanceof in your application
-        if (ValidateKit.isNotNull(ex)) {
-            errorExAttributes.put("ex", ex.toString());
+        Integer status = this.getStatus();
+        if (HttpStatus.OK.value() != status) {
+            Object scKey = status;
+            Exception ex = this.getHandlerExecutionException();
+            // check ex instanceof in your application
+            if (ValidateKit.isNotNull(ex)) {
+                errorExAttributes.put("ex", ex.toString());
+                if (ex instanceof ServiceException) {
+                    scKey = ((ServiceException) ex).getExceptionCode();
+                }
+            }
+            errorExAttributes.put(RespData.Config.SC_KEY, scKey);
         }
         errorAttributes.put("openingo.error", errorExAttributes);
         return errorAttributes;

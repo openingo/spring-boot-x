@@ -48,16 +48,34 @@ import java.util.Map;
 @Slf4j
 public class DefaultErrorAttributesX extends DefaultErrorAttributes {
 
-    private final ThreadLocalKit<Object> handlers = new ThreadLocalKit<>();
-    private final ThreadLocalKit<Exception> exceptions = new ThreadLocalKit<>();
-    private final ThreadLocalKit<Integer> statuses = new ThreadLocalKit<>();
+    private final ThreadLocalKit<Object> handlerHolder = new ThreadLocalKit<>();
+    private final ThreadLocalKit<Exception> exceptionHolder = new ThreadLocalKit<>();
+    private final ThreadLocalKit<Integer> statusHolder = new ThreadLocalKit<>();
+
+    // using exception instance or not
+    private final boolean usingException;
+
+    // using response status or not
+    private final boolean usingStatus;
 
     /**
-     * Create a new {@link DefaultErrorAttributes} instance that include the
-     * "exception" attribute.
+     * Create a new {@link DefaultErrorAttributesX} instance that included the
+     * "exception" attribute , can not get the "exception" instance and response status.
      */
     public DefaultErrorAttributesX() {
+        this(false, false);
+    }
+
+    /**
+     * Create a new {@link DefaultErrorAttributesX} instance.
+     * default included the "exception" attribute.
+     *
+     * @param usingException whether to get the "exception" instance and response status.
+     */
+    public DefaultErrorAttributesX(boolean usingException, boolean usingStatus) {
         super(true);
+        this.usingException = usingException;
+        this.usingStatus = usingStatus;
     }
 
     /**
@@ -70,11 +88,13 @@ public class DefaultErrorAttributesX extends DefaultErrorAttributes {
     @Override
     public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
         Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
-        Object handler = this.handlers.get();
+        Object handler = this.handlerHolder.get();
         if (ValidateKit.isNotNull(handler)) {
             errorAttributes.put("handler", handler.toString());
         }
-        this.statuses.set(ObjectKit.toInteger(errorAttributes.get("status")));
+        if (this.usingStatus) {
+            this.statusHolder.set(ObjectKit.toInteger(errorAttributes.get("status")));
+        }
         return errorAttributes;
     }
 
@@ -95,24 +115,43 @@ public class DefaultErrorAttributesX extends DefaultErrorAttributes {
      */
     @Override
     public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception exception) {
-        this.handlers.set(handler);
-        this.exceptions.set(exception);
+        this.handlerHolder.set(handler);
+        if (this.usingException) {
+            this.exceptionHolder.set(exception);
+        }
         StringBuilder errorBuilder = new StringBuilder();
         log.error(errorBuilder.append(Constants.REQUEST_REPORT_HEADER).toString());
         return super.resolveException(request, response, handler, exception);
     }
 
     /**
-     * @return current handler execution 's exceptions, may be <tt>null</tt>
+     * Returns current handler execution 's instance, may be <tt>null</tt>.
+     *
+     * if "usingException" is <tt>false</tt> will return <tt>null</tt>.
+     *
+     * @return current handler execution 's exception instance
      */
     protected Exception getHandlerExecutionException() {
-        return this.exceptions.get();
+        if (!this.usingException) {
+            log.info("\"usingException\" state is Illegal, required true state.");
+            return null;
+        }
+        return this.exceptionHolder.get();
     }
 
     /**
-     * Current Request's status, @see @{@linkplain org.springframework.http.HttpStatus}
+     * Current Request's status
+     *
+     * if "usingStatus" is <tt>false</tt> will return <tt>null</tt>.
+     *
+     * @see @{@linkplain org.springframework.http.HttpStatus}
+     * @return response status
      */
     protected Integer getStatus() {
-        return this.statuses.get();
+        if (!this.usingStatus) {
+            log.info("\"usingStatus\" state is Illegal, required true state.");
+            return null;
+        }
+        return this.statusHolder.get();
     }
 }

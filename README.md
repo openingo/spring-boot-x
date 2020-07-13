@@ -33,17 +33,18 @@
 
   ```json
   {
-      "timestamp": "2020-07-12T11:24:11.261+0000",
+      "timestamp": "2020-07-13T05:49:06.071+0000",
       "status": 500,
       "error": "Internal Server Error",
-      "message": "No message available",
+      "exception": "org.openingo.spring.exception.ServiceException",
+      "message": "testing exception",
       "path": "/ex",
       "handler": "public java.util.Map org.openingo.x.controller.UserController.ex()",
-      "exception": "java.lang.NullPointerException",
       "openingo.error": {
-          "em": "No message available",
+          "ex": "org.openingo.spring.exception.ServiceException: testing exception",
+          "em": "testing exception",
           "error": "Internal Server Error",
-          "ec": 500
+          "ec": "ERROR_CODE"
       }
   }
   ```
@@ -92,19 +93,34 @@ public class App {
 - ErrorAttributes
 
   ```java
-  public class DemoErrorAttributes extends WebErrorAttributesX {
+  public class DemoErrorAttributes extends DefaultErrorAttributesX {
+  
+      /**
+       * Create a new {@link DefaultErrorAttributesX} instance that included the
+       * "exception" attribute , can not get the "exception" instance and response status.
+       */
+      public DemoErrorAttributes() {
+          super(true, true);
+      }
   
       @Override
       public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
           Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
           Map<String, Object> errorExAttributes = new HashMap<>();
-          errorExAttributes.put(RespData.Config.SC_KEY, errorAttributes.get("status"));
           errorExAttributes.put(RespData.Config.SM_KEY, errorAttributes.get("message"));
           errorExAttributes.put("error", errorAttributes.get("error"));
-          Exception ex = this.getHandlerExecutionException();
-          // check ex instanceof in your application
-          if (ValidateKit.isNotNull(ex)) {
-              errorExAttributes.put("ex", ex.toString());
+          Integer status = this.getStatus();
+          if (HttpStatus.OK.value() != status) {
+              Object scKey = status;
+              Exception ex = this.getHandlerExecutionException();
+              // check ex instanceof in your application
+              if (ValidateKit.isNotNull(ex)) {
+                  errorExAttributes.put("ex", ex.toString());
+                  if (ex instanceof ServiceException) {
+                      scKey = ((ServiceException) ex).getExceptionCode();
+                  }
+              }
+              errorExAttributes.put(RespData.Config.SC_KEY, scKey);
           }
           errorAttributes.put("openingo.error", errorExAttributes);
           return errorAttributes;

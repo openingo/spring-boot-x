@@ -27,6 +27,8 @@
 
 package org.openingo.spring.exception;
 
+import org.openingo.jdkits.ObjectKit;
+
 /**
  * ServiceException
  *
@@ -34,24 +36,21 @@ package org.openingo.spring.exception;
  */
 public class ServiceException extends RuntimeException {
 
-    /**
-     * Constructs a new runtime exception with {@code null} as its
-     * detail message.  The cause is not initialized, and may subsequently be
-     * initialized by a call to {@link #initCause}.
-     */
-    public ServiceException() {
-    }
+    // exception code
+    private Object exceptionCode;
 
     /**
      * Constructs a new runtime exception with the specified detail message.
      * The cause is not initialized, and may subsequently be initialized by a
      * call to {@link #initCause}.
      *
+     * @param exceptionCode service exception custom code
      * @param message the detail message. The detail message is saved for
      *                later retrieval by the {@link #getMessage()} method.
      */
-    public ServiceException(String message) {
+    public ServiceException(Object exceptionCode, String message) {
         super(message);
+        this.exceptionCode = exceptionCode;
     }
 
     /**
@@ -60,16 +59,17 @@ public class ServiceException extends RuntimeException {
      * {@code cause} is <i>not</i> automatically incorporated in
      * this runtime exception's detail message.
      *
+     * @param exceptionCode service exception custom code
      * @param message the detail message (which is saved for later retrieval
      *                by the {@link #getMessage()} method).
      * @param cause   the cause (which is saved for later retrieval by the
      *                {@link #getCause()} method).  (A <tt>null</tt> value is
      *                permitted, and indicates that the cause is nonexistent or
      *                unknown.)
-     * @since 1.4
      */
-    public ServiceException(String message, Throwable cause) {
+    public ServiceException(Object exceptionCode, String message, Throwable cause) {
         super(message, cause);
+        this.exceptionCode = exceptionCode;
     }
 
     /**
@@ -79,14 +79,15 @@ public class ServiceException extends RuntimeException {
      * <tt>cause</tt>).  This constructor is useful for runtime exceptions
      * that are little more than wrappers for other throwables.
      *
+     * @param exceptionCode service exception custom code
      * @param cause the cause (which is saved for later retrieval by the
      *              {@link #getCause()} method).  (A <tt>null</tt> value is
      *              permitted, and indicates that the cause is nonexistent or
      *              unknown.)
-     * @since 1.4
      */
-    public ServiceException(Throwable cause) {
+    public ServiceException(Object exceptionCode, Throwable cause) {
         super(cause);
+        this.exceptionCode = exceptionCode;
     }
 
     /**
@@ -94,6 +95,7 @@ public class ServiceException extends RuntimeException {
      * message, cause, suppression enabled or disabled, and writable
      * stack trace enabled or disabled.
      *
+     * @param exceptionCode service exception custom code
      * @param message            the detail message.
      * @param cause              the cause.  (A {@code null} value is permitted,
      *                           and indicates that the cause is nonexistent or unknown.)
@@ -101,9 +103,36 @@ public class ServiceException extends RuntimeException {
      *                           or disabled
      * @param writableStackTrace whether or not the stack trace should
      *                           be writable
-     * @since 1.7
      */
-    public ServiceException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public ServiceException(Object exceptionCode, String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
+        this.exceptionCode = exceptionCode;
+    }
+
+    /**
+     * @return Service Exception Code
+     */
+    public Object getExceptionCode() {
+        return this.exceptionCode;
+    }
+
+    /**
+     * @return Service Exception String Code
+     */
+    public String getExceptionStringCode() {
+        return this.exceptionCode.toString();
+    }
+
+    /**
+     * Service Exception Integer Code
+     * if the string cannot be parsed as an integer return <tt>null</tt>.
+     * @return Service Exception Integer Code
+     */
+    public Integer getExceptionIntegerCode() {
+        try {
+            return ObjectKit.toInteger(this.exceptionCode);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 }
