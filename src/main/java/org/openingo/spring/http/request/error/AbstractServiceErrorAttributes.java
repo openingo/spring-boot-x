@@ -75,7 +75,7 @@ public abstract class AbstractServiceErrorAttributes extends DefaultErrorAttribu
         if (!this.responseOK(errorAttributes)) {
             Exception exception = this.getHandlerExecutionException();
             if (ValidateKit.isNotNull(exception)) {
-                message = exception.getMessage();
+                message = this.decorateExceptionMessage(exception);
                 if (exception instanceof ServiceException) {
                     code = ((ServiceException) exception).getExceptionCode();
                 }
@@ -85,6 +85,18 @@ public abstract class AbstractServiceErrorAttributes extends DefaultErrorAttribu
         serviceErrorAttributes.put(RespData.Config.SM_KEY, message);
         this.decorateErrorAttributes(errorAttributes, serviceErrorAttributes);
         return serviceErrorAttributes;
+    }
+
+    /**
+     * Decorate exception, may be you can returns friendly message to user.
+     * @param exception  the exception that got thrown during handler execution
+     */
+    public String decorateExceptionMessage(Exception exception) {
+        String friendlyFailureMessage = RespData.Config.FRIENDLY_FAILURE_MESSAGE;
+        if (ValidateKit.isNotNull(friendlyFailureMessage)) {
+            return friendlyFailureMessage;
+        }
+        return exception.getMessage();
     }
 
     /**
