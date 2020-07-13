@@ -27,24 +27,14 @@
 
 package org.openingo.x;
 
-import lombok.Data;
-import org.openingo.jdkits.ValidateKit;
-import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
+import org.openingo.jdkits.ThreadLocalKit;
 
 /**
- * KeyNamingPolicy
+ * NamingKit
  *
  * @author Qicz
  */
-@Data
-public class KeyNamingPolicy implements IKeyNamingPolicy {
+public final class NamingKit {
 
-    @Override
-    public String getKeyName(String key) {
-        String s = NamingKit.namingData.get();
-        if (ValidateKit.isNotNull(s)) {
-            return s + ":qicz:" + key;
-        }
-        return "qicz:" + key;
-    }
+    public static final ThreadLocalKit<String> namingData = new ThreadLocalKit<>();
 }

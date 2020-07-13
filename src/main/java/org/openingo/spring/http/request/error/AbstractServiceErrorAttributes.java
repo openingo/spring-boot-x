@@ -91,7 +91,7 @@ public abstract class AbstractServiceErrorAttributes extends DefaultErrorAttribu
      * Decorate exception, may be you can returns friendly message to user.
      * @param exception  the exception that got thrown during handler execution
      */
-    public String decorateExceptionMessage(Exception exception) {
+    private String decorateExceptionMessage(Exception exception) {
         String friendlyFailureMessage = RespData.Config.FRIENDLY_FAILURE_MESSAGE;
         if (ValidateKit.isNotNull(friendlyFailureMessage)) {
             return friendlyFailureMessage;
