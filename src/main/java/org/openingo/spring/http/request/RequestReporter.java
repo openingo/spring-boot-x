@@ -34,6 +34,7 @@ import org.openingo.jdkits.IPKit;
 import org.openingo.jdkits.ValidateKit;
 import org.openingo.spring.constants.Constants;
 import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.web.method.HandlerMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -51,7 +52,7 @@ public final class RequestReporter {
 	private ServletServerHttpRequest request;
 
 	// current request processing time
-	private Double processingTime;
+	private float processingTime = 0.0f;
 
 	// current request bodyData data
 	private Object bodyData;
@@ -61,6 +62,9 @@ public final class RequestReporter {
 
 	// current proceeding join point
 	private ProceedingJoinPoint point;
+
+	// action handler
+	private HandlerMethod handler;
 
 	private RequestReporter(){}
 

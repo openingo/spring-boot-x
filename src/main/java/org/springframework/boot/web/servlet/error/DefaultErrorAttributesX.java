@@ -32,6 +32,7 @@ import org.openingo.jdkits.ObjectKit;
 import org.openingo.jdkits.ThreadLocalKit;
 import org.openingo.jdkits.ValidateKit;
 import org.openingo.spring.constants.Constants;
+import org.openingo.spring.http.request.RequestReporter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
@@ -112,6 +113,8 @@ public class DefaultErrorAttributesX extends DefaultErrorAttributes {
         if (this.usingException) {
             this.exceptionHolder.set(exception);
         }
+        RequestReporter requestReporter = RequestReporter.getInstance();
+
         StringBuilder errorBuilder = new StringBuilder();
         log.error(errorBuilder.append(Constants.REQUEST_REPORT_HEADER).toString());
         return super.resolveException(request, response, handler, exception);

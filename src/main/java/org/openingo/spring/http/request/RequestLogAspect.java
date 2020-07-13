@@ -64,9 +64,9 @@ public class RequestLogAspect {
         this.processingTimeThreadLocal.set(SystemClockKit.now());
     }
 
-    private Double getProcessingSeconds() {
+    private float getProcessingSeconds() {
         long startTime = this.processingTimeThreadLocal.get();
-        return (SystemClockKit.now() - startTime)/1000.0;
+        return (SystemClockKit.now() - startTime)/1000.0f;
     }
 
     @Pointcut("execution(public * *.*..controller..*.*(..))")
@@ -77,20 +77,20 @@ public class RequestLogAspect {
     public Object around(ProceedingJoinPoint point) throws Throwable {
         this.handlerStart();
         Object proceed = point.proceed();
-        double processingTime = this.getProcessingSeconds();
+        float processingTime = this.getProcessingSeconds();
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        RequestReporter httpRequestReporter = RequestReporter.getInstance();
+        RequestReporter requestReporter = RequestReporter.getInstance();
         if (ValidateKit.isNull(request)) {
             StringBuilder reportInfoBuilder = new StringBuilder(Constants.REQUEST_REPORT_HEADER);
             reportInfoBuilder.append("Processing Time  : ").append(processingTime).append("s\n");
-            httpRequestReporter.report(reportInfoBuilder.toString());
+            requestReporter.report(reportInfoBuilder.toString());
             return proceed;
         }
-        httpRequestReporter.setPoint(point);
+        requestReporter.setPoint(point);
         // current request processing time
-        httpRequestReporter.setProcessingTime(processingTime);
+        requestReporter.setProcessingTime(processingTime);
         ServletServerHttpRequest serverHttpRequest = new ServletServerHttpRequest(request);
-        httpRequestReporter.setRequest(serverHttpRequest);
+        requestReporter.setRequest(serverHttpRequest);
         // bodyData data
         Object body = null;
         if (ValidateKit.isNotNull(request.getContentType())) {
@@ -105,14 +105,14 @@ public class RequestLogAspect {
                 log.error(e.toString());
             }
         }
-        httpRequestReporter.setBodyData(body);
+        requestReporter.setBodyData(body);
 
         // response data
         if (ValidateKit.isNotNull(proceed)) {
-            httpRequestReporter.setResponseData(JacksonKit.toJson(proceed));
+            requestReporter.setResponseData(JacksonKit.toJson(proceed));
         }
         // fire report
-        httpRequestReporter.report();
+        requestReporter.report();
         return proceed;
     }
 }
