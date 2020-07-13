@@ -25,13 +25,14 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.http.error;
+package org.springframework.boot.web.servlet.error;
 
 import lombok.extern.slf4j.Slf4j;
+import org.openingo.jdkits.ObjectKit;
+import org.openingo.jdkits.ThreadLocalKit;
 import org.openingo.jdkits.ValidateKit;
 import org.openingo.spring.constants.Constants;
-import org.openingo.spring.http.kit.HttpThreadLocalDataKit;
-import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
@@ -41,15 +42,37 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 /**
- * WebErrorAttributesX
+ * DefaultErrorAttributesX
  *
  * @author Qicz
  */
 @Slf4j
-public class WebErrorAttributesX extends DefaultErrorAttributes {
+public class DefaultErrorAttributesX extends DefaultErrorAttributes {
 
-    private Object handler;
-    private Exception ex;
+    private final ThreadLocalKit<Object> handlerHolder = new ThreadLocalKit<>();
+    private final ThreadLocalKit<Exception> exceptionHolder = new ThreadLocalKit<>();
+
+    // using exception instance or not
+    private final boolean usingException;
+
+    /**
+     * Create a new {@link DefaultErrorAttributesX} instance that included the
+     * "exception" attribute , can not get the "exception" instance.
+     */
+    public DefaultErrorAttributesX() {
+        this(false);
+    }
+
+    /**
+     * Create a new {@link DefaultErrorAttributesX} instance.
+     * default included the "exception" attribute.
+     *
+     * @param usingException whether to get the "exception" instance.
+     */
+    public DefaultErrorAttributesX(boolean usingException) {
+        super(true);
+        this.usingException = usingException;
+    }
 
     /**
      * Returns a {@link Map} of the error attributes. The map can be used as the model of
@@ -61,14 +84,10 @@ public class WebErrorAttributesX extends DefaultErrorAttributes {
     @Override
     public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
         Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
-        if (ValidateKit.isNotNull(this.handler)) {
-            errorAttributes.put("handler", this.handler.toString());
+        Object handler = this.handlerHolder.get();
+        if (ValidateKit.isNotNull(handler)) {
+            errorAttributes.put("handler", handler.toString());
         }
-        if (ValidateKit.isNotNull(this.ex)) {
-            errorAttributes.put("exception", this.ex.toString());
-            HttpThreadLocalDataKit.putData(this.ex);
-        }
-        this.flush();
         return errorAttributes;
     }
 
@@ -83,28 +102,64 @@ public class WebErrorAttributesX extends DefaultErrorAttributes {
      * @param response current HTTP response
      * @param handler  the executed handler, or {@code null} if none chosen at the
      *                 time of the exception (for example, if multipart resolution failed)
-     * @param ex       the exception that got thrown during handler execution
+     * @param exception       the exception that got thrown during handler execution
      * @return a corresponding {@code ModelAndView} to forward to,
      * or {@code null} for default processing in the resolution chain
      */
     @Override
-    public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        this.handler = handler;
-        this.ex = ex;
+    public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception exception) {
+        this.handlerHolder.set(handler);
+        if (this.usingException) {
+            this.exceptionHolder.set(exception);
+        }
         StringBuilder errorBuilder = new StringBuilder();
         log.error(errorBuilder.append(Constants.REQUEST_REPORT_HEADER).toString());
-        return super.resolveException(request, response, handler, ex);
-    }
-
-    private void flush() {
-        this.handler = null;
-        this.ex = null;
+        return super.resolveException(request, response, handler, exception);
     }
 
     /**
-     * @return current handler execution 's exceptions, may be <tt>null</tt>
+     * Returns current handler execution 's instance, may be <tt>null</tt>.
+     *
+     * if "usingException" is <tt>false</tt> will return <tt>null</tt>.
+     *
+     * @return current handler execution 's exception instance
      */
     protected Exception getHandlerExecutionException() {
-        return HttpThreadLocalDataKit.getData();
+        if (!this.usingException) {
+            log.info("\"usingException\" state is Illegal, required true state.");
+            return null;
+        }
+        return this.exceptionHolder.get();
+    }
+
+    /**
+     * Current Request's status
+     *
+     * @see @{@linkplain org.springframework.http.HttpStatus}
+     * @return response status
+     */
+    protected Integer getStatus(Map<String, Object> errorAttributes) {
+        return ObjectKit.toInteger(errorAttributes.get("status"));
+    }
+
+    /**
+     * @return Current Error
+     */
+    protected String getError(Map<String, Object> errorAttributes) {
+        return errorAttributes.get("error").toString();
+    }
+
+    /**
+     * @return Current Error Message
+     */
+    protected String getMessage(Map<String, Object> errorAttributes) {
+        return errorAttributes.get("message").toString();
+    }
+
+    /**
+     * @return <tt>true</tt> if response status is "OK" (200)
+     */
+    protected boolean responseOK(Map<String, Object> errorAttributes) {
+        return HttpStatus.OK.value() == this.getStatus(errorAttributes);
     }
 }

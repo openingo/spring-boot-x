@@ -29,8 +29,8 @@ package org.openingo.spring.extension.http.config;
 
 import org.openingo.spring.constants.Constants;
 import org.openingo.spring.constants.PropertiesConstants;
-import org.openingo.spring.http.error.WebErrorAttributesX;
 import org.openingo.spring.http.request.RequestLogAspect;
+import org.openingo.spring.http.request.error.DefaultServiceErrorAttributes;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -61,11 +61,11 @@ public class HttpConfig  {
     }
 
     /**
-     * Custom Error Attributes
+     * DefaultServiceErrorAttributes
      */
     @Bean
     @ConditionalOnMissingBean(value = ErrorAttributes.class, search = SearchStrategy.CURRENT)
-    public WebErrorAttributesX webErrorAttributesX() {
-        return new WebErrorAttributesX();
+    public DefaultServiceErrorAttributes serviceDefaultErrorAttributes() {
+        return new DefaultServiceErrorAttributes();
     }
 }

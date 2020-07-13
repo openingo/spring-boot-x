@@ -27,7 +27,10 @@
 
 package org.openingo.x.controller;
 
+import org.openingo.jdkits.http.RespData;
+import org.openingo.spring.exception.ServiceException;
 import org.openingo.spring.extension.data.redis.RedisTemplateX;
+import org.openingo.x.NamingKit;
 import org.openingo.x.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -62,23 +65,25 @@ public class UserController {
 
     @GetMapping("/save")
     public String save() {
+        NamingKit.namingData.set("openingo");
         redisTemplateX.opsForValue().set("name", "Qicz");
         return "ok";
     }
 
     @GetMapping("/json")
-    public Map json(){
-        return new HashMap<String, Object>(){{
+    public RespData json(){
+        return RespData.success(new HashMap<String, Object>(){{
             put("name","qicz");
             put("age", 18);
-        }};
+        }});
     }
 
     @GetMapping("/ex")
     public Map ex() {
-        Map map = null;//new HashMap();
-        map.put("a", "A");
-        return map;
+        //Map map = null;//new HashMap();
+        //map.put("a", "A");
+        throw new ServiceException("ERROR_CODE", "testing exception");
+        //return map;
     }
 
     @GetMapping("/non")

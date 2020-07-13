@@ -56,10 +56,4 @@ public class Config {
     public IKeyNamingPolicy keyNamingPolicy() {
         return new KeyNamingPolicy();
     }
-
-    // using business application config bean
-    @Bean
-    public DemoErrorAttributes demoErrorAttributes() {
-        return new DemoErrorAttributes();
-    }
 }

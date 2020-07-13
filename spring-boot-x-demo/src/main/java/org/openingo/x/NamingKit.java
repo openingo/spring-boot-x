@@ -25,37 +25,16 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.http.kit;
+package org.openingo.x;
+
+import org.openingo.jdkits.ThreadLocalKit;
 
 /**
- * HttpThreadLocalDataKit
+ * NamingKit
  *
  * @author Qicz
  */
-public final class HttpThreadLocalDataKit {
+public final class NamingKit {
 
-    private HttpThreadLocalDataKit(){}
-
-    private static final ThreadLocal<Object> httpData = new ThreadLocal<>();
-
-    /**
-     * Put data
-     * @param data
-     */
-    public static void putData(Object data) {
-        HttpThreadLocalDataKit.httpData.set(data);
-    }
-
-    /**
-     * Get data, remove from threadLocal in time.
-     */
-    public static <T> T getData() {
-        T data = null;
-        try {
-            data = (T)HttpThreadLocalDataKit.httpData.get();
-        } finally {
-            HttpThreadLocalDataKit.httpData.remove();
-        }
-        return data;
-    }
+    public static final ThreadLocalKit<String> namingData = new ThreadLocalKit<>();
 }

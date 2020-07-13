@@ -33,17 +33,18 @@
 
   ```json
   {
-      "timestamp": "2020-07-12T11:24:11.261+0000",
+      "timestamp": "2020-07-13T05:49:06.071+0000",
       "status": 500,
       "error": "Internal Server Error",
-      "message": "No message available",
+      "exception": "org.openingo.spring.exception.ServiceException",
+      "message": "testing exception",
       "path": "/ex",
       "handler": "public java.util.Map org.openingo.x.controller.UserController.ex()",
-      "exception": "java.lang.NullPointerException",
       "openingo.error": {
-          "em": "No message available",
+          "ex": "org.openingo.spring.exception.ServiceException: testing exception",
+          "em": "testing exception",
           "error": "Internal Server Error",
-          "ec": 500
+          "ec": "ERROR_CODE"
       }
   }
   ```
@@ -95,25 +96,50 @@ public class App {
       enable: true
   ```
 
-- ErrorAttributes
+- ServiceDefaultErrorAttributes
 
   ```java
-  public class DemoErrorAttributes extends WebErrorAttributesX {
+  /**
+   * AbstractServiceErrorAttributes
+   *
+   * @author Qicz
+   */
+  public class ServiceDefaultErrorAttributes extends DefaultErrorAttributesX {
   
+      /**
+       * Create a new {@link ServiceDefaultErrorAttributes} instance that included the
+       * "exception" attribute , can get the "exception" instance.
+       */
+      public ServiceDefaultErrorAttributes() {
+          super(true);
+      }
+  
+      /**
+       * Returns a {@link Map} of the error attributes. The map can be used as the model of
+       * an error page {@link ModelAndView}, or returned as a {@link ResponseBody}.
+       *
+       * @param webRequest        the source request
+       * @param includeStackTrace if stack trace elements should be included
+       * @return a map of error attributes
+       */
       @Override
       public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
           Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
-          Map<String, Object> errorExAttributes = new HashMap<>();
-          errorExAttributes.put(RespData.Config.SC_KEY, errorAttributes.get("status"));
-          errorExAttributes.put(RespData.Config.SM_KEY, errorAttributes.get("message"));
-          errorExAttributes.put("error", errorAttributes.get("error"));
-          Exception ex = this.getHandlerExecutionException();
-          // check ex instanceof in your application
-          if (ValidateKit.isNotNull(ex)) {
-              errorExAttributes.put("ex", ex.toString());
+          Map<String, Object> serviceErrorAttributes = new HashMap<>();
+          Object code = this.getStatus(errorAttributes).toString();
+          Object message = this.getError(errorAttributes);
+          if (!this.responseOK(errorAttributes)) {
+              Exception exception = this.getHandlerExecutionException();
+              if (ValidateKit.isNotNull(exception)) {
+                  message = exception.getMessage();
+                  if (exception instanceof ServiceException) {
+                      code = ((ServiceException) exception).getExceptionCode();
+                  }
+              }
           }
-          errorAttributes.put("openingo.error", errorExAttributes);
-          return errorAttributes;
+          serviceErrorAttributes.put(RespData.Config.SC_KEY, code);
+          serviceErrorAttributes.put(RespData.Config.SM_KEY, message);
+          return serviceErrorAttributes;
       }
   }
   ```
