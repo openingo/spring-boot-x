@@ -33,7 +33,7 @@
 
     <groupId>org.openingo.spring</groupId>
     <artifactId>spring-boot-x</artifactId>
-    <version>1.3.1-RELEASE</version>
+    <version>1.3.2-RELEASE</version>
 
     <name>spring-boot extensions</name>
     <description>spring-boot extensions</description>
@@ -130,7 +130,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
