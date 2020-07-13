@@ -90,40 +90,50 @@ public class App {
       enable: true
   ```
 
-- ErrorAttributes
+- ServiceDefaultErrorAttributes
 
   ```java
-  public class DemoErrorAttributes extends DefaultErrorAttributesX {
+  /**
+   * AbstractServiceErrorAttributes
+   *
+   * @author Qicz
+   */
+  public class ServiceDefaultErrorAttributes extends DefaultErrorAttributesX {
   
       /**
-       * Create a new {@link DefaultErrorAttributesX} instance that included the
-       * "exception" attribute, can get the "exception" instance.
+       * Create a new {@link ServiceDefaultErrorAttributes} instance that included the
+       * "exception" attribute , can get the "exception" instance.
        */
-      public DemoErrorAttributes() {
+      public ServiceDefaultErrorAttributes() {
           super(true);
       }
   
+      /**
+       * Returns a {@link Map} of the error attributes. The map can be used as the model of
+       * an error page {@link ModelAndView}, or returned as a {@link ResponseBody}.
+       *
+       * @param webRequest        the source request
+       * @param includeStackTrace if stack trace elements should be included
+       * @return a map of error attributes
+       */
       @Override
       public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
           Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
-          Map<String, Object> errorExAttributes = new HashMap<>();
-          errorExAttributes.put(RespData.Config.SM_KEY, errorAttributes.get("message"));
-          errorExAttributes.put("error", errorAttributes.get("error"));
-          Integer status = this.getStatus(errorAttributes);
-          if (HttpStatus.OK.value() != status) {
-              Object scKey = status.toString();
-              Exception ex = this.getHandlerExecutionException();
-              // check ex instanceof in your application
-              if (ValidateKit.isNotNull(ex)) {
-                  errorExAttributes.put("ex", ex.toString());
-                  if (ex instanceof ServiceException) {
-                      scKey = ((ServiceException) ex).getExceptionCode();
+          Map<String, Object> serviceErrorAttributes = new HashMap<>();
+          Object code = this.getStatus(errorAttributes).toString();
+          Object message = this.getError(errorAttributes);
+          if (!this.responseOK(errorAttributes)) {
+              Exception exception = this.getHandlerExecutionException();
+              if (ValidateKit.isNotNull(exception)) {
+                  message = exception.getMessage();
+                  if (exception instanceof ServiceException) {
+                      code = ((ServiceException) exception).getExceptionCode();
                   }
               }
-              errorExAttributes.put(RespData.Config.SC_KEY, scKey);
           }
-          errorAttributes.put("openingo.error", errorExAttributes);
-          return errorAttributes;
+          serviceErrorAttributes.put(RespData.Config.SC_KEY, code);
+          serviceErrorAttributes.put(RespData.Config.SM_KEY, message);
+          return serviceErrorAttributes;
       }
   }
   ```

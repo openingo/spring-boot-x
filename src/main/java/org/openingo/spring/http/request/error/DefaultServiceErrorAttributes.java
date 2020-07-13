@@ -25,35 +25,25 @@
  * SOFTWARE.
  */
 
-package org.openingo.x;
+package org.openingo.spring.http.request.error;
 
-import org.openingo.jdkits.http.RespData;
-import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import java.util.Map;
 
 /**
- * Config
+ * DefaultServiceErrorAttributes
  *
  * @author Qicz
  */
-@Configuration
-public class Config {
+public class DefaultServiceErrorAttributes extends AbstractServiceErrorAttributes {
 
-    public Config() {
-        RespData.Config.SC_KEY = "ec";
-        RespData.Config.SM_KEY = "em";
-    }
+    /**
+     * Decorate error attributes, add extension attributes etc.
+     *
+     * @param errorAttributes        error attributes
+     * @param serviceErrorAttributes service error attributes
+     */
+    @Override
+    public void decorateErrorAttributes(Map<String, Object> errorAttributes, Map<String, Object> serviceErrorAttributes) {
 
-    @Bean
-    public RedisSerializer<String> valueSerializer() {
-        return new StringRedisSerializer();
-    }
-
-    @Bean
-    public IKeyNamingPolicy keyNamingPolicy() {
-        return new KeyNamingPolicy();
     }
 }

@@ -32,6 +32,7 @@ import org.openingo.jdkits.ObjectKit;
 import org.openingo.jdkits.ThreadLocalKit;
 import org.openingo.jdkits.ValidateKit;
 import org.openingo.spring.constants.Constants;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
@@ -139,5 +140,26 @@ public class DefaultErrorAttributesX extends DefaultErrorAttributes {
      */
     protected Integer getStatus(Map<String, Object> errorAttributes) {
         return ObjectKit.toInteger(errorAttributes.get("status"));
+    }
+
+    /**
+     * @return Current Error
+     */
+    protected String getError(Map<String, Object> errorAttributes) {
+        return errorAttributes.get("error").toString();
+    }
+
+    /**
+     * @return Current Error Message
+     */
+    protected String getMessage(Map<String, Object> errorAttributes) {
+        return errorAttributes.get("message").toString();
+    }
+
+    /**
+     * @return <tt>true</tt> if response status is "OK" (200)
+     */
+    protected boolean responseOK(Map<String, Object> errorAttributes) {
+        return HttpStatus.OK.value() == this.getStatus(errorAttributes);
     }
 }

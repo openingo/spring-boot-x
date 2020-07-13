@@ -27,6 +27,7 @@
 
 package org.openingo.x.controller;
 
+import org.openingo.jdkits.http.RespData;
 import org.openingo.spring.exception.ServiceException;
 import org.openingo.spring.extension.data.redis.RedisTemplateX;
 import org.openingo.x.entity.User;
@@ -68,11 +69,11 @@ public class UserController {
     }
 
     @GetMapping("/json")
-    public Map json(){
-        return new HashMap<String, Object>(){{
+    public RespData json(){
+        return RespData.success(new HashMap<String, Object>(){{
             put("name","qicz");
             put("age", 18);
-        }};
+        }});
     }
 
     @GetMapping("/ex")
