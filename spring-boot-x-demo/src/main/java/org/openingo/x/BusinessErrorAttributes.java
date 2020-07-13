@@ -27,36 +27,37 @@
 
 package org.openingo.x;
 
-import org.openingo.jdkits.http.RespData;
-import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.openingo.spring.http.request.error.DefaultServiceErrorAttributes;
+import org.springframework.stereotype.Component;
 
 /**
- * Config
+ * BusinessErrorAttributes
  *
  * @author Qicz
  */
-@Configuration
-public class Config {
+@Component
+public class BusinessErrorAttributes extends DefaultServiceErrorAttributes {
 
-    public Config() {
-        RespData.Config.SC_KEY = "ec";
-        RespData.Config.SM_KEY = "em";
-        RespData.Config.FAILURE_SC = 111;
-       // RespData.Config.SM_ONLY = true; // set "true" just output message
-        RespData.Config.FRIENDLY_FAILURE_MESSAGE = null;//"friendly message";// set to "null" will using exception's message
-    }
-
-    @Bean
-    public RedisSerializer<String> valueSerializer() {
-        return new StringRedisSerializer();
-    }
-
-    @Bean
-    public IKeyNamingPolicy keyNamingPolicy() {
-        return new KeyNamingPolicy();
+    /**
+     * Decorate exception error code, custom for your business logic.
+     * <code>
+     * <pre>
+     * public Object decorateExceptionCode(Exception exception) {
+     *    if (exception instanceof IndexOutOfBoundsException) {
+     *      return 123;
+     *    }
+     *   return super.decorateExceptionCode(exception);
+     * }
+     * </pre>
+     * </code>
+     *
+     * @param exception the exception that got thrown during handler execution
+     */
+    @Override
+    public Object decorateExceptionCode(Exception exception) {
+        if (exception instanceof IndexOutOfBoundsException) {
+            return 123;
+        }
+        return super.decorateExceptionCode(exception);
     }
 }

@@ -64,31 +64,39 @@ public abstract class AbstractServiceErrorAttributes extends DefaultErrorAttribu
     @Override
     public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
         Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
-
-        Map<String, Object> serviceErrorAttributes = new HashMap<>();
+        // processing super error attributes
         Object code = this.getStatus(errorAttributes);
-        // deduce code type by RespData.Config.SUCCESS_SC
-        if (RespData.Config.SUCCESS_SC instanceof String) {
-            code = code.toString();
-        }
-        Object message = this.getError(errorAttributes);
-        if (!this.responseOK(errorAttributes)) {
-            Exception exception = this.getHandlerExecutionException();
-            if (ValidateKit.isNotNull(exception)) {
-                message = this.decorateExceptionMessage(exception);
-                if (exception instanceof ServiceException) {
-                    code = ((ServiceException) exception).getExceptionCode();
-                }
+        String message = this.getError(errorAttributes);
+        Exception exception = this.getHandlerExecutionException();
+        Map<String, Object> serviceErrorAttributes = new HashMap<>();
+        if (!this.responseOK(errorAttributes)
+                && ValidateKit.isNotNull(exception)) {
+            Object decorateExceptionCode = this.decorateExceptionCode(exception);
+            if (ValidateKit.isNotNull(decorateExceptionCode)) {
+                code = decorateExceptionCode;
             }
+            // check exception instance type again
+            if (exception instanceof ServiceException) {
+                code = ((ServiceException) exception).getExceptionCode();
+            }
+            message = this.decorateExceptionMessage(exception);
+            this.decorateErrorAttributes(errorAttributes, serviceErrorAttributes);
         }
-        serviceErrorAttributes.put(RespData.Config.SC_KEY, code);
+        // services error attributes processing
+        if (!RespData.Config.SM_ONLY) {
+            // deduce code type by RespData.Config.FAILURE_SC
+            if (RespData.Config.FAILURE_SC instanceof String) {
+                code = code.toString();
+            }
+            serviceErrorAttributes.put(RespData.Config.SC_KEY, code);
+        }
         serviceErrorAttributes.put(RespData.Config.SM_KEY, message);
-        this.decorateErrorAttributes(errorAttributes, serviceErrorAttributes);
         return serviceErrorAttributes;
     }
 
     /**
      * Decorate exception, may be you can returns friendly message to user.
+     *
      * @param exception  the exception that got thrown during handler execution
      */
     private String decorateExceptionMessage(Exception exception) {
@@ -100,7 +108,24 @@ public abstract class AbstractServiceErrorAttributes extends DefaultErrorAttribu
     }
 
     /**
+     * Decorate exception error code, custom for your business logic.
+     * <code>
+     * <pre>
+     * public Object decorateExceptionCode(Exception exception) {
+     *    if (exception instanceof IndexOutOfBoundsException) {
+     *      return 123;
+     *    }
+     *   return super.decorateExceptionCode(exception);
+     * }
+     * </pre>
+     * </code>
+     * @param exception  the exception that got thrown during handler execution
+     */
+    public abstract Object decorateExceptionCode(Exception exception);
+
+    /**
      * Decorate error attributes, add extension attributes etc.
+     *
      * @param errorAttributes error attributes
      * @param serviceErrorAttributes service error attributes
      */

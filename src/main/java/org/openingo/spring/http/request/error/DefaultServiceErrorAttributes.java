@@ -37,6 +37,26 @@ import java.util.Map;
 public class DefaultServiceErrorAttributes extends AbstractServiceErrorAttributes {
 
     /**
+     * Decorate exception error code, custom for your business logic.
+     * <code>
+     * <pre>
+     * public Object decorateExceptionCode(Exception exception) {
+     *    if (exception instanceof IndexOutOfBoundsException) {
+     *      return 123;
+     *    }
+     *   return super.decorateExceptionCode(exception);
+     * }
+     * </pre>
+     * </code>
+     *
+     * @param exception the exception that got thrown during handler execution
+     */
+    @Override
+    public Object decorateExceptionCode(Exception exception) {
+        return null;
+    }
+
+    /**
      * Decorate error attributes, add extension attributes etc.
      *
      * @param errorAttributes        error attributes

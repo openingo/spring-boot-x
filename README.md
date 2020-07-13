@@ -27,7 +27,7 @@
 
 - redis template extension, add key naming policy.
 
-- custom `ErrorAttributes`:
+- custom `ErrorAttributes`, with handler, include exception information:
 
   > add current request handler and exception 
 
@@ -53,15 +53,13 @@
 
 - dynamic data source [TODO]
 
-- rest extension [TODO]
-
 - validate groups[TODO]
 
 - others [TODO]
 
 ### How to use?
 
-- dependency
+- Dependency:
 
   ```xml
   <dependency>
@@ -71,7 +69,7 @@
   </dependency>
   ```
 
-- add `@EnableExtension` in your main application class
+- Add `@EnableExtension` in your main application class:
 
 ```java
 @SpringBootApplication
@@ -85,7 +83,7 @@ public class App {
 }
 ```
 
-- configuration
+- Configuration:
 
   ```yml
   openingo:
@@ -96,55 +94,96 @@ public class App {
       enable: true
   ```
 
-- ServiceDefaultErrorAttributes
+- `RespData.Config`
 
   ```java
   /**
-   * AbstractServiceErrorAttributes
+   * Config
    *
    * @author Qicz
    */
-  public class ServiceDefaultErrorAttributes extends DefaultErrorAttributesX {
+  @Configuration
+  public class Config {
   
-      /**
-       * Create a new {@link ServiceDefaultErrorAttributes} instance that included the
-       * "exception" attribute , can get the "exception" instance.
-       */
-      public ServiceDefaultErrorAttributes() {
-          super(true);
+      public Config() {
+          RespData.Config.SC_KEY = "ec";
+          RespData.Config.SM_KEY = "em";
+          RespData.Config.FAILURE_SC = 111;
+          //RespData.Config.SM_ONLY = true; // set "true" just output message
+          RespData.Config.FRIENDLY_FAILURE_MESSAGE = null;//"friendly message";// set to "null" will using exception's message
       }
+  }  
+  ```
+
+  - output
+
+    ```json
+    {
+        "em": "IndexOutOfBoundsException message",
+        "ec": 123
+    }
+    ```
+
+  - output with friendly message, `RespData.Config.FRIENDLY_FAILURE_MESSAGE = "friendly message";`
+
+    ```json
+    {
+        "em": "friendly message",
+        "ec": 123
+    }
+    ```
+
+    - log.error information
+
+      ```bash
+      2020-07-13 23:56:00.572 ERROR 35387 --- [nio-8080-exec-2] o.s.b.w.s.error.DefaultErrorAttributesX  : 
+      ****************************************************************
+      :: SpringApplicationX :: for current request report information 
+      ****************************************************************
+      
+      2020-07-13 23:56:00.587 ERROR 35387 --- [nio-8080-exec-2] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed; nested exception is java.lang.IndexOutOfBoundsException: IndexOutOfBoundsException message] with root cause
+      
+      java.lang.IndexOutOfBoundsException: IndexOutOfBoundsException message
+      	at org.openingo.x.controller.UserController.ex1(UserController.java:97) ~[classes/:na]
+      ```
+
+- Custom exception error code in your business:
+
+  ```java
+  /**
+   * BusinessErrorAttributes
+   *
+   * @author Qicz
+   */
+  @Component
+  public class BusinessErrorAttributes extends DefaultServiceErrorAttributes {
   
       /**
-       * Returns a {@link Map} of the error attributes. The map can be used as the model of
-       * an error page {@link ModelAndView}, or returned as a {@link ResponseBody}.
+       * Decorate exception error code, custom for your business logic.
+       * <code>
+       * <pre>
+       * public Object decorateExceptionCode(Exception exception) {
+       *    if (exception instanceof IndexOutOfBoundsException) {
+       *      return 123;
+       *    }
+       *   return super.decorateExceptionCode(exception);
+       * }
+       * </pre>
+       * </code>
        *
-       * @param webRequest        the source request
-       * @param includeStackTrace if stack trace elements should be included
-       * @return a map of error attributes
+       * @param exception the exception that got thrown during handler execution
        */
       @Override
-      public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
-          Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
-          Map<String, Object> serviceErrorAttributes = new HashMap<>();
-          Object code = this.getStatus(errorAttributes).toString();
-          Object message = this.getError(errorAttributes);
-          if (!this.responseOK(errorAttributes)) {
-              Exception exception = this.getHandlerExecutionException();
-              if (ValidateKit.isNotNull(exception)) {
-                  message = exception.getMessage();
-                  if (exception instanceof ServiceException) {
-                      code = ((ServiceException) exception).getExceptionCode();
-                  }
-              }
+      public Object decorateExceptionCode(Exception exception) {
+          if (exception instanceof IndexOutOfBoundsException) {
+              return 123;
           }
-          serviceErrorAttributes.put(RespData.Config.SC_KEY, code);
-          serviceErrorAttributes.put(RespData.Config.SM_KEY, message);
-          return serviceErrorAttributes;
+          return super.decorateExceptionCode(exception);
       }
   }
   ```
-
-- demo
+  
+- Demo
 
   https://github.com/OpeningO/spring-boot-x/tree/master/spring-boot-x-demo
 

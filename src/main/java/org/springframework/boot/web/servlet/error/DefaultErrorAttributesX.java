@@ -102,7 +102,7 @@ public class DefaultErrorAttributesX extends DefaultErrorAttributes {
      * @param response current HTTP response
      * @param handler  the executed handler, or {@code null} if none chosen at the
      *                 time of the exception (for example, if multipart resolution failed)
-     * @param exception       the exception that got thrown during handler execution
+     * @param exception the exception that got thrown during handler execution
      * @return a corresponding {@code ModelAndView} to forward to,
      * or {@code null} for default processing in the resolution chain
      */

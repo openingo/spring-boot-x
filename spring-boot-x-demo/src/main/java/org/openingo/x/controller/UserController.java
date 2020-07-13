@@ -82,7 +82,7 @@ public class UserController {
     public Map ex() {
         //Map map = null;//new HashMap();
         //map.put("a", "A");
-        throw new ServiceException("ERROR_CODE", "testing exception");
+        throw new ServiceException("123111zczc", "testing exception");
         //return map;
     }
 
@@ -90,5 +90,10 @@ public class UserController {
     public String non() {
         new NonController().ok();
         return "ok";
+    }
+
+    @GetMapping("/ex1")
+    public RespData ex1(){
+        throw new IndexOutOfBoundsException("IndexOutOfBoundsException message");
     }
 }
