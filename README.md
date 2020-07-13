@@ -97,10 +97,10 @@ public class App {
   
       /**
        * Create a new {@link DefaultErrorAttributesX} instance that included the
-       * "exception" attribute , can not get the "exception" instance and response status.
+       * "exception" attribute, can get the "exception" instance.
        */
       public DemoErrorAttributes() {
-          super(true, true);
+          super(true);
       }
   
       @Override
@@ -109,9 +109,9 @@ public class App {
           Map<String, Object> errorExAttributes = new HashMap<>();
           errorExAttributes.put(RespData.Config.SM_KEY, errorAttributes.get("message"));
           errorExAttributes.put("error", errorAttributes.get("error"));
-          Integer status = this.getStatus();
+          Integer status = this.getStatus(errorAttributes);
           if (HttpStatus.OK.value() != status) {
-              Object scKey = status;
+              Object scKey = status.toString();
               Exception ex = this.getHandlerExecutionException();
               // check ex instanceof in your application
               if (ValidateKit.isNotNull(ex)) {

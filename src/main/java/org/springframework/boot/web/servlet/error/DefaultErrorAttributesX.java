@@ -50,32 +50,27 @@ public class DefaultErrorAttributesX extends DefaultErrorAttributes {
 
     private final ThreadLocalKit<Object> handlerHolder = new ThreadLocalKit<>();
     private final ThreadLocalKit<Exception> exceptionHolder = new ThreadLocalKit<>();
-    private final ThreadLocalKit<Integer> statusHolder = new ThreadLocalKit<>();
 
     // using exception instance or not
     private final boolean usingException;
 
-    // using response status or not
-    private final boolean usingStatus;
-
     /**
      * Create a new {@link DefaultErrorAttributesX} instance that included the
-     * "exception" attribute , can not get the "exception" instance and response status.
+     * "exception" attribute , can not get the "exception" instance.
      */
     public DefaultErrorAttributesX() {
-        this(false, false);
+        this(false);
     }
 
     /**
      * Create a new {@link DefaultErrorAttributesX} instance.
      * default included the "exception" attribute.
      *
-     * @param usingException whether to get the "exception" instance and response status.
+     * @param usingException whether to get the "exception" instance.
      */
-    public DefaultErrorAttributesX(boolean usingException, boolean usingStatus) {
+    public DefaultErrorAttributesX(boolean usingException) {
         super(true);
         this.usingException = usingException;
-        this.usingStatus = usingStatus;
     }
 
     /**
@@ -91,9 +86,6 @@ public class DefaultErrorAttributesX extends DefaultErrorAttributes {
         Object handler = this.handlerHolder.get();
         if (ValidateKit.isNotNull(handler)) {
             errorAttributes.put("handler", handler.toString());
-        }
-        if (this.usingStatus) {
-            this.statusHolder.set(ObjectKit.toInteger(errorAttributes.get("status")));
         }
         return errorAttributes;
     }
@@ -142,16 +134,10 @@ public class DefaultErrorAttributesX extends DefaultErrorAttributes {
     /**
      * Current Request's status
      *
-     * if "usingStatus" is <tt>false</tt> will return <tt>null</tt>.
-     *
      * @see @{@linkplain org.springframework.http.HttpStatus}
      * @return response status
      */
-    protected Integer getStatus() {
-        if (!this.usingStatus) {
-            log.info("\"usingStatus\" state is Illegal, required true state.");
-            return null;
-        }
-        return this.statusHolder.get();
+    protected Integer getStatus(Map<String, Object> errorAttributes) {
+        return ObjectKit.toInteger(errorAttributes.get("status"));
     }
 }
