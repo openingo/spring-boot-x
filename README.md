@@ -50,6 +50,12 @@
 
 - `SpringApplicationX` more extensions
 
+- dynamic data source [TODO]
+
+- rest extension [TODO]
+
+- validate groups[TODO]
+
 - others [TODO]
 
 ### How to use?
