@@ -25,13 +25,13 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.http.error;
+package org.springframework.boot.web.servlet.error;
 
 import lombok.extern.slf4j.Slf4j;
+import org.openingo.jdkits.ObjectKit;
+import org.openingo.jdkits.ThreadLocalKit;
 import org.openingo.jdkits.ValidateKit;
 import org.openingo.spring.constants.Constants;
-import org.openingo.spring.http.kit.HttpThreadLocalDataKit;
-import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
@@ -41,15 +41,24 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 /**
- * WebErrorAttributesX
+ * DefaultErrorAttributesX
  *
  * @author Qicz
  */
 @Slf4j
-public class WebErrorAttributesX extends DefaultErrorAttributes {
+public class DefaultErrorAttributesX extends DefaultErrorAttributes {
 
-    private Object handler;
-    private Exception ex;
+    private final ThreadLocalKit<Object> handlers = new ThreadLocalKit<>();
+    private final ThreadLocalKit<Exception> exceptions = new ThreadLocalKit<>();
+    private final ThreadLocalKit<Integer> statuses = new ThreadLocalKit<>();
+
+    /**
+     * Create a new {@link DefaultErrorAttributes} instance that include the
+     * "exception" attribute.
+     */
+    public DefaultErrorAttributesX() {
+        super(true);
+    }
 
     /**
      * Returns a {@link Map} of the error attributes. The map can be used as the model of
@@ -61,14 +70,11 @@ public class WebErrorAttributesX extends DefaultErrorAttributes {
     @Override
     public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
         Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
-        if (ValidateKit.isNotNull(this.handler)) {
-            errorAttributes.put("handler", this.handler.toString());
+        Object handler = this.handlers.get();
+        if (ValidateKit.isNotNull(handler)) {
+            errorAttributes.put("handler", handler.toString());
         }
-        if (ValidateKit.isNotNull(this.ex)) {
-            errorAttributes.put("exception", this.ex.toString());
-            HttpThreadLocalDataKit.putData(this.ex);
-        }
-        this.flush();
+        this.statuses.set(ObjectKit.toInteger(errorAttributes.get("status")));
         return errorAttributes;
     }
 
@@ -83,28 +89,30 @@ public class WebErrorAttributesX extends DefaultErrorAttributes {
      * @param response current HTTP response
      * @param handler  the executed handler, or {@code null} if none chosen at the
      *                 time of the exception (for example, if multipart resolution failed)
-     * @param ex       the exception that got thrown during handler execution
+     * @param exception       the exception that got thrown during handler execution
      * @return a corresponding {@code ModelAndView} to forward to,
      * or {@code null} for default processing in the resolution chain
      */
     @Override
-    public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        this.handler = handler;
-        this.ex = ex;
+    public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception exception) {
+        this.handlers.set(handler);
+        this.exceptions.set(exception);
         StringBuilder errorBuilder = new StringBuilder();
         log.error(errorBuilder.append(Constants.REQUEST_REPORT_HEADER).toString());
-        return super.resolveException(request, response, handler, ex);
-    }
-
-    private void flush() {
-        this.handler = null;
-        this.ex = null;
+        return super.resolveException(request, response, handler, exception);
     }
 
     /**
      * @return current handler execution 's exceptions, may be <tt>null</tt>
      */
     protected Exception getHandlerExecutionException() {
-        return HttpThreadLocalDataKit.getData();
+        return this.exceptions.get();
+    }
+
+    /**
+     * Current Request's status, @see @{@linkplain org.springframework.http.HttpStatus}
+     */
+    protected Integer getStatus() {
+        return this.statuses.get();
     }
 }

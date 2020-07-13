@@ -29,7 +29,7 @@ package org.openingo.x;
 
 import org.openingo.jdkits.ValidateKit;
 import org.openingo.jdkits.http.RespData;
-import org.openingo.spring.http.error.WebErrorAttributesX;
+import org.springframework.boot.web.servlet.error.DefaultErrorAttributesX;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.HashMap;
@@ -40,13 +40,13 @@ import java.util.Map;
  *
  * @author Qicz
  */
-public class DemoErrorAttributes extends WebErrorAttributesX {
+public class DemoErrorAttributes extends DefaultErrorAttributesX {
 
     @Override
     public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
         Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
         Map<String, Object> errorExAttributes = new HashMap<>();
-        errorExAttributes.put(RespData.Config.SC_KEY, errorAttributes.get("status"));
+        errorExAttributes.put(RespData.Config.SC_KEY, this.getStatus());
         errorExAttributes.put(RespData.Config.SM_KEY, errorAttributes.get("message"));
         errorExAttributes.put("error", errorAttributes.get("error"));
         Exception ex = this.getHandlerExecutionException();

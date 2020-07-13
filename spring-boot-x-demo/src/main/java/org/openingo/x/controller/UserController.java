@@ -76,9 +76,10 @@ public class UserController {
 
     @GetMapping("/ex")
     public Map ex() {
-        Map map = null;//new HashMap();
-        map.put("a", "A");
-        return map;
+        //Map map = null;//new HashMap();
+        //map.put("a", "A");
+        throw new RuntimeException("testing exception");
+        //return map;
     }
 
     @GetMapping("/non")
