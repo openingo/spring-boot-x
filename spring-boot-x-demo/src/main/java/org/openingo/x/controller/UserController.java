@@ -27,6 +27,7 @@
 
 package org.openingo.x.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openingo.jdkits.http.RespData;
 import org.openingo.spring.exception.ServiceException;
 import org.openingo.spring.extension.data.redis.RedisTemplateX;
@@ -38,6 +39,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -95,5 +97,12 @@ public class UserController {
     @GetMapping("/ex1")
     public RespData ex1(){
         throw new IndexOutOfBoundsException("IndexOutOfBoundsException message");
+    }
+
+    @GetMapping("/ex2")
+    public RespData ex2() throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.readValue("[{asd}]", Map.class);
+        return RespData.success();
     }
 }

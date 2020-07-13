@@ -27,6 +27,7 @@
 
 package org.openingo.x;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.openingo.spring.http.request.error.DefaultServiceErrorAttributes;
 import org.springframework.stereotype.Component;
 
@@ -57,6 +58,9 @@ public class BusinessErrorAttributes extends DefaultServiceErrorAttributes {
     public Object decorateExceptionCode(Exception exception) {
         if (exception instanceof IndexOutOfBoundsException) {
             return 123;
+        }
+        if (exception instanceof JsonProcessingException) {
+            return 345;
         }
         return super.decorateExceptionCode(exception);
     }

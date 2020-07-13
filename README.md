@@ -115,7 +115,23 @@ public class App {
   }  
   ```
 
-  - output
+  - controller
+
+    ```java
+    @GetMapping("/ex1")
+    public RespData ex1(){
+        throw new IndexOutOfBoundsException("IndexOutOfBoundsException message");
+    }
+    
+    @GetMapping("/ex2")
+    public RespData ex2() throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.readValue("[{asd}]", Map.class);
+        return RespData.success();
+    }
+    ```
+
+  - `/ex1`output
 
     ```json
     {
@@ -124,7 +140,7 @@ public class App {
     }
     ```
 
-  - output with friendly message, `RespData.Config.FRIENDLY_FAILURE_MESSAGE = "friendly message";`
+  - `/ex1`output with friendly message, `RespData.Config.FRIENDLY_FAILURE_MESSAGE = "friendly message";`
 
     ```json
     {
@@ -145,6 +161,39 @@ public class App {
       
       java.lang.IndexOutOfBoundsException: IndexOutOfBoundsException message
       	at org.openingo.x.controller.UserController.ex1(UserController.java:97) ~[classes/:na]
+      ```
+
+  - `/ex2`output
+
+    ```json
+    {
+        "em": "Cannot deserialize instance of `java.util.LinkedHashMap` out of START_ARRAY token\n at [Source: (String)\"[{asd}]\"; line: 1, column: 1]",
+        "ec": 345
+    }
+    ```
+
+  - `/ex2`output with friendly message, `RespData.Config.FRIENDLY_FAILURE_MESSAGE = "friendly message";`
+
+    ```json
+    {
+        "em": "friendly message",
+        "ec": 345
+    }
+    ```
+
+    - log.error information
+
+      ```bash
+      2020-07-14 00:11:15.424 ERROR 35599 --- [nio-8080-exec-2] o.s.b.w.s.error.DefaultErrorAttributesX  : 
+      ****************************************************************
+      :: SpringApplicationX :: for current request report information 
+      ****************************************************************
+      
+      2020-07-14 00:11:15.436 ERROR 35599 --- [nio-8080-exec-2] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception
+      
+      com.fasterxml.jackson.databind.exc.MismatchedInputException: Cannot deserialize instance of `java.util.LinkedHashMap` out of START_ARRAY token
+       at [Source: (String)"[{asd}]"; line: 1, column: 1]
+      	at com.fasterxml.jackson.databind.exc.MismatchedInputException.from(MismatchedInputException.java:63) ~[jackson-databind-2.9.9.3.jar:2.9.9.3]
       ```
 
 - Custom exception error code in your business:
