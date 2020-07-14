@@ -30,6 +30,7 @@ package org.openingo.spring.extension.data.redis.config;
 import org.openingo.spring.constants.Constants;
 import org.openingo.spring.constants.PropertiesConstants;
 import org.openingo.spring.extension.data.redis.RedisTemplateX;
+import org.openingo.spring.extension.data.redis.StringRedisTemplateX;
 import org.openingo.spring.extension.data.redis.naming.DefaultKeyNamingPolicy;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
 import org.openingo.spring.extension.data.redis.serializer.FstSerializer;
@@ -65,6 +66,15 @@ public class RedisConfig {
     @ConditionalOnMissingBean
     public <V> RedisTemplateX<V> redisTemplateX() {
         return new RedisTemplateX<>();
+    }
+
+    /**
+     * @return RedisTemplate< String, String> wrapper
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    public StringRedisTemplateX stringRedisTemplateX() {
+        return new StringRedisTemplateX();
     }
 
     /**

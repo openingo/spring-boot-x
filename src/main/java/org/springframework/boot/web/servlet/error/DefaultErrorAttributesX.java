@@ -32,10 +32,13 @@ import org.openingo.jdkits.ObjectKit;
 import org.openingo.jdkits.ThreadLocalKit;
 import org.openingo.jdkits.ValidateKit;
 import org.openingo.spring.constants.Constants;
-import org.openingo.spring.http.request.RequestReporter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.request.RequestReporter;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -49,6 +52,9 @@ import java.util.Map;
  */
 @Slf4j
 public class DefaultErrorAttributesX extends DefaultErrorAttributes {
+
+    @Autowired
+    MappingJackson2HttpMessageConverter converter;
 
     private final ThreadLocalKit<Object> handlerHolder = new ThreadLocalKit<>();
     private final ThreadLocalKit<Exception> exceptionHolder = new ThreadLocalKit<>();
@@ -113,8 +119,16 @@ public class DefaultErrorAttributesX extends DefaultErrorAttributes {
         if (this.usingException) {
             this.exceptionHolder.set(exception);
         }
+        // print request information
         RequestReporter requestReporter = RequestReporter.getInstance();
+        requestReporter.setConverter(this.converter);
+        requestReporter.setRequest(request);
+        if (ValidateKit.isNotNull(handler)) {
+            requestReporter.setHandler((HandlerMethod) handler);
+        }
+        requestReporter.report();
 
+        // print error information
         StringBuilder errorBuilder = new StringBuilder();
         log.error(errorBuilder.append(Constants.REQUEST_REPORT_HEADER).toString());
         return super.resolveException(request, response, handler, exception);

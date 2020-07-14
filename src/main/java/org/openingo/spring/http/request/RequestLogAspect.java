@@ -32,19 +32,17 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.openingo.jdkits.JacksonKit;
 import org.openingo.jdkits.SystemClockKit;
 import org.openingo.jdkits.ThreadLocalKit;
 import org.openingo.jdkits.ValidateKit;
 import org.openingo.spring.constants.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.request.RequestReporter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 
 /**
  * RequestLogAspect
@@ -78,39 +76,20 @@ public class RequestLogAspect {
         this.handlerStart();
         Object proceed = point.proceed();
         float processingTime = this.getProcessingSeconds();
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         RequestReporter requestReporter = RequestReporter.getInstance();
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         if (ValidateKit.isNull(request)) {
-            StringBuilder reportInfoBuilder = new StringBuilder(Constants.REQUEST_REPORT_HEADER);
-            reportInfoBuilder.append("Processing Time  : ").append(processingTime).append("s\n");
-            requestReporter.report(reportInfoBuilder.toString());
+            requestReporter.report(Constants.REQUEST_REPORT_HEADER + "Processing Time  : " + processingTime + "s\n");
             return proceed;
         }
-        requestReporter.setPoint(point);
+
         // current request processing time
         requestReporter.setProcessingTime(processingTime);
-        ServletServerHttpRequest serverHttpRequest = new ServletServerHttpRequest(request);
-        requestReporter.setRequest(serverHttpRequest);
-        // bodyData data
-        Object body = null;
-        if (ValidateKit.isNotNull(request.getContentType())) {
-            body = "<File>";
-            try {
-                body = this.converter.read(Object.class, serverHttpRequest);
-                body = JacksonKit.toJson(body);
-            } catch (Exception e) {
-                if (e instanceof IOException) {
-                    body = null;
-                }
-                log.error(e.toString());
-            }
-        }
-        requestReporter.setBodyData(body);
+        requestReporter.setPoint(point);
+        requestReporter.setConverter(this.converter);
+        requestReporter.setRequest(request);
+        requestReporter.setResponseData(proceed);
 
-        // response data
-        if (ValidateKit.isNotNull(proceed)) {
-            requestReporter.setResponseData(JacksonKit.toJson(proceed));
-        }
         // fire report
         requestReporter.report();
         return proceed;

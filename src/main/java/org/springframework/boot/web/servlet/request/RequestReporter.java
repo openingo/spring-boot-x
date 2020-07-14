@@ -25,18 +25,21 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.http.request;
+package org.springframework.boot.web.servlet.request;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.openingo.jdkits.IPKit;
+import org.openingo.jdkits.JacksonKit;
 import org.openingo.jdkits.ValidateKit;
 import org.openingo.spring.constants.Constants;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.method.HandlerMethod;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Enumeration;
 
@@ -49,22 +52,22 @@ import java.util.Enumeration;
 @Slf4j
 public final class RequestReporter {
 
-	private ServletServerHttpRequest request;
+	private HttpServletRequest request;
 
 	// current request processing time
 	private float processingTime = 0.0f;
 
-	// current request bodyData data
-	private Object bodyData;
-
 	// response data
-	private Object responseData;
+	private Object responseData = null;
 
 	// current proceeding join point
 	private ProceedingJoinPoint point;
 
 	// action handler
 	private HandlerMethod handler;
+
+	// body message converter
+	private MappingJackson2HttpMessageConverter converter;
 
 	private RequestReporter(){}
 
@@ -75,40 +78,93 @@ public final class RequestReporter {
 	private static int maxOutputLengthOfParaValue = 512;
 
 	/**
+	 * Deduce current target class
+	 * @return current target class
+	 */
+	private Class<?> deduceTargetClass() {
+		Class<?> targetClass = null;
+		if (ValidateKit.isNotNull(this.point)) {
+			targetClass = this.point.getTarget().getClass();
+		}
+		if (ValidateKit.isNotNull(this.handler)) {
+			targetClass = this.handler.getBean().getClass();
+		}
+		if (ValidateKit.isNotNull(targetClass)) {
+			// deduce useful class
+			targetClass = !targetClass.getName().contains("$$EnhancerBy") ? targetClass : targetClass.getSuperclass();
+		}
+		return targetClass;
+	}
+
+	/**
+	 * Deduce current action name
+	 * @return current action name
+	 */
+	private String deduceActionName() {
+		if (ValidateKit.isNotNull(this.point)) {
+			return this.point.getSignature().getName();
+		}
+
+		if (ValidateKit.isNotNull(this.handler)) {
+			return this.handler.getMethod().getName();
+		}
+		return null;
+	}
+
+	/**
 	 * Current Request report
 	 */
 	public void report() {
-		HttpServletRequest servletRequest = this.request.getServletRequest();
+		ServletServerHttpRequest serverHttpRequest = new ServletServerHttpRequest(this.request);
 		StringBuilder reportInfoBuilder = new StringBuilder(Constants.REQUEST_REPORT_HEADER);
-		reportInfoBuilder.append("Client IP  : ").append(IPKit.getRequestIP(servletRequest)).append(" ").append("\n");
+		reportInfoBuilder.append("Client IP  : ").append(IPKit.getRequestIP(this.request)).append(" ").append("\n");
 		reportInfoBuilder.append("Request Time  : ").append(LocalDateTime.now()).append(" ").append("\n");
-		Class<?> target = this.point.getTarget().getClass();
-		reportInfoBuilder.append("Controller  : ").append(target.getName()).append(".(").append(target.getSimpleName()).append(".java:1)").append("\n");
-		reportInfoBuilder.append("URI  : ").append(this.request.getURI()).append(" ").append("\n");
-		reportInfoBuilder.append("Handler(Action)  : ").append(this.point.getSignature().getName()).append("\n");
-		reportInfoBuilder.append("Method  : ").append(this.request.getMethod()).append("\n");
+		Class<?> target = this.deduceTargetClass();
+		if (ValidateKit.isNotNull(target)) {
+			reportInfoBuilder.append("Controller  : ").append(target.getName()).append(".(").append(target.getSimpleName()).append(".java:1)").append("\n");
+		}
+		reportInfoBuilder.append("URI  : ").append(serverHttpRequest.getURI()).append(" ").append("\n");
+		String actionName = this.deduceActionName();
+		if (ValidateKit.isNotNull(actionName)) {
+			reportInfoBuilder.append("Handler(Action)  : ").append(actionName).append("\n");
+		}
+		reportInfoBuilder.append("Method  : ").append(serverHttpRequest.getMethod()).append("\n");
 		reportInfoBuilder.append("Processing Time  : ").append(this.processingTime).append("s\n");
 
 		// print all headers
-		reportInfoBuilder.append("Header(s)  : ").append(this.request.getHeaders()).append("\n");
+		reportInfoBuilder.append("Header(s)  : ").append(serverHttpRequest.getHeaders()).append("\n");
 
 		// print all bodyData params
-		if (ValidateKit.isNotNull(this.bodyData)) {
-			reportInfoBuilder.append("Body  : ").append(this.bodyData).append("\n");
+		// bodyData data
+		Object body = null;
+		if (ValidateKit.isNotNull(this.request.getContentType())) {
+			body = "<File>";
+			try {
+				body = this.converter.read(Object.class, serverHttpRequest);
+				body = JacksonKit.toJson(body);
+			} catch (Exception e) {
+				if (e instanceof IOException) {
+					body = null;
+				}
+				log.error(e.toString());
+			}
+		}
+		if (ValidateKit.isNotNull(body)) {
+			reportInfoBuilder.append("Body  : ").append(body).append("\n");
 		}
 
-		String urlQuery = servletRequest.getQueryString();
+		String urlQuery = this.request.getQueryString();
 		if (ValidateKit.isNotNull(urlQuery)) {
 			reportInfoBuilder.append("UrlQuery  : ").append(urlQuery).append("\n");
 		}
 
 		// print all parameters
-		Enumeration<String> e = servletRequest.getParameterNames();
+		Enumeration<String> e = this.request.getParameterNames();
 		if (e.hasMoreElements()) {
 			reportInfoBuilder.append("Parameter(s)  : ");
 			while (e.hasMoreElements()) {
 				String name = e.nextElement();
-				String[] values = servletRequest.getParameterValues(name);
+				String[] values = this.request.getParameterValues(name);
 				if (values.length == 1) {
 					reportInfoBuilder.append(name).append("=");
 					if (values[0] != null && values[0].length() > maxOutputLengthOfParaValue) {
@@ -133,7 +189,7 @@ public final class RequestReporter {
 
 		// response data
 		if (ValidateKit.isNotNull(this.responseData)) {
-			reportInfoBuilder.append("Response  : ").append(this.responseData).append("\n");
+			reportInfoBuilder.append("Response  : ").append(JacksonKit.toJson(this.responseData)).append("\n");
 		}
 
 		reportInfoBuilder.append("----------------------------------------------------------------\n");
