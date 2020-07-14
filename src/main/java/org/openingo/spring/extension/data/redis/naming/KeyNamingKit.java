@@ -25,16 +25,27 @@
  * SOFTWARE.
  */
 
-package org.openingo.x;
+package org.openingo.spring.extension.data.redis.naming;
 
-import org.openingo.jdkits.ThreadLocalKit;
+
+import org.openingo.jdkits.thread.ThreadLocalKit;
 
 /**
- * NamingKit
+ * KeyNamingKit
  *
  * @author Qicz
  */
-public final class NamingKit {
+public final class KeyNamingKit {
 
-    public static final ThreadLocalKit<String> namingData = new ThreadLocalKit<>();
+    private KeyNamingKit(){}
+
+    private static final ThreadLocalKit<String> namingData = new ThreadLocalKit<>();
+
+    public static void setNaming(String naming) {
+        namingData.set(naming);
+    }
+
+    public static String getNaming() {
+        return namingData.get();
+    }
 }

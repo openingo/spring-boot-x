@@ -28,8 +28,9 @@
 package org.openingo.x;
 
 import lombok.Data;
-import org.openingo.jdkits.ValidateKit;
+import org.openingo.jdkits.validate.ValidateKit;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
+import org.openingo.spring.extension.data.redis.naming.KeyNamingKit;
 
 /**
  * KeyNamingPolicy
@@ -41,7 +42,7 @@ public class KeyNamingPolicy implements IKeyNamingPolicy {
 
     @Override
     public String getKeyName(String key) {
-        String s = NamingKit.namingData.get();
+        String s = KeyNamingKit.getNaming();
         if (ValidateKit.isNotNull(s)) {
             return s + ":qicz:" + key;
         }

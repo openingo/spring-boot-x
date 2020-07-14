@@ -27,8 +27,9 @@
 
 package org.openingo.spring.extension.data.redis.naming;
 
-import org.openingo.jdkits.ListKit;
-import org.openingo.jdkits.ValidateKit;
+
+import org.openingo.jdkits.collection.ListKit;
+import org.openingo.jdkits.validate.ValidateKit;
 
 import java.util.Collection;
 import java.util.HashMap;

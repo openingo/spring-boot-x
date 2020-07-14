@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openingo.jdkits.http.RespData;
 import org.openingo.spring.exception.ServiceException;
 import org.openingo.spring.extension.data.redis.RedisTemplateX;
-import org.openingo.x.NamingKit;
+import org.openingo.spring.extension.data.redis.naming.KeyNamingKit;
 import org.openingo.x.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -67,7 +67,7 @@ public class UserController {
 
     @GetMapping("/save")
     public String save() {
-        NamingKit.namingData.set("openingo");
+        KeyNamingKit.setNaming("openingo");
         redisTemplateX.opsForValue().set("name", "Qicz");
         return "ok";
     }

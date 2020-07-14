@@ -25,14 +25,14 @@
  * SOFTWARE.
  */
 
-package org.springframework.boot.web.servlet.request;
+package org.openingo.spring.http.request;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.openingo.jdkits.IPKit;
-import org.openingo.jdkits.JacksonKit;
-import org.openingo.jdkits.ValidateKit;
+import org.openingo.jdkits.json.JacksonKit;
+import org.openingo.jdkits.sys.IPKit;
+import org.openingo.jdkits.validate.ValidateKit;
 import org.openingo.spring.constants.Constants;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpRequest;

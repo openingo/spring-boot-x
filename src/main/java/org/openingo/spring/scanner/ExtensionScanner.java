@@ -27,7 +27,7 @@
 
 package org.openingo.spring.scanner;
 
-import org.openingo.jdkits.ValidateKit;
+import org.openingo.jdkits.validate.ValidateKit;
 import org.openingo.spring.boot.SpringApplicationX;
 import org.openingo.spring.constants.Constants;
 import org.openingo.spring.constants.PackageConstants;

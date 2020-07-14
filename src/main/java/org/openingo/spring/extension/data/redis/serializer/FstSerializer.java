@@ -29,7 +29,7 @@ package org.openingo.spring.extension.data.redis.serializer;
 
 import org.nustaq.serialization.FSTObjectInput;
 import org.nustaq.serialization.FSTObjectOutput;
-import org.openingo.jdkits.ValidateKit;
+import org.openingo.jdkits.validate.ValidateKit;
 import org.springframework.data.redis.serializer.SerializationException;
 
 import java.io.ByteArrayInputStream;

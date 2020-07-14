@@ -28,12 +28,12 @@
 package org.springframework.boot.web.servlet.error;
 
 import lombok.extern.slf4j.Slf4j;
-import org.openingo.jdkits.ObjectKit;
-import org.openingo.jdkits.ThreadLocalKit;
-import org.openingo.jdkits.ValidateKit;
+import org.openingo.jdkits.lang.ObjectKit;
+import org.openingo.jdkits.thread.ThreadLocalKit;
+import org.openingo.jdkits.validate.ValidateKit;
 import org.openingo.spring.constants.Constants;
+import org.openingo.spring.http.request.RequestReporter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.servlet.request.RequestReporter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.bind.annotation.ResponseBody;

@@ -27,8 +27,8 @@
 
 package org.openingo.spring.http.request.error;
 
-import org.openingo.jdkits.ValidateKit;
 import org.openingo.jdkits.http.RespData;
+import org.openingo.jdkits.validate.ValidateKit;
 import org.openingo.spring.exception.ServiceException;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributesX;
 import org.springframework.web.bind.annotation.ResponseBody;

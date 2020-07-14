@@ -27,7 +27,8 @@
 
 package org.openingo.spring.exception;
 
-import org.openingo.jdkits.ObjectKit;
+
+import org.openingo.jdkits.lang.ObjectKit;
 
 /**
  * ServiceException
