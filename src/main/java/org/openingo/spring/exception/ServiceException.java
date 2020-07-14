@@ -29,6 +29,7 @@ package org.openingo.spring.exception;
 
 
 import org.openingo.jdkits.lang.ObjectKit;
+import org.openingo.jdkits.validate.ValidateKit;
 
 /**
  * ServiceException
@@ -38,7 +39,7 @@ import org.openingo.jdkits.lang.ObjectKit;
 public class ServiceException extends RuntimeException {
 
     // exception code
-    private Object exceptionCode;
+    private Object exceptionCode = null;
 
     /**
      * Constructs a new runtime exception with {@code null} as its
@@ -57,7 +58,7 @@ public class ServiceException extends RuntimeException {
      * @param message the detail message. The detail message is saved for
      *                later retrieval by the {@link #getMessage()} method.
      */
-    private ServiceException(String message) {
+    public ServiceException(String message) {
         super(message);
     }
 
@@ -75,7 +76,7 @@ public class ServiceException extends RuntimeException {
      *                unknown.)
      * @since 1.4
      */
-    private ServiceException(String message, Throwable cause) {
+    public ServiceException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -92,7 +93,7 @@ public class ServiceException extends RuntimeException {
      *              unknown.)
      * @since 1.4
      */
-    private ServiceException(Throwable cause) {
+    public ServiceException(Throwable cause) {
         super(cause);
     }
 
@@ -110,7 +111,7 @@ public class ServiceException extends RuntimeException {
      *                           be writable
      * @since 1.7
      */
-    private ServiceException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public ServiceException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 
@@ -195,7 +196,7 @@ public class ServiceException extends RuntimeException {
      * @return Service Exception String Code
      */
     public String getExceptionStringCode() {
-        return this.exceptionCode.toString();
+        return ValidateKit.isNotNull(this.exceptionCode) ? this.exceptionCode.toString() : "";
     }
 
     /**
@@ -204,10 +205,14 @@ public class ServiceException extends RuntimeException {
      * @return Service Exception Integer Code
      */
     public Integer getExceptionIntegerCode() {
-        try {
-            return ObjectKit.toInteger(this.exceptionCode);
-        } catch (NumberFormatException ex) {
-            return null;
+        Integer code = null;
+        if (ValidateKit.isNotNull(exceptionCode)) {
+            try {
+                code = ObjectKit.toInteger(this.exceptionCode);
+            } catch (NumberFormatException ex) {
+               // nop
+            }
         }
+        return code;
     }
 }

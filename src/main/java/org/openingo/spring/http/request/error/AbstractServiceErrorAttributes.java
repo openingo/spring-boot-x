@@ -64,27 +64,31 @@ public abstract class AbstractServiceErrorAttributes extends DefaultErrorAttribu
     @Override
     public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
         Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
+        // error code prepare
+        Object code = null;
         // processing super error attributes
-        Object code = this.getStatus(errorAttributes);
         String message = this.getError(errorAttributes);
         Exception exception = this.getHandlerExecutionException();
         Map<String, Object> serviceErrorAttributes = new HashMap<>();
         if (!this.responseOK(errorAttributes)
                 && ValidateKit.isNotNull(exception)) {
-            // check exception instance type again
+            // check exception instance type
             if (exception instanceof ServiceException) {
                 code = ((ServiceException) exception).getExceptionCode();
             }
-            // can rewrite ServiceException
-            Object decorateExceptionCode = this.decorateExceptionCode(exception);
-            if (ValidateKit.isNotNull(decorateExceptionCode)) {
-                code = decorateExceptionCode;
+            if (ValidateKit.isNull(code)) {
+                // can rewrite ServiceException
+                code = this.decorateExceptionCode(exception);
             }
             message = this.decorateExceptionMessage(exception);
             this.decorateErrorAttributes(errorAttributes, serviceErrorAttributes);
         }
         // services error attributes processing
         if (!RespData.Config.SM_ONLY) {
+            // if the code not handle, using response status
+            if (ValidateKit.isNull(code)) {
+                code = this.getStatus(errorAttributes);
+            }
             // deduce code type by RespData.Config.FAILURE_SC
             if (RespData.Config.FAILURE_SC instanceof String) {
                 code = code.toString();
