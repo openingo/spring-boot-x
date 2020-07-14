@@ -27,6 +27,9 @@
 
 package org.openingo.spring.extension.data.redis;
 
+import org.springframework.data.redis.connection.DataType;
+
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,83 +44,81 @@ public interface IRedisLiteOperations<V> {
     void set(String key, V value);
     void setex(String key, int seconds, V value);
     <T> T get(String key);
-    long del(String key);
-    long del(String... keys);
+    Boolean del(String key);
+    Long del(List<String> keys);
 
     void mset(Object... keysValues);
-    List<V> mget(String... keys);
+    List<V> mget(List<String> keys);
 
-    long decr(String... key);
-    long decrBy(String key, long value);
-    long incr(String key);
-    long incrBy(String key, long value);
-    boolean exists(String key);
-    String randomKey();
+    Long decr(String key);
+    Long decrBy(String key, long value);
+    Long incr(String key);
+    Long incrBy(String key, long value);
+    Boolean exists(String key);
     void rename(String oldKey, String newKey);
 
-    long expire(String key, int seconds);
-    long expireAt(String key, long unixTime);
-    long pexpire(String key, long millSeconds);
-    long pexpireAt(String key, long milliSecondsTimestamp);
+    Boolean expire(String key, long seconds);
+    Boolean expireAt(String key, Date date);
+    Boolean pexpire(String key, long millSeconds);
 
     <T> T getSet(String key, V value);
-    long persist(String key);
-    String type(String key);
-    long ttl(String key);
-    long pttl(String key);
-    long objectRefcount(String key);
-    long objectIdletime(String key);
+    Boolean persist(String key);
+    DataType type(String key);
+    Long ttl(String key);
+    Long pttl(String key);
+    Long countExistingKeys(List<String> keys);
+    Long objectIdletime(String key);
 
-    long hset(String key, Object field, Object value);
+    void hset(String key, Object field, Object value);
     void hmset(String key, Map<Object, Object> hash);
     <T> T hget(String key, Object field);
-    <T> List<T> hmget(String key, Object... fields);
-    long hdel(String key, Object... fields);
-    boolean hexists(String key, Object field);
+    <T> List<T> hmget(String key, List<Object> fields);
+    Long hdel(String key, Object... fields);
+    Boolean hexists(String key, Object field);
     <HK, HV> Map<HK, HV> hgetAll(String key);
     <HV> List<HV> hvals(String key);
     Set<String> hkeys(String key);
-    long hlen(String key);
+    Long hlen(String key);
 
     <T> T lindex(String key, long index);
-    long getCounter(String key);
-    long llen(String key);
+    Long getCounter(String key);
+    Long llen(String key);
     <T> T lpop(String key);
-    long lpush(String key, Object... values);
+    Long lpush(String key, V... values);
     void lset(String key, long index, Object value);
-    long lrem(String key, long count, Object value);
+    Long lrem(String key, long count, Object value);
     <T> List<T> lrange(String key, long start, long end);
     void ltrim(String key, long start, long end);
 
     <T> T rpop(String key);
     <T> T rpoplpush(String srcKey, String dstKey);
-    long rpush(String key, Object... values);
+    Long rpush(String key, Object... values);
     <T> List<T> blpop(String... keys);
     <T> List<T> blpop(int timeout, String... keys);
     <T> List<T> brpop(String... keys);
     <T> List<T> brpop(int timeout, String... keys);
 
-    long sadd(String key, Object... members);
-    long scard(String key);
+    Long sadd(String key, Object... members);
+    Long scard(String key);
     <T> T spop(String key);
     <T> Set<T> smembers(String key);
-    boolean sismember(String key, Object member);
+    Boolean sismember(String key, Object member);
     <T> Set<T> sinter(String... keys);
     <T> T srandmember(String key);
     <T> List<T> srandmember(String key, int count);
-    long srem(String key, Object... members);
+    Long srem(String key, Object... members);
     <T> Set<T> sunion(String... keys);
     <T> Set<T> sdiff(String... keys);
-    long zadd(String key, double score, Object member);
-    long zadd(String key, Map<Object, Double> scoreMembers);
-    long zcard(String key);
-    long zcount(String key, double min, double max);
-    double zincrby(String key, double score, Object member);
+    Long zadd(String key, double score, Object member);
+    Long zadd(String key, Map<Object, Double> scoreMembers);
+    Long zcard(String key);
+    Long zcount(String key, double min, double max);
+    Double zincrby(String key, double score, Object member);
     <T> Set<T> zrange(String key, long start, long end);
     <T> Set<T> zrevrange(String key, long start, long end);
     <T> Set<T> zrangeByScore(String key, double min, double max);
-    long zrank(String key, Object member);
-    long zrevrank(String key, Object member);
-    long zrem(String key, Object... members);
-    double zscore(String key, Object member);
+    Long zrank(String key, Object member);
+    Long zrevrank(String key, Object member);
+    Long zrem(String key, Object... members);
+    Double zscore(String key, Object member);
 }
