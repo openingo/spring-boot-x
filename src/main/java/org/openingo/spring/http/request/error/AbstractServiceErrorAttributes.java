@@ -72,12 +72,13 @@ public abstract class AbstractServiceErrorAttributes extends DefaultErrorAttribu
         Map<String, Object> serviceErrorAttributes = new HashMap<>();
         if (!this.responseOK(errorAttributes)
                 && ValidateKit.isNotNull(exception)) {
-            // check exception instance type
+            // check ServiceException with setting code
             if (exception instanceof ServiceException) {
                 code = ((ServiceException) exception).getExceptionCode();
             }
             if (ValidateKit.isNull(code)) {
-                // can rewrite ServiceException
+                // decorate exception
+                // can rewrite ServiceException using common code
                 code = this.decorateExceptionCode(exception);
             }
             message = this.decorateExceptionMessage(exception);
