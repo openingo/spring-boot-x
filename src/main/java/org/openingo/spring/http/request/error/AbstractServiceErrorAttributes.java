@@ -110,6 +110,9 @@ public abstract class AbstractServiceErrorAttributes extends DefaultErrorAttribu
      * @param exception  the exception that got thrown during handler execution
      */
     private String decorateExceptionMessage(Exception exception) {
+        if (exception instanceof ServiceException) {
+            return exception.getMessage();
+        }
         String friendlyFailureMessage = RespData.Config.FRIENDLY_FAILURE_MESSAGE;
         if (ValidateKit.isNotNull(friendlyFailureMessage)) {
             return friendlyFailureMessage;
