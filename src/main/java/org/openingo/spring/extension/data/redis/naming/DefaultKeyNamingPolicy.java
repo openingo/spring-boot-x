@@ -27,6 +27,8 @@
 
 package org.openingo.spring.extension.data.redis.naming;
 
+import org.openingo.jdkits.validate.ValidateKit;
+
 /**
  * DefaultKeyNamingPolicy
  *
@@ -34,8 +36,21 @@ package org.openingo.spring.extension.data.redis.naming;
  */
 public class DefaultKeyNamingPolicy implements IKeyNamingPolicy {
 
+    /**
+     * if {@code KeyNamingKit.getNaming()} is "null" return key,
+     * otherwise return {@code KeyNamingKit.getNaming()}+{@code KeyNamingKit.NAMING_SEPARATOR}+key
+     * @param key
+     * @return wrapper key
+     */
     @Override
     public String getKeyName(String key) {
-        return key;
+        String naming = KeyNamingKit.getNaming();
+        if (ValidateKit.isNull(naming)) {
+            return key;
+        }
+        if (!naming.endsWith(KeyNamingKit.NAMING_SEPARATOR)) {
+            naming = naming + KeyNamingKit.NAMING_SEPARATOR;
+        }
+        return naming + key;
     }
 }
