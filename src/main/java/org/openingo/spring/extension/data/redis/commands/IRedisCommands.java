@@ -25,15 +25,20 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.extension.data.redis;
+package org.openingo.spring.extension.data.redis.commands;
 
 /**
- * StringRedisTemplateXLite
- *
- * RedisTemplateXLite< String> wrapper
+ * IRedisCommands
  *
  * @author Qicz
  */
-public class StringRedisTemplateXLite extends RedisTemplateXLite<String> {
+public interface IRedisCommands<K, V> extends
+        IStringCommands<K, V>,
+        IHashCommands<K, V>,
+        IListCommands<K, V>,
+        ISetCommands<K, V>,
+        IZSetCommands<K, V>,
+        IGeoCommands<K, V>,
+        IHyperLogLogCommands<K, V> {
 
 }

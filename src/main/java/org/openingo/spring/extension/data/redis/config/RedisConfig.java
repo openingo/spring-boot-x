@@ -69,7 +69,8 @@ public class RedisConfig {
     }
 
     /**
-     * @return RedisTemplate< String, String> wrapper
+     * StringRedisTemplateX
+     * @return RedisTemplate< String, String>
      */
     @Bean
     @ConditionalOnMissingBean

@@ -28,9 +28,9 @@
 package org.openingo.spring.extension.data.redis;
 
 /**
- * StringRedisTemplateX
+ * StringRedisTemplateX lite
  *
- * RedisTemplateX< String> wrapper
+ * RedisTemplateX lite< String> wrapper
  *
  * @author Qicz
  */
