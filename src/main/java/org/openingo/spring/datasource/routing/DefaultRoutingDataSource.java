@@ -25,15 +25,18 @@
  * SOFTWARE.
  */
 
-package com.zaxxer.hikari;
+package org.openingo.spring.datasource.routing;
 
-import javax.sql.DataSourceX;
+import com.zaxxer.hikari.HikariDataSource;
 
 /**
- * HikariDataSourceX
+ * DefaultRoutingDataSource
  *
  * @author Qicz
  */
-public class HikariDataSourceX extends HikariDataSource implements DataSourceX {
-    
+public class DefaultRoutingDataSource extends HikariRoutingDataSource {
+
+    public DefaultRoutingDataSource(HikariDataSource defaultTargetDataSource) {
+        super(defaultTargetDataSource);
+    }
 }

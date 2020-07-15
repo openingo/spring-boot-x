@@ -25,23 +25,31 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.datasource;
+package org.openingo.spring.datasource.routing;
 
-import com.zaxxer.hikari.HikariDataSourceX;
+import com.alibaba.druid.pool.DruidDataSource;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSourceX;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
- * HikariRoutingDataSource
+ * DruidRoutingDataSource
  *
  * @author Qicz
  */
-public class HikariRoutingDataSource extends AbstractRoutingDataSourceX<HikariDataSourceX> {
+public class DruidRoutingDataSource extends AbstractRoutingDataSourceX {
 
-    public HikariRoutingDataSource(HikariDataSourceX defaultTargetDataSource,
-                                   ConcurrentHashMap<Object, HikariDataSourceX> targetDataSources) {
-        super(defaultTargetDataSource, targetDataSources);
+    public DruidRoutingDataSource(DruidDataSource defaultTargetDataSource) {
+        super(defaultTargetDataSource);
+    }
+
+    /**
+     * Close the dataSource
+     * @param dataSource closing dataSource
+     */
+    @Override
+    public void closeDataSource(Object dataSource) {
+        if (dataSource instanceof DruidDataSource) {
+            ((DruidDataSource)dataSource).close();
+        }
     }
 
     /**
