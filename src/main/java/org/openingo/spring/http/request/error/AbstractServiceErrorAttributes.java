@@ -67,40 +67,33 @@ public abstract class AbstractServiceErrorAttributes extends DefaultErrorAttribu
         // error code prepare
         Object code = null;
         // processing super error attributes
-        String message = this.getError(errorAttributes);
+        String message = null;
         Exception exception = this.getHandlerExecutionException();
         Map<String, Object> serviceErrorAttributes = new HashMap<>();
         if (!this.responseOK(errorAttributes)
                 && ValidateKit.isNotNull(exception)) {
-            // config non code
-            if (!RespData.Config.SM_ONLY) {
-                // check ServiceException with setting code
-                if (exception instanceof ServiceException) {
-                    code = ((ServiceException) exception).getExceptionCode();
-                }
-                if (ValidateKit.isNull(code)) {
-                    // decorate exception
-                    // can rewrite ServiceException using common code
-                    code = this.decorateExceptionCode(exception);
-                }
+            // check ServiceException with setting code
+            if (exception instanceof ServiceException) {
+                code = ((ServiceException) exception).getExceptionCode();
+                message = exception.getMessage();
             }
+            // decorate exception
+            // can rewrite ServiceException using common code
+            code = ValidateKit.isNull(code) ? this.decorateExceptionCode(exception) : code;
             // decorate exception message
-            message = this.decorateExceptionMessage(exception);
-            this.decorateErrorAttributes(errorAttributes, serviceErrorAttributes);
+            message = ValidateKit.isNull(message) ? this.decorateExceptionMessage(exception) : message;
         }
         // services error attributes processing
         if (!RespData.Config.SM_ONLY) {
             // if the code not handle, using response status
-            if (ValidateKit.isNull(code)) {
-                code = this.getStatus(errorAttributes);
-            }
+            code = ValidateKit.isNull(code) ? this.getStatus(errorAttributes) : code;
             // deduce code type by RespData.Config.FAILURE_SC
-            if (RespData.Config.FAILURE_SC instanceof String) {
-                code = code.toString();
-            }
+            code = (RespData.Config.FAILURE_SC instanceof String) ? code.toString() : code;
             serviceErrorAttributes.put(RespData.Config.SC_KEY, code);
         }
+        message = ValidateKit.isNull(message) ? this.getError(errorAttributes) : message;
         serviceErrorAttributes.put(RespData.Config.SM_KEY, message);
+        this.decorateErrorAttributes(errorAttributes, serviceErrorAttributes);
         return serviceErrorAttributes;
     }
 
