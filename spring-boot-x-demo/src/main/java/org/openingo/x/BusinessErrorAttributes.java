@@ -29,7 +29,15 @@ package org.openingo.x;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.openingo.spring.http.request.error.DefaultServiceErrorAttributes;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BindException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
+
+import javax.validation.ConstraintViolationException;
 
 /**
  * BusinessErrorAttributes
@@ -61,6 +69,15 @@ public class BusinessErrorAttributes extends DefaultServiceErrorAttributes {
         }
         if (exception instanceof JsonProcessingException) {
             return 345;
+        }
+        if (exception instanceof MethodArgumentNotValidException
+                || exception instanceof ConstraintViolationException
+                || exception instanceof BindException
+                || exception instanceof HttpMessageNotReadableException
+                || exception instanceof MissingServletRequestPartException
+                || exception instanceof MissingServletRequestParameterException
+                || exception instanceof MultipartException) {
+            return 1234;
         }
         return super.decorateExceptionCode(exception);
     }

@@ -28,9 +28,6 @@
 package org.openingo.spring.exception;
 
 
-import org.openingo.jdkits.lang.ObjectKit;
-import org.openingo.jdkits.validate.ValidateKit;
-
 /**
  * ServiceException
  *
@@ -190,29 +187,5 @@ public class ServiceException extends RuntimeException {
      */
     public Object getExceptionCode() {
         return this.exceptionCode;
-    }
-
-    /**
-     * @return Service Exception String Code
-     */
-    public String getExceptionStringCode() {
-        return ValidateKit.isNotNull(this.exceptionCode) ? this.exceptionCode.toString() : "";
-    }
-
-    /**
-     * Service Exception Integer Code
-     * if the string cannot be parsed as an integer return <tt>null</tt>.
-     * @return Service Exception Integer Code
-     */
-    public Integer getExceptionIntegerCode() {
-        Integer code = null;
-        if (ValidateKit.isNotNull(exceptionCode)) {
-            try {
-                code = ObjectKit.toInteger(this.exceptionCode);
-            } catch (NumberFormatException ex) {
-               // nop
-            }
-        }
-        return code;
     }
 }

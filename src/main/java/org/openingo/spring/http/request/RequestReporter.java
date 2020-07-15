@@ -31,6 +31,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.openingo.jdkits.json.JacksonKit;
+import org.openingo.jdkits.reflect.ClassKit;
 import org.openingo.jdkits.sys.IPKit;
 import org.openingo.jdkits.validate.ValidateKit;
 import org.openingo.spring.constants.Constants;
@@ -89,11 +90,7 @@ public final class RequestReporter {
 		if (ValidateKit.isNotNull(this.handler)) {
 			targetClass = this.handler.getBean().getClass();
 		}
-		if (ValidateKit.isNotNull(targetClass)) {
-			// deduce useful class
-			targetClass = !targetClass.getName().contains("$$EnhancerBy") ? targetClass : targetClass.getSuperclass();
-		}
-		return targetClass;
+		return ClassKit.getUserClass(targetClass);
 	}
 
 	/**
