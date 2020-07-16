@@ -33,7 +33,7 @@ package org.openingo.spring.extension.data.redis.commands;
  * @author Qicz
  */
 public interface IRedisCommands<K, V> extends
-        IStringCommands<K, V>,
+        IValueCommands<K, V>,
         IHashCommands<K, V>,
         IListCommands<K, V>,
         ISetCommands<K, V>,

@@ -37,11 +37,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * IStringCommands
+ * IValueCommands
  *
  * @author Qicz
  */
-public interface IStringCommands<K, V> {
+public interface IValueCommands<K, V> {
 
     /**
      * Set {@code value} for {@code key}.
