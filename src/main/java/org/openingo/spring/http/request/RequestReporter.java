@@ -194,7 +194,8 @@ public final class RequestReporter {
 
 		// exception
 		if (ValidateKit.isNotNull(this.exception)) {
-			reportInfoBuilder.append("Exception  : ").append(JacksonKit.toJson(this.exception)).append("\n");
+			reportInfoBuilder.append("Exception  : ").append(this.exception.getClass()).append("\n");
+			reportInfoBuilder.append("Exception Message  : ").append(this.exception.getMessage()).append("\n");
 		}
 
 		reportInfoBuilder.append("----------------------------------------------------------------\n");
