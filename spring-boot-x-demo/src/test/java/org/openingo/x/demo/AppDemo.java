@@ -5,7 +5,7 @@ import org.junit.runner.RunWith;
 import org.openingo.spring.boot.SpringApplicationX;
 import org.openingo.spring.extension.data.redis.RedisX;
 import org.openingo.spring.extension.data.redis.naming.DefaultKeyNamingPolicy;
-import org.openingo.spring.extension.data.redis.serializer.FstSerializer;
+import org.openingo.spring.extension.data.redis.serializer.FstRedisSerializer;
 import org.openingo.x.App;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -57,7 +57,7 @@ public class AppDemo {
 
     @Test
     public void testFst() {
-        byte[] zcqs = new FstSerializer<>().serialize("zcq");
+        byte[] zcqs = new FstRedisSerializer<>().serialize("zcq");
         System.out.println(new String(zcqs));
     }
 

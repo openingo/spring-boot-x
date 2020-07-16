@@ -34,7 +34,7 @@ import org.openingo.spring.extension.data.redis.StringRedisX;
 import org.openingo.spring.extension.data.redis.naming.DefaultKeyNamingPolicy;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
 import org.openingo.spring.extension.data.redis.naming.KeyNamingKit;
-import org.openingo.spring.extension.data.redis.serializer.FstSerializer;
+import org.openingo.spring.extension.data.redis.serializer.FstRedisSerializer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -43,7 +43,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.net.UnknownHostException;
 
 /**
  * RedisConfig
@@ -63,8 +64,8 @@ public class RedisConfig {
      * @return the default redis template
      */
     @Bean
-    @ConditionalOnMissingBean
-    public RedisX<Object> redisTemplateX() {
+    @ConditionalOnMissingBean(name = "redisX")
+    public RedisX<Object> redisX() {
         return new RedisX<>();
     }
 
@@ -73,8 +74,8 @@ public class RedisConfig {
      * @return RedisX < String, String>
      */
     @Bean
-    @ConditionalOnMissingBean
-    public StringRedisX stringRedisTemplateX() {
+    @ConditionalOnMissingBean(name = "stringRedisX")
+    public StringRedisX stringRedisX() {
         return new StringRedisX();
     }
 
@@ -83,11 +84,11 @@ public class RedisConfig {
      * @return RedisTemplate using FST for values and StringRedisSerializer for keys
      */
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+    @ConditionalOnMissingBean(name = "redisTemplate")
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) throws UnknownHostException {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(this.valueSerializer());
+        redisTemplate.setKeySerializer(RedisSerializer.string());
         return redisTemplate;
     }
 
@@ -96,8 +97,8 @@ public class RedisConfig {
      */
     @Bean
     @ConditionalOnMissingBean
-    public <V> RedisSerializer<V> valueSerializer() {
-        return new FstSerializer<>();
+    public <V> RedisSerializer<V> fstRedisSerializer() {
+        return new FstRedisSerializer<>();
     }
 
     /**

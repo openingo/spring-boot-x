@@ -36,11 +36,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 /**
- * FstSerializer
+ * FstRedisSerializer
  *
  * @author Qicz
  */
-public class FstSerializer<T> implements ISerializer<T> {
+public class FstRedisSerializer<T> implements ISerializer<T> {
 
     @Override
     public byte[] serialize(T t) throws SerializationException {
@@ -68,4 +68,7 @@ public class FstSerializer<T> implements ISerializer<T> {
             throw new SerializationException(e.toString(), e);
         }
     }
+
+    public static FstRedisSerializer<String> string = new FstRedisSerializer<>();
+    public static FstRedisSerializer<Object> object = new FstRedisSerializer<>();
 }

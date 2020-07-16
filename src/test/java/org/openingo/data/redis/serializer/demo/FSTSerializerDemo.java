@@ -29,7 +29,7 @@ package org.openingo.data.redis.serializer.demo;
 
 import org.junit.Test;
 import org.openingo.data.redis.serializer.demo.entity.User;
-import org.openingo.spring.extension.data.redis.serializer.FstSerializer;
+import org.openingo.spring.extension.data.redis.serializer.FstRedisSerializer;
 
 /**
  * FSTSerializerDemo
@@ -45,10 +45,10 @@ public class FSTSerializerDemo {
         user.setName("name");
         user.setAge(12);
 
-        FstSerializer objectFstSerializer = new FstSerializer();
-        byte[] serialize = objectFstSerializer.serialize(user);
+        FstRedisSerializer objectFstRedisSerializer = new FstRedisSerializer();
+        byte[] serialize = objectFstRedisSerializer.serialize(user);
 
-        User userCp = (User)objectFstSerializer.deserialize(serialize);
+        User userCp = (User) objectFstRedisSerializer.deserialize(serialize);
 
         System.out.println(userCp);
     }

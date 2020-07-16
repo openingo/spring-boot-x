@@ -68,7 +68,7 @@ public class UserController {
     @GetMapping("/save")
     public String save() {
         KeyNamingKit.setNaming("openingo");
-        redisX.opsForValue().set("name", "Qicz");
+        redisX.set("name", "Qicz");
         return "ok";
     }
 
