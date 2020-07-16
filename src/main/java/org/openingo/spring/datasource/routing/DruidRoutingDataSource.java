@@ -25,32 +25,42 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.extension.data.redis.naming;
+package org.openingo.spring.datasource.routing;
 
-import org.openingo.jdkits.validate.ValidateKit;
+import com.alibaba.druid.pool.DruidDataSource;
+import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSourceX;
 
 /**
- * DefaultKeyNamingPolicy
+ * DruidRoutingDataSource
  *
  * @author Qicz
  */
-public class DefaultKeyNamingPolicy implements IKeyNamingPolicy {
+public class DruidRoutingDataSource extends AbstractRoutingDataSourceX {
+
+    public DruidRoutingDataSource(DruidDataSource defaultTargetDataSource) {
+        super(defaultTargetDataSource);
+    }
 
     /**
-     * if {@code KeyNamingKit.getNaming()} is "null" return key,
-     * otherwise return {@code KeyNamingKit.getNaming()}+{@code KeyNamingKit.NAMING_SEPARATOR}+key
-     * @param key
-     * @return wrapper key
+     * Close the dataSource
+     * @param dataSource closing dataSource
      */
     @Override
-    public String getKeyName(String key) {
-        String naming = KeyNamingKit.getNaming();
-        if (ValidateKit.isNull(naming)) {
-            return key;
+    public void closeDataSource(Object dataSource) {
+        if (dataSource instanceof DruidDataSource) {
+            ((DruidDataSource)dataSource).close();
         }
-        if (!naming.endsWith(KeyNamingKit.NAMING_SEPARATOR)) {
-            naming = naming + KeyNamingKit.NAMING_SEPARATOR;
-        }
-        return naming + key;
+    }
+
+    /**
+     * Determine the current lookup key. This will typically be
+     * implemented to check a thread-bound transaction context.
+     * <p>Allows for arbitrary keys. The returned key needs
+     * to match the stored lookup key type, as resolved by the
+     * {@link #resolveSpecifiedLookupKey} method.
+     */
+    @Override
+    protected Object determineCurrentLookupKey() {
+        return null;
     }
 }

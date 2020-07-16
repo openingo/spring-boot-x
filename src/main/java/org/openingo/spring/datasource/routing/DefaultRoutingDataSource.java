@@ -25,32 +25,18 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.extension.data.redis.naming;
+package org.openingo.spring.datasource.routing;
 
-import org.openingo.jdkits.validate.ValidateKit;
+import com.zaxxer.hikari.HikariDataSource;
 
 /**
- * DefaultKeyNamingPolicy
+ * DefaultRoutingDataSource
  *
  * @author Qicz
  */
-public class DefaultKeyNamingPolicy implements IKeyNamingPolicy {
+public class DefaultRoutingDataSource extends HikariRoutingDataSource {
 
-    /**
-     * if {@code KeyNamingKit.getNaming()} is "null" return key,
-     * otherwise return {@code KeyNamingKit.getNaming()}+{@code KeyNamingKit.NAMING_SEPARATOR}+key
-     * @param key
-     * @return wrapper key
-     */
-    @Override
-    public String getKeyName(String key) {
-        String naming = KeyNamingKit.getNaming();
-        if (ValidateKit.isNull(naming)) {
-            return key;
-        }
-        if (!naming.endsWith(KeyNamingKit.NAMING_SEPARATOR)) {
-            naming = naming + KeyNamingKit.NAMING_SEPARATOR;
-        }
-        return naming + key;
+    public DefaultRoutingDataSource(HikariDataSource defaultTargetDataSource) {
+        super(defaultTargetDataSource);
     }
 }

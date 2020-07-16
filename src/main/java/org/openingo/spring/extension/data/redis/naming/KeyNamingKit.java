@@ -39,6 +39,9 @@ public final class KeyNamingKit {
 
     private KeyNamingKit(){}
 
+    // naming separator
+    public static final String NAMING_SEPARATOR = ":";
+
     private static final ThreadLocalKit<String> namingData = new ThreadLocalKit<>();
 
     public static void setNaming(String naming) {
