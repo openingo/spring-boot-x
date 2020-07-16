@@ -60,12 +60,11 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfig {
 
     /**
-     * @param <V>
      * @return the default redis template
      */
     @Bean
     @ConditionalOnMissingBean
-    public <V> RedisX<V> redisTemplateX() {
+    public RedisX<Object> redisTemplateX() {
         return new RedisX<>();
     }
 
@@ -81,12 +80,11 @@ public class RedisConfig {
 
     /**
      * @param redisConnectionFactory
-     * @param <V>
      * @return RedisTemplate using FST for values and StringRedisSerializer for keys
      */
     @Bean
-    public <V> RedisTemplate<String, V> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, V> redisTemplate = new RedisTemplate<>();
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(this.valueSerializer());
