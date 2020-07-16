@@ -35,7 +35,7 @@ import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSourceX;
  *
  * @author Qicz
  */
-public abstract class HikariRoutingDataSource extends AbstractRoutingDataSourceX {
+public class HikariRoutingDataSource extends AbstractRoutingDataSourceX {
 
     public HikariRoutingDataSource(HikariDataSource defaultTargetDataSource) {
         super(defaultTargetDataSource);
