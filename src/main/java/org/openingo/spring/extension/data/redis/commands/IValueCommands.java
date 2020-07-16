@@ -57,10 +57,10 @@ public interface IValueCommands<K, V> {
      *
      * @param key must not be {@literal null}.
      * @param value must not be {@literal null}.
-     * @param timeout the key expiration timeout.
+     * @param timeoutSeconds the key expiration timeout.
      * @see <a href="https://redis.io/commands/setex">Redis Documentation: SETEX</a>
      */
-    void setEx(K key, long timeout, V value);
+    void setEx(K key, long timeoutSeconds, V value);
 
     /**
      * Get the value of {@code key}.

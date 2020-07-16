@@ -78,12 +78,12 @@ public abstract class AbstractRedisCommands<K, V> implements IRedisCommands<K, V
      *
      * @param key must not be {@literal null}.
      * @param value must not be {@literal null}.
-     * @param timeout the key expiration timeout.
+     * @param timeoutSeconds the key expiration timeout.
      * @see <a href="https://redis.io/commands/setex">Redis Documentation: SETEX</a>
      */
     @Override
-    public void setEx(K key, long timeout, V value) {
-        this.opsForValue().set(key, value, timeout, TimeUnit.SECONDS);
+    public void setEx(K key, long timeoutSeconds, V value) {
+        this.opsForValue().set(key, value, timeoutSeconds, TimeUnit.SECONDS);
     }
 
     /**
