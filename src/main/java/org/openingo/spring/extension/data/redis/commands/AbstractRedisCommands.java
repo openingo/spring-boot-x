@@ -450,7 +450,7 @@ public abstract class AbstractRedisCommands<K, V> implements IRedisCommands<K, V
      */
     @Override
     public void hSet(K key, Object hashKey, Object value) {
-        this.opsForHash().put(key, hashKey, hashKey);
+        this.opsForHash().put(key, hashKey, value);
     }
 
     /**
