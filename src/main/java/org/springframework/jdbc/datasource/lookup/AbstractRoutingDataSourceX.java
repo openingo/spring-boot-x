@@ -27,15 +27,14 @@
 
 package org.springframework.jdbc.datasource.lookup;
 
+import lombok.extern.slf4j.Slf4j;
 import org.openingo.jdkits.validate.ValidateKit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.openingo.spring.datasource.holder.RoutingDataSourceHolder;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
-import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -44,10 +43,9 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Qicz
  */
+@Slf4j
 public abstract class AbstractRoutingDataSourceX extends AbstractRoutingDataSource {
-
-    private static final Logger logger = LoggerFactory.getLogger(AbstractRoutingDataSourceX.class);
-
+    
     @Nullable
     private ConcurrentHashMap<Object, Object> targetDataSources;
 
@@ -56,16 +54,21 @@ public abstract class AbstractRoutingDataSourceX extends AbstractRoutingDataSour
     // auto close the same key dataSource
     private Boolean autoCloseSameKeyDataSource = true;
 
-    private void addDataSource(Object dataSourceKey, DataSource dataSource, boolean refresh) throws SQLException {
+    private void addDataSource(Object dataSourceKey, DataSource dataSource, boolean refresh) {
         Assert.notNull(this.targetDataSources, "[Assertion failed] - the targetDataSources argument cannot be null");
         Assert.notNull(dataSourceKey, "[Assertion failed] - the dataSourceKey argument cannot be null");
         Assert.notNull(dataSource, "[Assertion failed] - the dataSource argument cannot be null");
         if (this.hasDataSource(dataSourceKey)) {
-            logger.info("the same dataSource {} is exists", dataSourceKey);
+            log.info("the same dataSource {} is exists", dataSourceKey);
             Assert.isTrue(this.autoCloseSameKeyDataSource, "the same dataSource ["+dataSourceKey+"] is exists");
             Object closingDataSource = this.targetDataSources.get(dataSourceKey);
-            this.closeDataSource(closingDataSource);
-            this.targetDataSources.remove(dataSourceKey);
+            Boolean closeDataSourceState = this.closeDataSource(closingDataSource);
+            if (ValidateKit.isTrue(closeDataSourceState)) {
+                log.info("the dataSource with the key {} is closed", dataSourceKey);
+                this.targetDataSources.remove(dataSourceKey);
+            } else {
+                log.error("the dataSource with the key {} has an error in close operations", dataSourceKey);
+            }
         }
         this.targetDataSources.put(dataSourceKey, dataSource);
         synchronized (refreshLock) {
@@ -81,21 +84,39 @@ public abstract class AbstractRoutingDataSourceX extends AbstractRoutingDataSour
         super.setTargetDataSources(this.targetDataSources);
     }
 
+    /**
+     * whether or not close the dataSource that has the same dataSource key
+     * @param autoCloseSameKeyDataSource <tt>true</tt> close the dataSource that has the same dataSourceKey
+     */
     public void setAutoCloseSameKeyDataSource(Boolean autoCloseSameKeyDataSource) {
         this.autoCloseSameKeyDataSource = autoCloseSameKeyDataSource;
     }
 
+    /**
+     * the dataSource has the {@code dataSourceKey} is exists or not.
+     * @param dataSourceKey
+     * @return <tt>true</tt> exists
+     */
     public Boolean hasDataSource(Object dataSourceKey) {
         Assert.notNull(this.targetDataSources, "[Assertion failed] - the targetDataSources argument cannot be null");
         return this.targetDataSources.containsKey(dataSourceKey);
     }
 
-    public void addDataSource(Object dataSourceKey, DataSource dataSource) throws SQLException {
+    /**
+     * add a new dataSource
+     * @param dataSourceKey
+     * @param dataSource
+     */
+    public void addDataSource(Object dataSourceKey, DataSource dataSource) {
         this.addDataSource(dataSourceKey, dataSource, true);
-        logger.info("add dataSource finished.");
+        log.info("add dataSource finished.");
     }
 
-    public void addDataSources(Map<Object, DataSource> dataSources) throws SQLException {
+    /**
+     * add more dataSources
+     * @param dataSources
+     */
+    public void addDataSources(Map<Object, DataSource> dataSources) {
         if (ValidateKit.isNull(dataSources)) {
             return;
         }
@@ -105,10 +126,14 @@ public abstract class AbstractRoutingDataSourceX extends AbstractRoutingDataSour
         }
         synchronized (refreshLock) {
             this.afterPropertiesSet();
-            logger.info("add dataSources finished.");
+            log.info("add dataSources finished.");
         }
     }
 
+    /**
+     * remove the dataSource with the {@code dataSourceKey}
+     * @param dataSourceKey
+     */
     public void removeDataSource(Object dataSourceKey) {
         Assert.notNull(this.targetDataSources, "[Assertion failed] - the targetDataSources argument cannot be null");
         if (this.hasDataSource(dataSourceKey)) {
@@ -118,7 +143,7 @@ public abstract class AbstractRoutingDataSourceX extends AbstractRoutingDataSour
             }
             synchronized (refreshLock) {
                 this.afterPropertiesSet();
-                logger.info("remove dataSource finished.");
+                log.info("remove dataSource finished.");
             }
         }
     }
@@ -128,7 +153,7 @@ public abstract class AbstractRoutingDataSourceX extends AbstractRoutingDataSour
         if (ValidateKit.isNotNull(this.targetDataSources)) {
             for (Map.Entry<Object, Object> entry : this.targetDataSources.entrySet()) {
                 this.closeDataSource(entry.getValue());
-                logger.info("dataSource {} closed.", entry.getKey());
+                log.info("dataSource {} closed.", entry.getKey());
             }
             this.targetDataSources.clear();
         }
@@ -153,8 +178,20 @@ public abstract class AbstractRoutingDataSourceX extends AbstractRoutingDataSour
     }
 
     /**
-     * Close the dataSource
-     * @param dataSource closing dataSource
+     * Determine the current lookup key. This will typically be
+     * implemented to check a thread-bound transaction context.
+     * <p>Allows for arbitrary keys. The returned key needs
+     * to match the stored lookup key type, as resolved by the
+     * {@link #resolveSpecifiedLookupKey} method.
      */
-    public abstract void closeDataSource(Object dataSource);
+    @Override
+    protected Object determineCurrentLookupKey() {
+        return RoutingDataSourceHolder.getCurrentUsingDataSourceKey();
+    }
+
+    /**
+     * Close the dataSource
+     * @param dataSourceInstance closing dataSource
+     */
+    public abstract Boolean closeDataSource(Object dataSourceInstance);
 }

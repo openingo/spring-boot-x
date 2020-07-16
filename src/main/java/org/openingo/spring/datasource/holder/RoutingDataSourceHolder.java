@@ -25,32 +25,43 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.datasource.routing;
+package org.openingo.spring.datasource.holder;
 
-import com.alibaba.druid.pool.DruidDataSource;
-import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSourceX;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * DruidRoutingDataSource
+ * RoutingDataSourceHolder
  *
  * @author Qicz
  */
-public class DruidRoutingDataSource extends AbstractRoutingDataSourceX {
+@Slf4j
+public final class RoutingDataSourceHolder {
 
-    public DruidRoutingDataSource(DruidDataSource defaultTargetDataSource) {
-        super(defaultTargetDataSource);
+    private RoutingDataSourceHolder(){}
+
+    private static final ThreadLocalX<Object> ROUTING_DATASOURCE_HOLDER = new ThreadLocalX<>();
+
+    /**
+     * Set current using dataSource Key
+     * @param dataSourceKey current using dataSource Key
+     */
+    public static void setCurrentUsingDataSourceKey(Object dataSourceKey) {
+        log.info("Routing dataSource with the key {}", dataSourceKey);
+        ROUTING_DATASOURCE_HOLDER.set(dataSourceKey);
     }
 
     /**
-     * Close the dataSource
-     *
-     * @param dataSourceInstance closing dataSource
+     * Returns the current using dataSource key
+     * @return current using dataSource Key
      */
-    @Override
-    public Boolean closeDataSource(Object dataSourceInstance) {
-        if (dataSourceInstance instanceof DruidDataSource) {
-            ((DruidDataSource) dataSourceInstance).close();
-        }
-        return true;
+    public static Object getCurrentUsingDataSourceKey() {
+        return ROUTING_DATASOURCE_HOLDER.get();
+    }
+
+    /**
+     * Manual remove current using dataSource Key
+     */
+    public static void clearCurrentUsingDataSourceKey() {
+        ROUTING_DATASOURCE_HOLDER.remove();
     }
 }

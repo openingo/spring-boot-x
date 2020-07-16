@@ -44,24 +44,13 @@ public abstract class HikariRoutingDataSource extends AbstractRoutingDataSourceX
     /**
      * Close the dataSource
      *
-     * @param dataSource closing dataSource
+     * @param dataSourceInstance closing dataSource
      */
     @Override
-    public void closeDataSource(Object dataSource) {
-        if (dataSource instanceof HikariDataSource) {
-            ((HikariDataSource)dataSource).close();
+    public Boolean closeDataSource(Object dataSourceInstance) {
+        if (dataSourceInstance instanceof HikariDataSource) {
+            ((HikariDataSource) dataSourceInstance).close();
         }
-    }
-
-    /**
-     * Determine the current lookup key. This will typically be
-     * implemented to check a thread-bound transaction context.
-     * <p>Allows for arbitrary keys. The returned key needs
-     * to match the stored lookup key type, as resolved by the
-     * {@link #resolveSpecifiedLookupKey} method.
-     */
-    @Override
-    protected Object determineCurrentLookupKey() {
-        return null;
+        return true;
     }
 }
