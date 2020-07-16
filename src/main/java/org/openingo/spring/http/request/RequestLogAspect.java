@@ -33,7 +33,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.openingo.jdkits.sys.SystemClockKit;
-import org.openingo.jdkits.thread.ThreadLocalKit;
 import org.openingo.jdkits.validate.ValidateKit;
 import org.openingo.spring.constants.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,14 +54,14 @@ public class RequestLogAspect {
     @Autowired
     MappingJackson2HttpMessageConverter converter;
 
-    private final ThreadLocalKit<Long> processingTimeThreadLocal = new ThreadLocalKit<>();
+    private final ThreadLocalX<Long> PROCESSING_TIME_HOLDER = new ThreadLocalX<>();
 
     private void handlerStart() {
-        this.processingTimeThreadLocal.set(SystemClockKit.now());
+        this.PROCESSING_TIME_HOLDER.set(SystemClockKit.now());
     }
 
     private float getProcessingSeconds() {
-        long startTime = this.processingTimeThreadLocal.get();
+        long startTime = this.PROCESSING_TIME_HOLDER.getRemove();
         return (SystemClockKit.now() - startTime)/1000.0f;
     }
 

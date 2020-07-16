@@ -29,7 +29,6 @@ package org.springframework.boot.web.servlet.error;
 
 import lombok.extern.slf4j.Slf4j;
 import org.openingo.jdkits.lang.ObjectKit;
-import org.openingo.jdkits.thread.ThreadLocalKit;
 import org.openingo.jdkits.validate.ValidateKit;
 import org.openingo.spring.constants.Constants;
 import org.openingo.spring.http.request.RequestReporter;
@@ -56,8 +55,8 @@ public class DefaultErrorAttributesX extends DefaultErrorAttributes {
     @Autowired
     MappingJackson2HttpMessageConverter converter;
 
-    private final ThreadLocalKit<Object> handlerHolder = new ThreadLocalKit<>();
-    private final ThreadLocalKit<Exception> exceptionHolder = new ThreadLocalKit<>();
+    private final ThreadLocalX<Object> HANDLER_HOLDER = new ThreadLocalX<>();
+    private final ThreadLocalX<Exception> EXCEPTION_HOLDER = new ThreadLocalX<>();
 
     // using exception instance or not
     private final boolean usingException;
@@ -91,7 +90,7 @@ public class DefaultErrorAttributesX extends DefaultErrorAttributes {
     @Override
     public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
         Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
-        Object handler = this.handlerHolder.get();
+        Object handler = this.HANDLER_HOLDER.getRemove();
         if (ValidateKit.isNotNull(handler)) {
             errorAttributes.put("handler", handler.toString());
         }
@@ -115,9 +114,9 @@ public class DefaultErrorAttributesX extends DefaultErrorAttributes {
      */
     @Override
     public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception exception) {
-        this.handlerHolder.set(handler);
+        this.HANDLER_HOLDER.set(handler);
         if (this.usingException) {
-            this.exceptionHolder.set(exception);
+            this.EXCEPTION_HOLDER.set(exception);
         }
         // print request information
         RequestReporter requestReporter = RequestReporter.getInstance();
@@ -143,10 +142,9 @@ public class DefaultErrorAttributesX extends DefaultErrorAttributes {
      */
     protected Exception getHandlerExecutionException() {
         if (!this.usingException) {
-            log.info("\"usingException\" state is Illegal, required true state.");
-            return null;
+            throw new IllegalStateException("\"usingException\" state is Illegal, required true state.");
         }
-        return this.exceptionHolder.get();
+        return this.EXCEPTION_HOLDER.getRemove();
     }
 
     /**

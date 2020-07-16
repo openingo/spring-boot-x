@@ -28,8 +28,6 @@
 package org.openingo.spring.extension.data.redis.naming;
 
 
-import org.openingo.jdkits.thread.ThreadLocalKit;
-
 /**
  * KeyNamingKit
  *
@@ -42,13 +40,13 @@ public final class KeyNamingKit {
     // naming separator
     public static final String NAMING_SEPARATOR = ":";
 
-    private static final ThreadLocalKit<String> namingData = new ThreadLocalKit<>();
+    private static final ThreadLocalX<String> NAMING_DATA_HOLDER = new ThreadLocalX<>();
 
     public static void setNaming(String naming) {
-        namingData.set(naming);
+        NAMING_DATA_HOLDER.set(naming);
     }
 
     public static String getNaming() {
-        return namingData.get();
+        return NAMING_DATA_HOLDER.getRemove();
     }
 }
