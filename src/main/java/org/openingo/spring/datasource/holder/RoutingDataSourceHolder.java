@@ -28,6 +28,7 @@
 package org.openingo.spring.datasource.holder;
 
 import lombok.extern.slf4j.Slf4j;
+import org.openingo.jdkits.thread.ThreadLocalX;
 
 /**
  * RoutingDataSourceHolder

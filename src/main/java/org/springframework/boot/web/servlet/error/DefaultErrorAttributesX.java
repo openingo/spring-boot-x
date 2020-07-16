@@ -29,6 +29,7 @@ package org.springframework.boot.web.servlet.error;
 
 import lombok.extern.slf4j.Slf4j;
 import org.openingo.jdkits.lang.ObjectKit;
+import org.openingo.jdkits.thread.ThreadLocalX;
 import org.openingo.jdkits.validate.ValidateKit;
 import org.openingo.spring.constants.Constants;
 import org.openingo.spring.http.request.RequestReporter;

@@ -28,6 +28,8 @@
 package org.openingo.spring.extension.data.redis.naming;
 
 
+import org.openingo.jdkits.thread.ThreadLocalX;
+
 /**
  * KeyNamingKit
  *
