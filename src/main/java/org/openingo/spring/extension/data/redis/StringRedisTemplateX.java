@@ -28,12 +28,12 @@
 package org.openingo.spring.extension.data.redis;
 
 /**
- * StringRedisX lite
+ * StringRedisTemplateX lite
  *
- * RedisX lite< String> wrapper
+ * RedisTemplateX lite< String> wrapper
  *
  * @author Qicz
  */
-public class StringRedisX extends RedisX<String> {
+public class StringRedisTemplateX extends RedisTemplateX<String> {
 
 }

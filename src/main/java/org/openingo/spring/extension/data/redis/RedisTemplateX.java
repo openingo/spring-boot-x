@@ -34,12 +34,12 @@ import org.springframework.data.redis.core.*;
 import org.springframework.lang.Nullable;
 
 /**
- * RedisX< String, V>
+ * RedisTemplateX< String, V>
  *
  * @author Qicz
  */
 @SuppressWarnings("all")
-public class RedisX<V> extends AbstractRedisCommands<String, V> {
+public class RedisTemplateX<V> extends AbstractRedisCommands<String, V> {
 
     @Autowired
     RedisTemplate<String, V> redisTemplate;
