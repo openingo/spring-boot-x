@@ -70,6 +70,9 @@ public final class RequestReporter {
 	// body message converter
 	private MappingJackson2HttpMessageConverter converter;
 
+	// exception
+	private Exception exception;
+
 	private RequestReporter(){}
 
 	public static RequestReporter getInstance() {
@@ -187,6 +190,11 @@ public final class RequestReporter {
 		// response data
 		if (ValidateKit.isNotNull(this.responseData)) {
 			reportInfoBuilder.append("Response  : ").append(JacksonKit.toJson(this.responseData)).append("\n");
+		}
+
+		// exception
+		if (ValidateKit.isNotNull(this.exception)) {
+			reportInfoBuilder.append("Exception  : ").append(JacksonKit.toJson(this.exception)).append("\n");
 		}
 
 		reportInfoBuilder.append("----------------------------------------------------------------\n");

@@ -123,6 +123,7 @@ public class DefaultErrorAttributesX extends DefaultErrorAttributes {
         RequestReporter requestReporter = RequestReporter.getInstance();
         requestReporter.setConverter(this.converter);
         requestReporter.setRequest(request);
+        requestReporter.setException(exception);
         if (ValidateKit.isNotNull(handler)) {
             requestReporter.setHandler((HandlerMethod) handler);
         }
