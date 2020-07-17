@@ -59,19 +59,15 @@ import java.util.Map;
 @ConditionalOnClass({ Servlet.class, DispatcherServlet.class })
 public class HttpConfig  {
 
-    @Configuration
+    @Bean
     @ConditionalOnProperty(
             prefix = PropertiesConstants.HTTP_REQUEST_LOG_CONFIG_PROPERTIES_PREFIX,
             name = PropertiesConstants.ENABLE,
             havingValue = Constants.TRUE,
             matchIfMissing = true // default enable
     )
-    static class HttpRequestLogConfig {
-
-        @Bean
-        public HttpRequestLogAspect httpRequestLogAspect() {
-            return new HttpRequestLogAspect();
-        }
+    public HttpRequestLogAspect httpRequestLogAspect() {
+        return new HttpRequestLogAspect();
     }
 
     @Configuration
