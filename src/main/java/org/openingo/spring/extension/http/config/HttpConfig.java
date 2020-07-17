@@ -38,6 +38,7 @@ import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -131,7 +132,7 @@ public class HttpConfig  {
 
             @Override
             public String getContentType() {
-                return "text/html";
+                return MediaType.TEXT_HTML_VALUE;
             }
         }
     }
