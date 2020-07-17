@@ -45,4 +45,6 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = PropertiesConstants.HTTP_CONFIG_PROPERTIES_PREFIX)
 public class HttpConfigProperties extends ExtensionConfigProperties {
 
+    boolean corsAllowAll = false;
+
 }

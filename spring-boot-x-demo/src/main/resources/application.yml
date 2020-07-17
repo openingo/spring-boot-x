@@ -2,5 +2,6 @@ openingo:
   request:
     log:
       enable: true
+      cors-allow-all: true
   redis:
     enable: true
