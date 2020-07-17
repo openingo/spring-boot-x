@@ -32,7 +32,8 @@ import org.openingo.jdkits.lang.ObjectKit;
 import org.openingo.jdkits.thread.ThreadLocalX;
 import org.openingo.jdkits.validate.ValidateKit;
 import org.openingo.spring.constants.Constants;
-import org.openingo.spring.http.request.RequestReporter;
+import org.openingo.spring.extension.http.config.HttpConfigProperties;
+import org.openingo.spring.http.request.HttpRequestReporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -55,6 +56,9 @@ public class DefaultErrorAttributesX extends DefaultErrorAttributes {
 
     @Autowired
     MappingJackson2HttpMessageConverter converter;
+
+    @Autowired
+    HttpConfigProperties.HttpRequestLogConfigProperties httpRequestLogConfigProperties;
 
     private final ThreadLocalX<Object> HANDLER_HOLDER = new ThreadLocalX<>();
     private final ThreadLocalX<Exception> EXCEPTION_HOLDER = new ThreadLocalX<>();
@@ -119,19 +123,21 @@ public class DefaultErrorAttributesX extends DefaultErrorAttributes {
         if (this.usingException) {
             this.EXCEPTION_HOLDER.set(exception);
         }
-        // print request information
-        RequestReporter requestReporter = RequestReporter.getInstance();
-        requestReporter.setConverter(this.converter);
-        requestReporter.setRequest(request);
-        requestReporter.setException(exception);
-        if (ValidateKit.isNotNull(handler)) {
-            requestReporter.setHandler((HandlerMethod) handler);
-        }
-        requestReporter.report();
+        // when log enable print request information
+        if (this.httpRequestLogConfigProperties.isEnable()) {
+            HttpRequestReporter httpRequestReporter = HttpRequestReporter.getInstance();
+            httpRequestReporter.setConverter(this.converter);
+            httpRequestReporter.setRequest(request);
+            httpRequestReporter.setException(exception);
+            if (ValidateKit.isNotNull(handler)) {
+                httpRequestReporter.setHandler((HandlerMethod) handler);
+            }
+            httpRequestReporter.report();
 
-        // print error information
-        StringBuilder errorBuilder = new StringBuilder();
-        log.error(errorBuilder.append(Constants.REQUEST_REPORT_HEADER).toString());
+            // print error information
+            StringBuilder errorBuilder = new StringBuilder();
+            log.error(errorBuilder.append(Constants.REQUEST_REPORT_HEADER).toString());
+        }
         return super.resolveException(request, response, handler, exception);
     }
 

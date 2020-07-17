@@ -29,24 +29,22 @@ package org.openingo.spring.extension.http.config;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openingo.javax.StringBuilderX;
+import org.openingo.jdkits.validate.ValidateKit;
 import org.openingo.spring.constants.Constants;
 import org.openingo.spring.constants.PropertiesConstants;
-import org.openingo.spring.http.request.RequestLogAspect;
+import org.openingo.spring.http.request.HttpRequestLogAspect;
 import org.openingo.spring.http.request.error.DefaultServiceErrorAttributes;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.condition.SearchStrategy;
+import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.View;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
@@ -57,92 +55,123 @@ import java.util.Map;
  * @author Qicz
  */
 @Configuration
-@ConditionalOnProperty(
-        prefix = PropertiesConstants.HTTP_CONFIG_PROPERTIES_PREFIX,
-        name = PropertiesConstants.ENABLE,
-        havingValue = Constants.TRUE,
-        matchIfMissing = true // default enable
-)
-@ConditionalOnClass(WebMvcConfigurer.class)
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+@ConditionalOnClass({ Servlet.class, DispatcherServlet.class })
 public class HttpConfig  {
 
-    @Bean
-    public RequestLogAspect requestLogAspect() {
-        return new RequestLogAspect();
+    @Configuration
+    @ConditionalOnProperty(
+            prefix = PropertiesConstants.HTTP_REQUEST_LOG_CONFIG_PROPERTIES_PREFIX,
+            name = PropertiesConstants.ENABLE,
+            havingValue = Constants.TRUE,
+            matchIfMissing = true // default enable
+    )
+    static class HttpRequestLogConfig {
+
+        @Bean
+        public HttpRequestLogAspect httpRequestLogAspect() {
+            return new HttpRequestLogAspect();
+        }
     }
 
-    /**
-     * DefaultServiceErrorAttributes
-     */
-    @Bean
-    @ConditionalOnMissingBean(value = ErrorAttributes.class, search = SearchStrategy.CURRENT)
-    public DefaultServiceErrorAttributes serviceDefaultErrorAttributes() {
-        return new DefaultServiceErrorAttributes();
+    @Configuration
+    @ConditionalOnProperty(
+            prefix = PropertiesConstants.HTTP_REQUEST_ERROR_CONFIG_PROPERTIES_PREFIX,
+            name = PropertiesConstants.ENABLE,
+            havingValue = Constants.TRUE,
+            matchIfMissing = true // default enable
+    )
+    static class HttpErrorConfig {
+
+        /**
+         * DefaultServiceErrorAttributes
+         */
+        @Bean
+        @ConditionalOnMissingBean(value = ErrorAttributes.class, search = SearchStrategy.CURRENT)
+        public DefaultServiceErrorAttributes serviceDefaultErrorAttributes() {
+            return new DefaultServiceErrorAttributes();
+        }
+
+        @Bean(name = "error")
+        @ConditionalOnMissingBean(name = "error")
+        public View defaultErrorView() {
+            return new StaticErrorView();
+        }
+
+        static class StaticErrorView implements View {
+
+            private static final Log logger = LogFactory.getLog(StaticErrorView.class);
+
+            @Override
+            public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response)
+                    throws Exception {
+                if (response.isCommitted()) {
+                    String message = getMessage(model);
+                    logger.error(message);
+                    return;
+                }
+                StringBuilder builder = new StringBuilder();
+                if (response.getContentType() == null) {
+                    response.setContentType(getContentType());
+                }
+                builder.append("<html><body><h1> :: SpringApplicationX :: Whitelabel Error Page</h1>");
+                builder.append("<h3>Error Details:</h3>");
+                model.forEach((k, v) -> builder.append("<div> ").append(k).append(" => \"").append(v).append("\" </div>"));
+                builder.append("</body></html>");
+                response.getWriter().append(builder.toString());
+            }
+
+            private String getMessage(Map<String, ?> model) {
+                Object path = model.get("path");
+                String message = "Cannot render error page for request [" + path + "]";
+                Object mMessage = model.get("message");
+                if (ValidateKit.isNotNull(mMessage)) {
+                    message += " and exception [" + mMessage + "]";
+                }
+                message += " as the response has already been committed.";
+                message += " As a result, the response may have the wrong status code.";
+                return message;
+            }
+
+            @Override
+            public String getContentType() {
+                return "text/html";
+            }
+        }
     }
 
     @Bean
     @ConditionalOnProperty(
-            prefix = PropertiesConstants.HTTP_CONFIG_PROPERTIES_PREFIX,
-            name = "cors-allow-all",
+            prefix = PropertiesConstants.HTTP_REQUEST_CORS_CONFIG_PROPERTIES_PREFIX,
+            name = PropertiesConstants.ENABLE,
             havingValue = Constants.TRUE
     )
     @ConditionalOnMissingBean
-    public CorsFilter corsAllowAllFilter() {
+    public CorsFilter corsFilter(HttpConfigProperties.HttpRequestCorsConfigProperties corsConfigProperties) {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.addAllowedOrigin("*");
-        corsConfiguration.addAllowedHeader("*");
-        corsConfiguration.addAllowedMethod("*");
-        corsConfiguration.setAllowCredentials(true);
-        source.registerCorsConfiguration("/**", corsConfiguration);
+        String allowedOrigin = corsConfigProperties.getAllowedOrigin();
+        String allowedHeader = corsConfigProperties.getAllowedHeader();
+        String allowedMethod = corsConfigProperties.getAllowedMethod();
+        if (corsConfigProperties.isAllowedAll()) {
+            allowedOrigin = CorsConfiguration.ALL;
+            allowedHeader = CorsConfiguration.ALL;
+            allowedMethod = CorsConfiguration.ALL;
+        }
+        if (ValidateKit.isNotNull(allowedOrigin)) {
+            corsConfiguration.addAllowedOrigin(allowedOrigin);
+        }
+        if (ValidateKit.isNotNull(allowedHeader)) {
+            corsConfiguration.addAllowedHeader(allowedHeader);
+        }
+        if (ValidateKit.isNotNull(allowedMethod)) {
+            corsConfiguration.addAllowedMethod(allowedMethod);
+        }
+        corsConfiguration.setAllowCredentials(corsConfigProperties.isAllowCredentials());
+        String path = corsConfigProperties.getPath();
+        if (ValidateKit.isNotNull(path)) {
+            source.registerCorsConfiguration(path, corsConfiguration);
+        }
         return new CorsFilter(source);
-    }
-
-    @Bean(name = "error")
-    @ConditionalOnMissingBean(name = "error")
-    public View defaultErrorView() {
-        return new StaticErrorView();
-    }
-
-    private static class StaticErrorView implements View {
-
-        private static final Log logger = LogFactory.getLog(StaticErrorView.class);
-
-        @Override
-        public void render(Map<String, ?> model, HttpServletRequest request, HttpServletResponse response)
-                throws Exception {
-            if (response.isCommitted()) {
-                String message = getMessage(model);
-                logger.error(message);
-                return;
-            }
-            StringBuilderX builder = new StringBuilderX();
-            if (response.getContentType() == null) {
-                response.setContentType(getContentType());
-            }
-            builder.append("<html><body><h1>SpringApplicationX Whitelabel Error Page</h1>");
-            builder.append("<h3>Error Details:</h3>");
-            model.forEach((k, v) -> builder.append("<div> ").append(k).append(" => \"").append(v).append("\" </div>"));
-            builder.append("</body></html>");
-            response.getWriter().append(builder.toString());
-        }
-
-        private String getMessage(Map<String, ?> model) {
-            Object path = model.get("path");
-            String message = "Cannot render error page for request [" + path + "]";
-            Object mMessage = model.get("message");
-            if (mMessage != null) {
-                message += " and exception [" + mMessage + "]";
-            }
-            message += " as the response has already been committed.";
-            message += " As a result, the response may have the wrong status code.";
-            return message;
-        }
-
-        @Override
-        public String getContentType() {
-            return "text/html";
-        }
-
     }
 }

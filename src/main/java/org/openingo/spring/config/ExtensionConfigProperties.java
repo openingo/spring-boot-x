@@ -27,15 +27,18 @@
 
 package org.openingo.spring.config;
 
+import lombok.Data;
+
 /**
  * ExtensionConfigProperties
  *
  * @author Qicz
  */
+@Data
 public class ExtensionConfigProperties {
 
     /**
-     * enable or not, default enable <tt>true</tt>
+     * enable or not, default enable
      */
     private boolean enable = true;
 }

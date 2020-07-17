@@ -51,7 +51,7 @@ import java.util.Enumeration;
  */
 @Data
 @Slf4j
-public final class RequestReporter {
+public final class HttpRequestReporter {
 
 	private HttpServletRequest request;
 
@@ -73,10 +73,10 @@ public final class RequestReporter {
 	// exception
 	private Exception exception;
 
-	private RequestReporter(){}
+	private HttpRequestReporter(){}
 
-	public static RequestReporter getInstance() {
-		return new RequestReporter();
+	public static HttpRequestReporter getInstance() {
+		return new HttpRequestReporter();
 	}
 	
 	private static int maxOutputLengthOfParaValue = 512;
@@ -194,8 +194,8 @@ public final class RequestReporter {
 
 		// exception
 		if (ValidateKit.isNotNull(this.exception)) {
-			reportInfoBuilder.append("Exception  : ").append(this.exception.getClass()).append("\n");
-			reportInfoBuilder.append("Exception Message  : ").append(this.exception.getMessage()).append("\n");
+			reportInfoBuilder.append("Exception  : ").append(this.exception.toString()).append("\n");
+			//reportInfoBuilder.append("Exception Message  : ").append(this.exception.getMessage()).append("\n");
 		}
 
 		reportInfoBuilder.append("----------------------------------------------------------------\n");

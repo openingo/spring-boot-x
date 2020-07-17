@@ -32,19 +32,42 @@ import lombok.EqualsAndHashCode;
 import org.openingo.spring.config.ExtensionConfigProperties;
 import org.openingo.spring.constants.PropertiesConstants;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * HttpConfigProperties
  *
  * @author Qicz
  */
-@Data
-@EqualsAndHashCode(callSuper = true)
-@Component
-@ConfigurationProperties(prefix = PropertiesConstants.HTTP_CONFIG_PROPERTIES_PREFIX)
-public class HttpConfigProperties extends ExtensionConfigProperties {
+@Configuration
+public class HttpConfigProperties {
 
-    boolean corsAllowAll = false;
+    @Data
+    @Configuration
+    @EqualsAndHashCode(callSuper = true)
+    @ConfigurationProperties(prefix = PropertiesConstants.HTTP_REQUEST_LOG_CONFIG_PROPERTIES_PREFIX)
+    public static class HttpRequestLogConfigProperties extends ExtensionConfigProperties {
 
+    }
+
+    @Data
+    @Configuration
+    @EqualsAndHashCode(callSuper = true)
+    @ConfigurationProperties(prefix = PropertiesConstants.HTTP_REQUEST_ERROR_CONFIG_PROPERTIES_PREFIX)
+    public static class HttpRequestErrorConfigProperties extends ExtensionConfigProperties {
+
+    }
+
+    @Data
+    @Configuration
+    @EqualsAndHashCode(callSuper = true)
+    @ConfigurationProperties(prefix = PropertiesConstants.HTTP_REQUEST_CORS_CONFIG_PROPERTIES_PREFIX)
+    public static class HttpRequestCorsConfigProperties extends ExtensionConfigProperties {
+        private boolean allowedAll = false;
+        private boolean allowCredentials = false;
+        private String allowedOrigin;
+        private String allowedHeader;
+        private String allowedMethod;
+        private String path = "/**";
+    }
 }

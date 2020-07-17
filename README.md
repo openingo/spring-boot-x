@@ -87,11 +87,18 @@ public class App {
 
   ```yml
   openingo:
-    request:
-      log:
-        enable: true
     redis:
       enable: true
+    http:
+      request:
+        error:
+          enable: true
+        log:
+          enable: true
+        cors:
+          enable: true
+          allowed-all: true
+          allowed-header: "*" # when allowed-all is true will ignore
   ```
 
 - `RespData.Config`

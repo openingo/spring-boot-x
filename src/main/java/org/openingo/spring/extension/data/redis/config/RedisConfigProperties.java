@@ -32,7 +32,7 @@ import lombok.EqualsAndHashCode;
 import org.openingo.spring.config.ExtensionConfigProperties;
 import org.openingo.spring.constants.PropertiesConstants;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * RedisConfigProperties
@@ -41,7 +41,7 @@ import org.springframework.stereotype.Component;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Component
+@Configuration
 @ConfigurationProperties(prefix = PropertiesConstants.REDIS_CONFIG_PROPERTIES_PREFIX)
 public class RedisConfigProperties extends ExtensionConfigProperties {
 

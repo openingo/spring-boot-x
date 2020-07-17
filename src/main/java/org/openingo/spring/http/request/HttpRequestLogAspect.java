@@ -44,13 +44,13 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * RequestLogAspect
+ * HttpRequestLogAspect
  *
  * @author Qicz
  */
 @Aspect
 @Slf4j
-public class RequestLogAspect {
+public class HttpRequestLogAspect {
 
     @Autowired
     MappingJackson2HttpMessageConverter converter;
@@ -75,22 +75,22 @@ public class RequestLogAspect {
         this.handlerStart();
         Object proceed = point.proceed();
         float processingTime = this.getProcessingSeconds();
-        RequestReporter requestReporter = RequestReporter.getInstance();
+        HttpRequestReporter httpRequestReporter = HttpRequestReporter.getInstance();
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         if (ValidateKit.isNull(request)) {
-            requestReporter.report(Constants.REQUEST_REPORT_HEADER + "Processing Time  : " + processingTime + "s\n");
+            httpRequestReporter.report(Constants.REQUEST_REPORT_HEADER + "Processing Time  : " + processingTime + "s\n");
             return proceed;
         }
 
         // current request processing time
-        requestReporter.setProcessingTime(processingTime);
-        requestReporter.setPoint(point);
-        requestReporter.setConverter(this.converter);
-        requestReporter.setRequest(request);
-        requestReporter.setResponseData(proceed);
+        httpRequestReporter.setProcessingTime(processingTime);
+        httpRequestReporter.setPoint(point);
+        httpRequestReporter.setConverter(this.converter);
+        httpRequestReporter.setRequest(request);
+        httpRequestReporter.setResponseData(proceed);
 
         // fire report
-        requestReporter.report();
+        httpRequestReporter.report();
         return proceed;
     }
 }

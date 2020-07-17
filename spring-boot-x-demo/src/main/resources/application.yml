@@ -1,7 +1,13 @@
 openingo:
-  request:
-    log:
-      enable: true
-      cors-allow-all: true
   redis:
     enable: true
+  http:
+    request:
+      error:
+        enable: true
+      log:
+        enable: true
+      cors:
+        enable: true
+        allowed-all: true
+        allowed-header: "*" # when allowed-all is true will ignore

@@ -30,6 +30,8 @@ package org.openingo.spring.http.request.error;
 import org.openingo.jdkits.http.RespData;
 import org.openingo.jdkits.validate.ValidateKit;
 import org.openingo.spring.exception.ServiceException;
+import org.openingo.spring.extension.http.config.HttpConfigProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributesX;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
@@ -44,6 +46,9 @@ import java.util.Map;
  * @author Qicz
  */
 public abstract class AbstractServiceErrorAttributes extends DefaultErrorAttributesX {
+
+    @Autowired
+    HttpConfigProperties.HttpRequestErrorConfigProperties httpRequestErrorConfigProperties;
 
     /**
      * Create a new {@link AbstractServiceErrorAttributes} instance that included the
@@ -64,6 +69,10 @@ public abstract class AbstractServiceErrorAttributes extends DefaultErrorAttribu
     @Override
     public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
         Map<String, Object> errorAttributes = super.getErrorAttributes(webRequest, includeStackTrace);
+        // error resolve config is disable using the origin errorAttributes
+        if (!this.httpRequestErrorConfigProperties.isEnable()) {
+            return errorAttributes;
+        }
         // error code prepare
         Object code = null;
         // processing super error attributes
