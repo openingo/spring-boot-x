@@ -86,8 +86,10 @@ public class DefaultErrorAttributesX extends DefaultErrorAttributes {
     }
 
     /**
-     * Returns a {@link Map} of the error attributes. The map can be used as the model of
-     * an error page {@link ModelAndView}, or returned as a {@link ResponseBody}.
+     * Returns a {@link Map} of the error attributes that has
+     * exception, handler, message, error, timestamp, status, path params.
+     * The map can be used as the model of an error page {@link ModelAndView},
+     * or returned as a {@link ResponseBody}.
      * @param webRequest the source request
      * @param includeStackTrace if stack trace elements should be included
      * @return a map of error attributes

@@ -85,6 +85,8 @@ public class BusinessErrorAttributes extends DefaultServiceErrorAttributes {
 
     /**
      * Decorate error attributes, add extension attributes etc.
+     * the {@code errorAttributes} that has exception, handler, message,
+     * error, timestamp, status, path params.
      *
      * @param errorAttributes        error attributes
      * @param serviceErrorAttributes service error attributes
