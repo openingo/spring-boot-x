@@ -25,32 +25,18 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.datasource.routing;
+package org.openingo.x.datasource;
 
-import com.zaxxer.hikari.HikariDataSource;
-import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSourceX;
+import java.sql.SQLException;
 
 /**
- * HikariRoutingDataSource
+ * IDataSourceService
  *
  * @author Qicz
  */
-public class HikariRoutingDataSource extends AbstractRoutingDataSourceX {
+public interface IDataSourceService {
 
-    public HikariRoutingDataSource(HikariDataSource defaultTargetDataSource) {
-        super(defaultTargetDataSource);
-    }
+    void switchDataSource(String name) throws SQLException;
 
-    /**
-     * Close the dataSource
-     *
-     * @param dataSourceInstance closing dataSource
-     */
-    @Override
-    public Boolean closeDataSource(Object dataSourceInstance) {
-        if (dataSourceInstance instanceof HikariDataSource) {
-            ((HikariDataSource) dataSourceInstance).close();
-        }
-        return true;
-    }
+    void add(String name);
 }

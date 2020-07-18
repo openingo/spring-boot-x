@@ -25,32 +25,17 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.datasource.routing;
+package org.openingo.spring.datasource.provider;
 
-import com.alibaba.druid.pool.DruidDataSource;
-import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSourceX;
+import javax.sql.DataSource;
 
 /**
- * DruidRoutingDataSource
+ * IDataSourceProvider
  *
  * @author Qicz
  */
-public class DruidRoutingDataSource extends AbstractRoutingDataSourceX {
-
-    public DruidRoutingDataSource(DruidDataSource defaultTargetDataSource) {
-        super(defaultTargetDataSource);
-    }
-
-    /**
-     * Close the dataSource
-     *
-     * @param dataSourceInstance closing dataSource
-     */
-    @Override
-    public Boolean closeDataSource(Object dataSourceInstance) {
-        if (dataSourceInstance instanceof DruidDataSource) {
-            ((DruidDataSource) dataSourceInstance).close();
-        }
-        return true;
-    }
+public interface IDataSourceProvider {
+    DataSource getDataSource();
+    boolean build();
+    boolean destroy();
 }

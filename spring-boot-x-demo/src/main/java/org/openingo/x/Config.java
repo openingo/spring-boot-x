@@ -27,8 +27,12 @@
 
 package org.openingo.x;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import org.openingo.jdkits.http.RespData;
+import org.openingo.spring.datasource.provider.DruidDataSourceProvider;
+import org.openingo.spring.datasource.routing.RoutingDataSource;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.serializer.RedisSerializer;
@@ -58,5 +62,16 @@ public class Config {
     @Bean
     public IKeyNamingPolicy keyNamingPolicy() {
         return new KeyNamingPolicy();
+    }
+
+    @Bean(initMethod = "init", destroyMethod = "close")
+    @ConfigurationProperties("spring.datasource")
+    public DruidDataSource defaultDataSource(){
+        return new DruidDataSource();
+    }
+
+    @Bean
+    public RoutingDataSource routingDataSource(DruidDataSource dataSource) {
+        return new RoutingDataSource(new DruidDataSourceProvider(dataSource));
     }
 }

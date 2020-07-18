@@ -70,6 +70,7 @@
         <fst.version>2.57</fst.version>
         <druid.version>1.1.21</druid.version>
         <hikaricp.version>3.2.0</hikaricp.version>
+        <c3p0.version>0.9.5.3</c3p0.version>
     </properties>
 
     <dependencyManagement>
@@ -108,6 +109,11 @@
                 <artifactId>HikariCP</artifactId>
                 <version>${hikaricp.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.mchange</groupId>
+                <artifactId>c3p0</artifactId>
+                <version>${c3p0.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -127,6 +133,8 @@
             <artifactId>spring-jdbc</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <!-- datasource pool -->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
@@ -137,6 +145,12 @@
             <artifactId>HikariCP</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
