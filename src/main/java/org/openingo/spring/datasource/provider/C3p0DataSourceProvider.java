@@ -161,8 +161,12 @@ public class C3p0DataSourceProvider implements IDataSourceProvider {
                 toInt(ps.getProperty("maxIdleTime")),toInt(ps.getProperty("acquireIncrement")));
     }
 
+    /**
+     * start the provider
+     * @return true started
+     */
     @Override
-    public boolean build() {
+    public boolean startProviding() {
         if (isStarted)
             return true;
 
@@ -186,6 +190,10 @@ public class C3p0DataSourceProvider implements IDataSourceProvider {
         return Integer.parseInt(str);
     }
 
+    /**
+     * Returns provider's dataSource
+     * @return provider's dataSource
+     */
     @Override
     public DataSource getDataSource() {
         return dataSource;
@@ -195,6 +203,11 @@ public class C3p0DataSourceProvider implements IDataSourceProvider {
         return dataSource;
     }
 
+    /**
+     * Destroy the provider
+     * @return true destroyed
+     */
+    @Override
     public boolean destroy() {
         if (dataSource != null)
             dataSource.close();

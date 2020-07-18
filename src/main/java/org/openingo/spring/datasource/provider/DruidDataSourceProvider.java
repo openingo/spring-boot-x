@@ -186,8 +186,12 @@ public class DruidDataSourceProvider implements IDataSourceProvider {
         return this;
     }
 
+    /**
+     * start the provider
+     * @return true started
+     */
     @Override
-    public boolean build() {
+    public boolean startProviding() {
         if (isStarted)
             return true;
 
@@ -277,6 +281,10 @@ public class DruidDataSourceProvider implements IDataSourceProvider {
         }
     }
 
+    /**
+     * Destroy the provider
+     * @return true destroyed
+     */
     @Override
     public boolean destroy() {
         if (dataSource != null)
@@ -287,6 +295,10 @@ public class DruidDataSourceProvider implements IDataSourceProvider {
         return true;
     }
 
+    /**
+     * Returns provider's dataSource
+     * @return provider's dataSource
+     */
     @Override
     public DataSource getDataSource() {
         return dataSource;

@@ -167,13 +167,21 @@ public class HikariDataSourceProvider implements IDataSourceProvider {
         this.driverClass = driverClass;
     }
 
+    /**
+     * Returns provider's dataSource
+     * @return provider's dataSource
+     */
     @Override
     public DataSource getDataSource() {
         return dataSource;
     }
 
+    /**
+     * start the provider
+     * @return true started
+     */
     @Override
-    public boolean build() {
+    public boolean startProviding() {
         HikariConfig config = new HikariConfig();
         //设定基本参数
         config.setJdbcUrl(jdbcUrl);
@@ -238,6 +246,10 @@ public class HikariDataSourceProvider implements IDataSourceProvider {
         return true;
     }
 
+    /**
+     * Destroy the provider
+     * @return true destroyed
+     */
     @Override
     public boolean destroy() {
         if (dataSource != null)

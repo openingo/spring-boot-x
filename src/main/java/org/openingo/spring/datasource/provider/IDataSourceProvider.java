@@ -35,7 +35,22 @@ import javax.sql.DataSource;
  * @author Qicz
  */
 public interface IDataSourceProvider {
+
+    /**
+     * Returns provider's dataSource
+     * @return provider's dataSource
+     */
     DataSource getDataSource();
-    boolean build();
+
+    /**
+     * start the provider
+     * @return true started
+     */
+    boolean startProviding();
+
+    /**
+     * Destroy the provider
+     * @return true destroyed
+     */
     boolean destroy();
 }

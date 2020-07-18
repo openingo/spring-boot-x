@@ -70,7 +70,7 @@ public class DataSourceService implements IDataSourceService {
     @Override
     public void add(String name) {
         DruidDataSourceProvider druidDataSourceProvider = new DruidDataSourceProvider(dataSource.getUrl(), dataSource.getUsername(), dataSource.getPassword());
-        druidDataSourceProvider.build();
+        druidDataSourceProvider.startProviding();
         routingDataSource.addDataSource(name, druidDataSourceProvider);
     }
 }
