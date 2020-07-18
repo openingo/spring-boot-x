@@ -38,6 +38,7 @@ import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import javax.validation.ConstraintViolationException;
+import java.util.Map;
 
 /**
  * BusinessErrorAttributes
@@ -80,5 +81,17 @@ public class BusinessErrorAttributes extends DefaultServiceErrorAttributes {
             return 1234;
         }
         return super.decorateExceptionCode(exception);
+    }
+
+    /**
+     * Decorate error attributes, add extension attributes etc.
+     *
+     * @param errorAttributes        error attributes
+     * @param serviceErrorAttributes service error attributes
+     */
+    @Override
+    public void decorateErrorAttributes(Map<String, Object> errorAttributes, Map<String, Object> serviceErrorAttributes) {
+        super.decorateErrorAttributes(errorAttributes, serviceErrorAttributes);
+        //serviceErrorAttributes.putAll(errorAttributes);
     }
 }
