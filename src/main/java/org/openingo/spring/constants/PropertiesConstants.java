@@ -40,11 +40,11 @@ public final class PropertiesConstants {
     public static final String REDIS_CONFIG_PROPERTIES_PREFIX = "openingo.redis";
 
     // http configs
-    private static final String HTTP_REQUEST_CONFIG_PROPERTIES_PREFIX = "openingo.http.";
+    private static final String HTTP_REQUEST_CONFIG_PROPERTIES_PREFIX = "openingo.http.request.";
     // http request log config properties prefix
-    public static final String HTTP_REQUEST_LOG_CONFIG_PROPERTIES_PREFIX = HTTP_REQUEST_CONFIG_PROPERTIES_PREFIX + "request-log";
+    public static final String HTTP_REQUEST_LOG_CONFIG_PROPERTIES_PREFIX = HTTP_REQUEST_CONFIG_PROPERTIES_PREFIX + "log";
     // http request error config properties prefix
-    public static final String HTTP_REQUEST_ERROR_CONFIG_PROPERTIES_PREFIX = HTTP_REQUEST_CONFIG_PROPERTIES_PREFIX + "request-error";
+    public static final String HTTP_REQUEST_ERROR_CONFIG_PROPERTIES_PREFIX = HTTP_REQUEST_CONFIG_PROPERTIES_PREFIX + "error";
     // http request cors config properties prefix
     public static final String HTTP_REQUEST_CORS_CONFIG_PROPERTIES_PREFIX = HTTP_REQUEST_CONFIG_PROPERTIES_PREFIX + "cors";
 
