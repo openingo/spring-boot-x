@@ -51,7 +51,7 @@
 
 - `SpringApplicationX` more extensions
 
-- dynamic data source [TODO]
+- Routing dataSource (dynamic dataSource)
 
 - validate groups[TODO]
 
