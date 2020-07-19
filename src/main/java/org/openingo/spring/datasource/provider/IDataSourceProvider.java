@@ -42,6 +42,8 @@ public interface IDataSourceProvider {
      */
     DataSource getDataSource();
 
+    String getProviderName();
+
     /**
      * start the provider
      * @return true started

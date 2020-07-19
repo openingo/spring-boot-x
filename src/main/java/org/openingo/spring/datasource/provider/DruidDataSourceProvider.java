@@ -28,112 +28,45 @@
 package org.openingo.spring.datasource.provider;
 
 import com.alibaba.druid.DruidRuntimeException;
-import com.alibaba.druid.filter.Filter;
 import com.alibaba.druid.pool.DruidDataSource;
 import org.openingo.jdkits.lang.StrKit;
+import org.openingo.jdkits.validate.ValidateKit;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Properties;
 
 /**
  * DruidDataSourceProvider
- * copy & reference from jfinal
+ *
+ * validationQuery :
+ * hsqldb - "select 1 from INFORMATION_SCHEMA.SYSTEM_USERS"
+ * Oracle - "select 1 from dual"
+ * DB2 - "select 1 from sysibm.sysdummy1"
+ * mysql - "select 1"
+ *
+ * Filters:
+ * statistics："stat"
+ * Prevent SQL injection："wall"
+ * combine： "stat,wall"
  *
  * @author Qicz
  */
-public class DruidDataSourceProvider implements IDataSourceProvider {
+public class DruidDataSourceProvider extends DruidDataSource implements IDataSourceProvider {
 
-    //连接池的名称
-    protected String name = null;
+    // provider Name
+    private String providerName = null;
 
-    // 基本属性 url、user、password
-    protected String url;
-    protected String username;
-    protected String password;
-    protected String publicKey;
-    protected String driverClass = null;	// 由 "com.mysql.jdbc.Driver" 改为 null 让 druid 自动探测 driverClass 值
+    private String publicKey;
 
-    // 初始连接池大小、最小空闲连接数、最大活跃连接数
-    protected int initialSize = 1;
-    protected int minIdle = 10;
-    protected int maxActive = 32;
+    private String filters;
 
-    // 配置获取连接等待超时的时间
-    protected long maxWait = DruidDataSource.DEFAULT_MAX_WAIT;
+    private volatile boolean isStarted = false;
 
-    // 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
-    protected long timeBetweenEvictionRunsMillis = DruidDataSource.DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS;
-    // 配置连接在池中最小生存的时间
-    protected long minEvictableIdleTimeMillis = DruidDataSource.DEFAULT_MIN_EVICTABLE_IDLE_TIME_MILLIS;
-    // 配置发生错误时多久重连
-    protected long timeBetweenConnectErrorMillis = DruidDataSource.DEFAULT_TIME_BETWEEN_CONNECT_ERROR_MILLIS;
+    private DruidDataSource cloneInstance = null;
 
-    /**
-     * hsqldb - "select 1 from INFORMATION_SCHEMA.SYSTEM_USERS"
-     * Oracle - "select 1 from dual"
-     * DB2 - "select 1 from sysibm.sysdummy1"
-     * mysql - "select 1"
-     */
-    protected String validationQuery = "select 1";
-    protected String  connectionInitSql = null;
-    protected String connectionProperties = null;
-    protected boolean testWhileIdle = true;
-    protected boolean testOnBorrow = false;
-    protected boolean testOnReturn = false;
-
-    // 是否打开连接泄露自动检测
-    protected boolean removeAbandoned = false;
-    // 连接长时间没有使用，被认为发生泄露时长
-    protected long removeAbandonedTimeoutMillis = 300 * 1000;
-    // 发生泄露时是否需要输出 log，建议在开启连接泄露检测时开启，方便排错
-    protected boolean logAbandoned = false;
-
-    // 是否缓存preparedStatement，即PSCache，对支持游标的数据库性能提升巨大，如 oracle、mysql 5.5 及以上版本
-    // protected boolean poolPreparedStatements = false;	// oracle、mysql 5.5 及以上版本建议为 true;
-
-    // 只要maxPoolPreparedStatementPerConnectionSize>0,poolPreparedStatements就会被自动设定为true，使用oracle时可以设定此值。
-    protected int maxPoolPreparedStatementPerConnectionSize = -1;
-
-    protected Integer defaultTransactionIsolation = null;
-
-    // 配置监控统计拦截的filters
-    protected String filters;	// 监控统计："stat"    防SQL注入："wall"     组合使用： "stat,wall"
-    protected List<Filter> filterList;
-
-    protected DruidDataSource dataSource;
-    protected volatile boolean isStarted = false;
-
-    public DruidDataSourceProvider(DruidDataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    public DruidDataSourceProvider(String url, String username, String password) {
-        this.url = url;
-        this.username = username;
-        this.password = password;
-        this.validationQuery = autoCheckValidationQuery(url);
-    }
-
-    public DruidDataSourceProvider(String url, String username, String password, String driverClass) {
-        this.url = url;
-        this.username = username;
-        this.password = password;
-        this.driverClass = driverClass;
-        this.validationQuery = autoCheckValidationQuery(url);
-    }
-
-    public DruidDataSourceProvider(String url, String username, String password, String driverClass, String filters) {
-        this.url = url;
-        this.username = username;
-        this.password = password;
-        this.driverClass = driverClass;
-        this.filters = filters;
-        this.validationQuery = autoCheckValidationQuery(url);
-    }
-
-    private static String  autoCheckValidationQuery(String url){
+    private static String autoCheckValidationQuery(String url){
         if(url.startsWith("jdbc:oracle")){
             return "select 1 from dual";
         }else if(url.startsWith("jdbc:db2")){
@@ -146,44 +79,75 @@ public class DruidDataSourceProvider implements IDataSourceProvider {
         return "select 1";
     }
 
-    /**
-     * connection sql in initial, eg set encoding or schema etc
-     */
-    public void setConnectionInitSql(String sql){
-        this.connectionInitSql = sql;
+    private DruidDataSource deduceDataSource() {
+        if (ValidateKit.isNotNull(this.cloneInstance)) {
+            return this.cloneInstance;
+        }
+        return this;
     }
 
-    public final String getName() {
-        return name;
+    private DruidDataSourceProvider() {
+        super.setInitialSize(1);
+        super.setMinIdle(10);
+        super.setMaxActive(32);
+        super.setMaxWait(DruidDataSource.DEFAULT_MAX_WAIT);
+        super.setTimeBetweenEvictionRunsMillis(DruidDataSource.DEFAULT_TIME_BETWEEN_EVICTION_RUNS_MILLIS);
+        super.setMinEvictableIdleTimeMillis(DruidDataSource.DEFAULT_MIN_EVICTABLE_IDLE_TIME_MILLIS);
+        super.setTimeBetweenConnectErrorMillis(DruidDataSource.DEFAULT_TIME_BETWEEN_CONNECT_ERROR_MILLIS);
+        super.setTestWhileIdle(true);
+        super.setTestOnBorrow(false);
+        super.setTestOnReturn(false);
+        super.setRemoveAbandoned(false);
+        super.setRemoveAbandonedTimeoutMillis(5 * 60 * 1000);
+        super.setLogAbandoned(false);
+        // oracle、mysql 5.5 and upper
+        super.setPoolPreparedStatements(true);
+        super.setMaxPoolPreparedStatementPerConnectionSize(-1);
     }
 
-    /**
-     * 连接池名称
-     *
-     * @param name
-     */
-    public final void setName(String name) {
-        this.name = name;
+    public DruidDataSourceProvider(DruidDataSource dataSource) {
+        this.cloneInstance = dataSource;
     }
 
-    /**
-     * 设置过滤器，如果要开启监控统计需要使用此方法或在构造方法中进行设置
-     * <p>
-     * 监控统计："stat"
-     * 防SQL注入："wall"
-     * 组合使用： "stat,wall"
-     * </p>
-     */
-    public DruidDataSourceProvider setFilters(String filters) {
+    public DruidDataSourceProvider(String url, String username, String password) {
+        this();
+        super.setUrl(url);
+        super.setUsername(username);
+        super.setPassword(password);
+        super.setValidationQuery(autoCheckValidationQuery(url));
+    }
+
+    public DruidDataSourceProvider(String url, String username, String password, String driverClass) {
+        this(url, username, password);
+        super.setDriverClassName(driverClass);
+    }
+
+    public DruidDataSourceProvider(String url, String username, String password, String driverClass, String filters) {
+        this(url, username, password, driverClass);
+        this.setFilters(filters);
+    }
+
+    public void setProviderName(String name) {
+        this.providerName = name;
+    }
+
+    public void set(int initialSize, int minIdle, int maxActive) {
+        DruidDataSource dataSource = this.deduceDataSource();
+        dataSource.setInitialSize(initialSize);
+        dataSource.setMinIdle(minIdle);
+        dataSource.setMaxActive(maxActive);
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public void setConnectionInitSqls(String... sqls) {
+        this.deduceDataSource().setConnectionInitSqls(Arrays.asList(sqls));
+    }
+
+    public void setFilters(String filters)  {
         this.filters = filters;
-        return this;
-    }
-
-    public synchronized DruidDataSourceProvider addFilter(Filter filter) {
-        if (filterList == null)
-            filterList = new ArrayList<Filter>();
-        filterList.add(filter);
-        return this;
     }
 
     /**
@@ -192,93 +156,37 @@ public class DruidDataSourceProvider implements IDataSourceProvider {
      */
     @Override
     public boolean startProviding() {
-        if (isStarted)
+        if (isStarted) {
             return true;
-
-        dataSource = new DruidDataSource();
-        if(this.name != null){
-            dataSource.setName(this.name);
-        }
-        dataSource.setUrl(url);
-        dataSource.setUsername(username);
-        dataSource.setPassword(password);
-        if (driverClass != null)
-            dataSource.setDriverClassName(driverClass);
-        dataSource.setInitialSize(initialSize);
-        dataSource.setMinIdle(minIdle);
-        dataSource.setMaxActive(maxActive);
-        dataSource.setMaxWait(maxWait);
-        dataSource.setTimeBetweenConnectErrorMillis(timeBetweenConnectErrorMillis);
-        dataSource.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
-        dataSource.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
-
-        dataSource.setValidationQuery(validationQuery);
-        if(StrKit.notBlank(connectionInitSql)){
-            List<String> connectionInitSqls = new ArrayList<String>();
-            connectionInitSqls.add(this.connectionInitSql);
-            dataSource.setConnectionInitSqls(connectionInitSqls);
-        }
-        dataSource.setTestWhileIdle(testWhileIdle);
-        dataSource.setTestOnBorrow(testOnBorrow);
-        dataSource.setTestOnReturn(testOnReturn);
-
-        dataSource.setRemoveAbandoned(removeAbandoned);
-        dataSource.setRemoveAbandonedTimeoutMillis(removeAbandonedTimeoutMillis);
-        dataSource.setLogAbandoned(logAbandoned);
-
-        // maxPoolPreparedStatementPerConnectionSize>0, poolPreparedStatements when be set to true , see druid sources
-        dataSource.setMaxPoolPreparedStatementPerConnectionSize(maxPoolPreparedStatementPerConnectionSize);
-
-        if (defaultTransactionIsolation != null) {
-            dataSource.setDefaultTransactionIsolation(defaultTransactionIsolation);
         }
 
-        boolean hasSetConnectionProperties = false;
-        if (StrKit.notBlank(filters)){
-            try {
-                dataSource.setFilters(filters);
-                if(filters.contains("config")){
-                    // check the public key
-                    if(StrKit.isBlank(this.publicKey)){
-                        throw new DruidRuntimeException("Druid setting the config filter, publicKey required.");
-                    }
-                    String decryptStr = "config.decrypt=true;config.decrypt.key="+this.publicKey;
-                    String cp = this.connectionProperties;
-                    if(StrKit.isBlank(cp)){
-                        cp = decryptStr;
-                    }else{
-                        cp = cp + ";" + decryptStr;
-                    }
-                    dataSource.setConnectionProperties(cp);
-                    hasSetConnectionProperties = true;
+        if (StrKit.notBlank(this.filters)) {
+            Properties connectProperties = null;
+            if(this.filters.contains("config")) {
+                // check the public key
+                if(StrKit.isBlank(this.publicKey)){
+                    throw new DruidRuntimeException("Druid setting the config filter, publicKey required.");
                 }
-            } catch (SQLException e) {throw new RuntimeException(e);}
+                connectProperties = this.getConnectProperties();
+                if (ValidateKit.isNull(connectProperties)) {
+                    connectProperties = new Properties();
+                }
+                connectProperties.setProperty("config.decrypt", "true");
+                connectProperties.setProperty("config.decrypt.key", this.publicKey);
+            }
+            try {
+                // can not use the deduce dataSource, need call super logic when set filters
+                if (ValidateKit.isNotNull(this.cloneInstance)) {
+                    this.cloneInstance.setFilters(this.filters);
+                    this.cloneInstance.setConnectProperties(connectProperties);
+                } else {
+                    super.setFilters(this.filters);
+                    super.setConnectProperties(connectProperties);
+                }
+            } catch (SQLException e) {throw new DruidRuntimeException(e);}
         }
-        // make sure the setConnectionProperties will be invoked once
-        if(!hasSetConnectionProperties && StrKit.notBlank(this.connectionProperties)){
-            dataSource.setConnectionProperties(this.connectionProperties);
-        }
-        addFilterList(dataSource);
-
         isStarted = true;
         return true;
-    }
-
-    private void addFilterList(DruidDataSource ds) {
-        if (filterList != null) {
-            List<Filter> targetList = ds.getProxyFilters();
-            for (Filter add : filterList) {
-                boolean found = false;
-                for (Filter target : targetList) {
-                    if (add.getClass().equals(target.getClass())) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (! found)
-                    targetList.add(add);
-            }
-        }
     }
 
     /**
@@ -287,10 +195,7 @@ public class DruidDataSourceProvider implements IDataSourceProvider {
      */
     @Override
     public boolean destroy() {
-        if (dataSource != null)
-            dataSource.close();
-
-        dataSource = null;
+        this.deduceDataSource().close();
         isStarted = false;
         return true;
     }
@@ -301,114 +206,19 @@ public class DruidDataSourceProvider implements IDataSourceProvider {
      */
     @Override
     public DataSource getDataSource() {
-        return dataSource;
+        return this.deduceDataSource();
     }
 
-    public DruidDataSourceProvider set(int initialSize, int minIdle, int maxActive) {
-        this.initialSize = initialSize;
-        this.minIdle = minIdle;
-        this.maxActive = maxActive;
-        return this;
+    @Override
+    public String getProviderName() {
+        return this.providerName;
     }
 
-    public DruidDataSourceProvider setDriverClass(String driverClass) {
-        this.driverClass = driverClass;
-        return this;
-    }
-
-    public DruidDataSourceProvider setInitialSize(int initialSize) {
-        this.initialSize = initialSize;
-        return this;
-    }
-
-    public DruidDataSourceProvider setMinIdle(int minIdle) {
-        this.minIdle = minIdle;
-        return this;
-    }
-
-    public DruidDataSourceProvider setMaxActive(int maxActive) {
-        this.maxActive = maxActive;
-        return this;
-    }
-
-    public DruidDataSourceProvider setMaxWait(long maxWait) {
-        this.maxWait = maxWait;
-        return this;
-    }
-
-    public DruidDataSourceProvider setDefaultTransactionIsolation(int defaultTransactionIsolation) {
-        this.defaultTransactionIsolation = defaultTransactionIsolation;
-        return this;
-    }
-
-    public DruidDataSourceProvider setTimeBetweenEvictionRunsMillis(long timeBetweenEvictionRunsMillis) {
-        this.timeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis;
-        return this;
-    }
-
-    public DruidDataSourceProvider setMinEvictableIdleTimeMillis(long minEvictableIdleTimeMillis) {
-        this.minEvictableIdleTimeMillis = minEvictableIdleTimeMillis;
-        return this;
-    }
-
-    /**
-     * hsqldb - "select 1 from INFORMATION_SCHEMA.SYSTEM_USERS"
-     * Oracle - "select 1 from dual"
-     * DB2 - "select 1 from sysibm.sysdummy1"
-     * mysql - "select 1"
-     */
-    public DruidDataSourceProvider setValidationQuery(String validationQuery) {
-        this.validationQuery = validationQuery;
-        return this;
-    }
-
-    public DruidDataSourceProvider setTestWhileIdle(boolean testWhileIdle) {
-        this.testWhileIdle = testWhileIdle;
-        return this;
-    }
-
-    public DruidDataSourceProvider setTestOnBorrow(boolean testOnBorrow) {
-        this.testOnBorrow = testOnBorrow;
-        return this;
-    }
-
-    public DruidDataSourceProvider setTestOnReturn(boolean testOnReturn) {
-        this.testOnReturn = testOnReturn;
-        return this;
-    }
-
-    public DruidDataSourceProvider setMaxPoolPreparedStatementPerConnectionSize(int maxPoolPreparedStatementPerConnectionSize) {
-        this.maxPoolPreparedStatementPerConnectionSize = maxPoolPreparedStatementPerConnectionSize;
-        return this;
-    }
-
-    public final DruidDataSourceProvider setTimeBetweenConnectErrorMillis(long timeBetweenConnectErrorMillis) {
-        this.timeBetweenConnectErrorMillis = timeBetweenConnectErrorMillis;
-        return this;
-    }
-
-    public final DruidDataSourceProvider setRemoveAbandoned(boolean removeAbandoned) {
-        this.removeAbandoned = removeAbandoned;
-        return this;
-    }
-
-    public final DruidDataSourceProvider setRemoveAbandonedTimeoutMillis(long removeAbandonedTimeoutMillis) {
-        this.removeAbandonedTimeoutMillis = removeAbandonedTimeoutMillis;
-        return this;
-    }
-
-    public final DruidDataSourceProvider setLogAbandoned(boolean logAbandoned) {
-        this.logAbandoned = logAbandoned;
-        return this;
-    }
-
-    public final DruidDataSourceProvider setConnectionProperties(String connectionProperties) {
-        this.connectionProperties = connectionProperties;
-        return this;
-    }
-
-    public final DruidDataSourceProvider setPublicKey(String publicKey) {
-        this.publicKey = publicKey;
-        return this;
+    @Override
+    public DruidDataSource cloneDruidDataSource() {
+        if (ValidateKit.isNotNull(this.cloneInstance)) {
+            return this.cloneInstance.cloneDruidDataSource();
+        }
+        return super.cloneDruidDataSource();
     }
 }
