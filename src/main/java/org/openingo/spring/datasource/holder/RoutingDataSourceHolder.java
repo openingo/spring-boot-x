@@ -47,16 +47,18 @@ public final class RoutingDataSourceHolder {
      * @param dataSourceKey current using dataSource Key
      */
     public static void setCurrentUsingDataSourceKey(Object dataSourceKey) {
-        log.info("Routing dataSource with the key {}", dataSourceKey);
+        log.info("Routing dataSource with the key \"{}\"", dataSourceKey);
         ROUTING_DATASOURCE_HOLDER.set(dataSourceKey);
     }
 
     /**
-     * Returns the current using dataSource key
+     * Returns the current using dataSource key and remove it in the same time
      * @return current using dataSource Key
      */
     public static Object getCurrentUsingDataSourceKey() {
-        return ROUTING_DATASOURCE_HOLDER.get();
+        Object removingDataSourceKey = ROUTING_DATASOURCE_HOLDER.getRemove();
+        log.info("Routing removing dataSource with the key \"{}\"", removingDataSourceKey);
+        return removingDataSourceKey;
     }
 
     /**

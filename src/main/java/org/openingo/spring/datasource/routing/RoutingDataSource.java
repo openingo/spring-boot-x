@@ -113,18 +113,18 @@ public class RoutingDataSource extends AbstractDataSource implements DataSource,
 		Assert.notNull(dataSourceKey, "[Assertion failed] - the dataSourceKey argument cannot be null");
 		Assert.notNull(dataSource, "[Assertion failed] - the dataSource argument cannot be null");
 		if (this.hasDataSource(dataSourceKey)) {
-			log.info("the same dataSource {} is exists", dataSourceKey);
-			Assert.isTrue(this.autoCloseSameKeyDataSource, "the same dataSource ["+dataSourceKey+"] is exists");
+			log.info("The dataSource with the same key \"{}\" is exists.", dataSourceKey);
+			Assert.isTrue(this.autoCloseSameKeyDataSource, "the dataSource ["+dataSourceKey+"] with the same key that is exists. you can set the 'autoCloseSameKeyDataSource' to true to auto close the same dataSource.");
 			IDataSourceProvider closingDataSource = this.targetDataSources.get(dataSourceKey);
 			if (closingDataSource.destroy()) {
-				log.info("the dataSource with the key {} is closed", dataSourceKey);
+				log.info("The dataSource with the key \"{}\" is closed", dataSourceKey);
 				this.targetDataSources.remove(dataSourceKey);
 			} else {
-				log.error("the dataSource with the key {} has an error in close operations", dataSourceKey);
+				log.error("The dataSource with the key \"{}\" has an error in close operations", dataSourceKey);
 			}
 		}
 		this.targetDataSources.put(dataSourceKey, dataSource);
-		log.info("add dataSource \"{} \" finished.", dataSourceKey);
+		log.info("The dataSource with the key \"{} \" is added.", dataSourceKey);
 	}
 
 	/**
@@ -139,7 +139,7 @@ public class RoutingDataSource extends AbstractDataSource implements DataSource,
 		for(Map.Entry<Object, IDataSourceProvider> entry: dataSources.entrySet()) {
 			this.addDataSource(entry.getKey(), entry.getValue());
 		}
-		log.info("add dataSources finished.");
+		log.info("All dataSources being added have been successfully added.");
 	}
 
 	/**
@@ -153,7 +153,7 @@ public class RoutingDataSource extends AbstractDataSource implements DataSource,
 			if (ValidateKit.isNotNull(deletingDataSource)) {
 				deletingDataSource.destroy();
 			}
-			log.info("remove dataSource \"{}\" finished.", dataSourceKey);
+			log.info("The dataSource with the key \"{}\" is removed.", dataSourceKey);
 		}
 	}
 
@@ -162,7 +162,7 @@ public class RoutingDataSource extends AbstractDataSource implements DataSource,
 		if (ValidateKit.isNotNull(this.targetDataSources)) {
 			for (Map.Entry<Object, IDataSourceProvider> entry : this.targetDataSources.entrySet()) {
 				entry.getValue().destroy();
-				log.info("dataSource {} closed.", entry.getKey());
+				log.info("The dataSource with the key \"{}\" is closed.", entry.getKey());
 			}
 			this.targetDataSources.clear();
 		}

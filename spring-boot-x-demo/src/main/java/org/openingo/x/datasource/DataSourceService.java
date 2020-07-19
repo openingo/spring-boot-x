@@ -54,21 +54,18 @@ public class DataSourceService implements IDataSourceService {
 
     @Override
     public void switchDataSource(String name) throws SQLException {
-        try {
-            System.out.println("======before======");
-            routingDataSource.getConnection();
-            System.out.println(routingDataSource.getCurrentUsingDataSourceProvider().toString());
-            RoutingDataSourceHolder.setCurrentUsingDataSourceKey(name);
-            routingDataSource.getConnection();
-            System.out.println("======after======");
-            System.out.println(routingDataSource.getCurrentUsingDataSourceProvider().toString());
-        } finally {
-            RoutingDataSourceHolder.clearCurrentUsingDataSourceKey();
-        }
+        System.out.println("======before======");
+        routingDataSource.getConnection();
+        System.out.println(routingDataSource.getCurrentUsingDataSourceProvider().toString());
+        RoutingDataSourceHolder.setCurrentUsingDataSourceKey(name);
+        routingDataSource.getConnection();
+        System.out.println("======after======");
+        System.out.println(routingDataSource.getCurrentUsingDataSourceProvider().toString());
     }
 
     @Override
     public void add(String name) {
+        //routingDataSource.setAutoCloseSameKeyDataSource(false);
         DruidDataSourceProvider druidDataSourceProvider = new DruidDataSourceProvider(dataSource.getUrl(), dataSource.getUsername(), dataSource.getPassword());
         druidDataSourceProvider.startProviding();
         routingDataSource.addDataSource(name, druidDataSourceProvider);
