@@ -38,9 +38,6 @@ import javax.sql.DataSource;
  */
 public class HikariDataSourceProvider extends HikariDataSource implements IDataSourceProvider {
 
-    // provider Name
-    private String providerName = null;
-
     private volatile boolean isStarted = false;
 
     public HikariDataSourceProvider(HikariDataSource dataSource) {
@@ -58,10 +55,6 @@ public class HikariDataSourceProvider extends HikariDataSource implements IDataS
         super.setDriverClassName(driverClassName);
     }
 
-    public void setProviderName(String name) {
-        this.providerName = name;
-    }
-
     /**
      * Returns provider's dataSource
      * @return provider's dataSource
@@ -73,7 +66,7 @@ public class HikariDataSourceProvider extends HikariDataSource implements IDataS
 
     @Override
     public final String getProviderName() {
-        return providerName;
+        return this.getPoolName();
     }
 
     /**

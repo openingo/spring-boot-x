@@ -68,7 +68,7 @@
         <lombok.version>1.18.8</lombok.version>
         <jdkits.version>3.1-SNAPSHOT</jdkits.version>
         <fst.version>2.57</fst.version>
-        <druid.version>1.1.21</druid.version>
+        <druid.version>1.1.23</druid.version>
         <hikaricp.version>3.2.0</hikaricp.version>
         <c3p0.version>0.9.5.3</c3p0.version>
     </properties>
@@ -101,7 +101,7 @@
             </dependency>
             <dependency>
                 <groupId>com.alibaba</groupId>
-                <artifactId>druid</artifactId>
+                <artifactId>druid-spring-boot-starter</artifactId>
                 <version>${druid.version}</version>
             </dependency>
             <dependency>
@@ -137,7 +137,7 @@
         <!-- datasource pool -->
         <dependency>
             <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
+            <artifactId>druid-spring-boot-starter</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -90,15 +90,14 @@ public class App {
     redis:
       enable: true
     http:
-      request:
-        error:
-          enable: true
-        log:
-          enable: true
-        cors:
-          enable: true
-          allowed-all: true
-          allowed-header: "*" # when allowed-all is true will ignore
+      request-error:
+        enable: true
+      request-log:
+        enable: true
+      cors:
+        enable: true
+        allowed-all: true
+        allowed-header: "*"
   ```
 
 - `RespData.Config`

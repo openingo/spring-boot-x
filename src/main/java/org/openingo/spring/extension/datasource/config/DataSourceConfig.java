@@ -25,29 +25,31 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.constants;
+package org.openingo.spring.extension.datasource.config;
 
 /**
- * PropertiesConstants
+ * DataSourceConfig
  *
  * @author Qicz
  */
-public final class PropertiesConstants {
+public class DataSourceConfig {
 
-    private PropertiesConstants(){}
-
-    // redis config properties prefix
-    public static final String REDIS_CONFIG_PROPERTIES_PREFIX = "openingo.redis";
-
-    // http configs
-    private static final String HTTP_REQUEST_CONFIG_PROPERTIES_PREFIX = "openingo.http.";
-    // http request log config properties prefix
-    public static final String HTTP_REQUEST_LOG_CONFIG_PROPERTIES_PREFIX = HTTP_REQUEST_CONFIG_PROPERTIES_PREFIX + "request-log";
-    // http request error config properties prefix
-    public static final String HTTP_REQUEST_ERROR_CONFIG_PROPERTIES_PREFIX = HTTP_REQUEST_CONFIG_PROPERTIES_PREFIX + "request-error";
-    // http request cors config properties prefix
-    public static final String HTTP_REQUEST_CORS_CONFIG_PROPERTIES_PREFIX = HTTP_REQUEST_CONFIG_PROPERTIES_PREFIX + "cors";
-
-    // enable
-    public static final String ENABLE = "enable";
+//    /**
+//     * Druid DataSource configuration.
+//     */
+//    @Configuration
+//    @ConditionalOnClass(DruidDataSource.class)
+//    @ConditionalOnMissingBean(DataSource.class)
+//    @ConditionalOnProperty(
+//            name = "spring.datasource.type",
+//            havingValue = "com.alibaba.druid.pool.DruidDataSource"
+//    )
+//    static class Druid {
+//
+//        @Bean
+//        @ConfigurationProperties(prefix = "spring.datasource.druid")
+//        public DruidDataSource dataSource(DataSourceProperties properties) {
+//            return properties.initializeDataSourceBuilder().type(DruidDataSource.class).build();
+//        }
+//    }
 }

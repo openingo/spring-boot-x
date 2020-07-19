@@ -40,7 +40,7 @@
         <spring-boot-x.version>1.5-SNAPSHOT</spring-boot-x.version>
         <mysql.sersion>8.0.17</mysql.sersion>
 
-        <druid.version>1.1.21</druid.version>
+        <druid.version>1.1.23</druid.version>
         <hikaricp.version>3.2.0</hikaricp.version>
     </properties>
 
@@ -102,7 +102,7 @@
         </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
+            <artifactId>druid-spring-boot-starter</artifactId>
             <version>${druid.version}</version>
         </dependency>
         <dependency>
