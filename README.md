@@ -295,7 +295,5 @@ public class App {
   }
   ```
   
-- Demo
-
-  https://github.com/OpeningO/spring-boot-x/tree/master/spring-boot-x-demo
+- [Demo](./spring-boot-x-demo)
 
