@@ -39,7 +39,6 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author Qicz
  */
-@Configuration
 public class HttpConfigProperties {
 
     @Data
