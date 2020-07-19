@@ -64,7 +64,7 @@ public final class RoutingDataSourceHolder {
     /**
      * Manual remove current using dataSource Key
      */
-    public static void clearCurrentUsingDataSourceKey() {
+    /*public static void clearCurrentUsingDataSourceKey() {
         ROUTING_DATASOURCE_HOLDER.remove();
-    }
+    }*/
 }

@@ -51,7 +51,63 @@
 
 - `SpringApplicationX` more extensions
 
-- Routing dataSource (dynamic dataSource)
+- `RoutingDataSource` (dynamic dataSource)
+
+  - support Hikaricp & Alibaba Druid
+
+  - how?
+
+    ```java
+    @Bean(initMethod = "init", destroyMethod = "close")
+    @ConfigurationProperties("spring.datasource")
+    public DruidDataSource defaultDataSource(){
+        return new DruidDataSource();
+    }
+    
+    @Bean
+    public RoutingDataSource routingDataSource(DruidDataSource dataSource) {
+        return new RoutingDataSource(new DruidDataSourceProvider(dataSource));
+    }
+    ```
+
+    ```java
+    /**
+     * DataSourceService
+     *
+     * @author Qicz
+     */
+    @Service
+    @Slf4j
+    public class DataSourceService implements IDataSourceService {
+    
+        @Autowired
+        RoutingDataSource routingDataSource;
+    
+        @Autowired
+        DruidDataSource dataSource;
+    
+        @Override
+        public void switchDataSource(String name) throws SQLException {
+            System.out.println("======before======");
+            routingDataSource.getConnection();
+            System.out.println(routingDataSource.getCurrentUsingDataSourceProvider().toString());
+            RoutingDataSourceHolder.setCurrentUsingDataSourceKey(name);
+            routingDataSource.getConnection();
+            System.out.println("======after======");
+            System.out.println(routingDataSource.getCurrentUsingDataSourceProvider().toString());
+        }
+    
+        @Override
+        public void add(String name) {
+            //routingDataSource.setAutoCloseSameKeyDataSource(false);
+            DruidDataSourceProvider druidDataSourceProvider = new DruidDataSourceProvider(dataSource.getUrl(), dataSource.getUsername(), dataSource.getPassword());
+            druidDataSourceProvider.startProviding();
+            routingDataSource.addDataSource(name, druidDataSourceProvider);
+        }
+    }
+    ```
+
+    > `RoutingDataSourceHolder.getCurrentUsingDataSourceKey` will get and remove current using.
 
 - validate groups[TODO]
 
