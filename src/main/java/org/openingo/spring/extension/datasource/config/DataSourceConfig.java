@@ -34,22 +34,4 @@ package org.openingo.spring.extension.datasource.config;
  */
 public class DataSourceConfig {
 
-//    /**
-//     * Druid DataSource configuration.
-//     */
-//    @Configuration
-//    @ConditionalOnClass(DruidDataSource.class)
-//    @ConditionalOnMissingBean(DataSource.class)
-//    @ConditionalOnProperty(
-//            name = "spring.datasource.type",
-//            havingValue = "com.alibaba.druid.pool.DruidDataSource"
-//    )
-//    static class Druid {
-//
-//        @Bean
-//        @ConfigurationProperties(prefix = "spring.datasource.druid")
-//        public DruidDataSource dataSource(DataSourceProperties properties) {
-//            return properties.initializeDataSourceBuilder().type(DruidDataSource.class).build();
-//        }
-//    }
 }
