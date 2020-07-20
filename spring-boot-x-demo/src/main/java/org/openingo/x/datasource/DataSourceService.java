@@ -54,13 +54,17 @@ public class DataSourceService implements IDataSourceService {
 
     @Override
     public void switchDataSource(String name) throws SQLException {
-        System.out.println("======before======"+name);
-        routingDataSource.getConnection();
-        System.out.println(routingDataSource.getCurrentUsingDataSourceProvider().hashCode());
-        RoutingDataSourceHolder.setCurrentUsingDataSourceKey(name);
-        routingDataSource.getConnection();
-        System.out.println("======after======");
-        System.out.println(routingDataSource.getCurrentUsingDataSourceProvider().hashCode());
+        try {
+            System.out.println("======before======"+name);
+            routingDataSource.getConnection();
+            System.out.println(routingDataSource.getCurrentUsingDataSourceProvider().hashCode());
+            RoutingDataSourceHolder.setCurrentUsingDataSourceKey(name);
+            routingDataSource.getConnection();
+            System.out.println("======after======");
+            System.out.println(routingDataSource.getCurrentUsingDataSourceProvider().hashCode());
+        } finally {
+            RoutingDataSourceHolder.clearCurrentUsingDataSourceKey();
+        }
     }
 
     @Override

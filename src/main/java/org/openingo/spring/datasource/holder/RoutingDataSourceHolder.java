@@ -48,25 +48,27 @@ public final class RoutingDataSourceHolder {
      * @param dataSourceKey current using dataSource Key
      */
     public static void setCurrentUsingDataSourceKey(Object dataSourceKey) {
-        log.info("Routing using dataSource with the key \"{}\"", dataSourceKey);
+        log.info("The key for current setting dataSource is \"{}\"", dataSourceKey);
         ROUTING_DATASOURCE_HOLDER.set(dataSourceKey);
     }
 
     /**
-     * Returns the current using dataSource key and remove it in the same time
+     * Returns the current using dataSource key
      * @return current using dataSource Key
      */
     public static Object getCurrentUsingDataSourceKey() {
-        Object removingDataSourceKey = ROUTING_DATASOURCE_HOLDER.getRemove();
-        String extMessage = ValidateKit.isNull(removingDataSourceKey) ? ", that will use the default dataSource" : "";
-        log.info("Routing removing dataSource with the key \"{}\"{}.", removingDataSourceKey, extMessage);
-        return removingDataSourceKey;
+        Object usingDataSourceKey = ROUTING_DATASOURCE_HOLDER.get();
+        String extMessage = ValidateKit.isNull(usingDataSourceKey) ? ", that will use the default dataSource" : "";
+        log.info("The key for current using dataSource is \"{}\"{}.", usingDataSourceKey, extMessage);
+        return usingDataSourceKey;
     }
 
     /**
      * Manual remove current using dataSource Key
      */
-    /*public static void clearCurrentUsingDataSourceKey() {
+    public static void clearCurrentUsingDataSourceKey() {
+        Object removingDataSourceKey = ROUTING_DATASOURCE_HOLDER.get();
+        log.info("The key for current removing dataSource is \"{}\"", removingDataSourceKey);
         ROUTING_DATASOURCE_HOLDER.remove();
-    }*/
+    }
 }
