@@ -28,6 +28,7 @@
 package org.openingo.spring.http.request;
 
 import lombok.Data;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.openingo.jdkits.json.JacksonKit;
@@ -114,6 +115,7 @@ public final class HttpRequestReporter {
 	/**
 	 * Current Request report
 	 */
+	@SneakyThrows
 	public void report() {
 		ServletServerHttpRequest serverHttpRequest = new ServletServerHttpRequest(this.request);
 		StringBuilder reportInfoBuilder = new StringBuilder(Constants.REQUEST_REPORT_HEADER);
