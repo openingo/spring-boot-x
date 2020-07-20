@@ -29,6 +29,7 @@ package org.openingo.spring.datasource.holder;
 
 import lombok.extern.slf4j.Slf4j;
 import org.openingo.java.lang.ThreadLocalX;
+import org.openingo.jdkits.validate.ValidateKit;
 
 /**
  * RoutingDataSourceHolder
@@ -47,7 +48,7 @@ public final class RoutingDataSourceHolder {
      * @param dataSourceKey current using dataSource Key
      */
     public static void setCurrentUsingDataSourceKey(Object dataSourceKey) {
-        log.info("Routing dataSource with the key \"{}\"", dataSourceKey);
+        log.info("Routing using dataSource with the key \"{}\"", dataSourceKey);
         ROUTING_DATASOURCE_HOLDER.set(dataSourceKey);
     }
 
@@ -57,7 +58,8 @@ public final class RoutingDataSourceHolder {
      */
     public static Object getCurrentUsingDataSourceKey() {
         Object removingDataSourceKey = ROUTING_DATASOURCE_HOLDER.getRemove();
-        log.info("Routing removing dataSource with the key \"{}\"", removingDataSourceKey);
+        String extMessage = ValidateKit.isNull(removingDataSourceKey) ? ", that will use the default dataSource" : "";
+        log.info("Routing removing dataSource with the key \"{}\"{}.", removingDataSourceKey, extMessage);
         return removingDataSourceKey;
     }
 
