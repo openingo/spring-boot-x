@@ -37,7 +37,7 @@
 
     <properties>
         <spring-boot.version>2.1.8.RELEASE</spring-boot.version>
-        <spring-boot-x.version>1.5-SNAPSHOT</spring-boot-x.version>
+        <spring-boot-x.version>1.5</spring-boot-x.version>
         <mysql.sersion>8.0.17</mysql.sersion>
 
         <druid.version>1.1.23</druid.version>
