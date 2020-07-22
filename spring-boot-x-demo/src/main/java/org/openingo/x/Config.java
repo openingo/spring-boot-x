@@ -55,6 +55,11 @@ public class Config {
         this.environment = environment;
         this.applicationContext = applicationContext;
         System.out.println("env===="+environment);
+        String endpointBasePath = environment.getProperty("management.endpoints.web.base-path");
+        String address = environment.getProperty("management.server.address");
+        System.out.println("basepth==="+endpointBasePath);
+        System.out.println("address==="+address);
+        System.out.println("env host===="+environment);
         System.out.println("env port===="+environment.getProperty("local.server.port"));
         System.out.println("env port===="+environment.getProperty("server.port"));
         System.out.println("application===="+applicationContext);
