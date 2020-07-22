@@ -33,8 +33,10 @@ import org.openingo.spring.datasource.provider.DruidDataSourceProvider;
 import org.openingo.spring.datasource.routing.RoutingDataSource;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -46,7 +48,16 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class Config {
 
-    public Config() {
+    private final Environment environment;
+    private final ApplicationContext applicationContext;
+
+    public Config(Environment environment, ApplicationContext applicationContext) {
+        this.environment = environment;
+        this.applicationContext = applicationContext;
+        System.out.println("env===="+environment);
+        System.out.println("env port===="+environment.getProperty("local.server.port"));
+        System.out.println("env port===="+environment.getProperty("server.port"));
+        System.out.println("application===="+applicationContext);
         RespData.Config.SC_KEY = "ec";
         RespData.Config.SM_KEY = "em";
         RespData.Config.FAILURE_SC = 111;
