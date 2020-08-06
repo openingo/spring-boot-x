@@ -30,10 +30,10 @@ package org.openingo.spring.extension.data.redis;
 /**
  * StringRedisTemplateX lite
  *
- * RedisTemplateX lite< String> wrapper
+ * StringKeyRedisTemplateX lite< String> wrapper
  *
  * @author Qicz
  */
-public class StringRedisTemplateX extends RedisTemplateX<String> {
+public class StringRedisTemplateX extends StringKeyRedisTemplateX<String> {
 
 }

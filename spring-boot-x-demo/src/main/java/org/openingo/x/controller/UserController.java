@@ -30,7 +30,7 @@ package org.openingo.x.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openingo.jdkits.http.RespData;
 import org.openingo.spring.exception.ServiceException;
-import org.openingo.spring.extension.data.redis.RedisTemplateX;
+import org.openingo.spring.extension.data.redis.StringKeyRedisTemplateX;
 import org.openingo.spring.extension.data.redis.callback.SessionCallbackX;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
 import org.openingo.spring.extension.data.redis.naming.KeyNamingKit;
@@ -60,7 +60,7 @@ import java.util.Map;
 public class UserController {
 
     @Autowired
-    RedisTemplateX redisTemplateX;
+    StringKeyRedisTemplateX stringKeyRedisTemplateX;
 
     @Autowired
     IKeyNamingPolicy keyNamingPolicy;
@@ -78,7 +78,7 @@ public class UserController {
     @GetMapping("/save")
     public String save() {
         KeyNamingKit.set("openingo");
-        redisTemplateX.set("name", "Qicz");
+        stringKeyRedisTemplateX.set("name", "Qicz");
         return "ok";
     }
 
@@ -86,11 +86,11 @@ public class UserController {
     public String saveex() {
         try {
             KeyNamingKit.set("openingo");
-            redisTemplateX.setEnableTransactionSupport(true);
-            redisTemplateX.multi();
-            redisTemplateX.set("name", "Qicz");
-            redisTemplateX.expire("name", 48*3600);
-            List exec = redisTemplateX.exec();
+            stringKeyRedisTemplateX.setEnableTransactionSupport(true);
+            stringKeyRedisTemplateX.multi();
+            stringKeyRedisTemplateX.set("name", "Qicz");
+            stringKeyRedisTemplateX.expire("name", 48*3600);
+            List exec = stringKeyRedisTemplateX.exec();
             System.out.println("exec=========="+exec);
             return "ok";
         } finally {
@@ -101,13 +101,13 @@ public class UserController {
     public String saveexe() {
         try {
             KeyNamingKit.set("openingo");
-            Object exec = redisTemplateX.execute(new SessionCallbackX<Object>() {
+            Object exec = stringKeyRedisTemplateX.execute(new SessionCallbackX<Object>() {
                 @Override
                 public Object execute() {
-                    redisTemplateX.multi();
-                    redisTemplateX.set("name", "Qicz");
-                    redisTemplateX.expire("name", 48 * 3600);
-                    return redisTemplateX.exec();
+                    stringKeyRedisTemplateX.multi();
+                    stringKeyRedisTemplateX.set("name", "Qicz");
+                    stringKeyRedisTemplateX.expire("name", 48 * 3600);
+                    return stringKeyRedisTemplateX.exec();
                 }
             });
 

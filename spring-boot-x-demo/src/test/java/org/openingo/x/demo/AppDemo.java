@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openingo.jdkits.collection.ListKit;
 import org.openingo.spring.boot.SpringApplicationX;
-import org.openingo.spring.extension.data.redis.RedisTemplateX;
+import org.openingo.spring.extension.data.redis.StringKeyRedisTemplateX;
 import org.openingo.spring.extension.data.redis.naming.DefaultKeyNamingPolicy;
 import org.openingo.spring.extension.data.redis.serializer.FstRedisSerializer;
 import org.openingo.x.App;
@@ -33,21 +33,21 @@ import java.util.concurrent.TimeUnit;
 public class AppDemo {
 
     @Autowired
-    RedisTemplateX<String> redisTemplateX;
+    StringKeyRedisTemplateX<String> stringKeyRedisTemplateX;
 
     @Test
     public void ok() {
-        System.out.println(redisTemplateX);
+        System.out.println(stringKeyRedisTemplateX);
     }
 
     @Test
     public void testOps() {
-        System.out.println(this.redisTemplateX.opsForList());
+        System.out.println(this.stringKeyRedisTemplateX.opsForList());
     }
 
     @Test
     public void testValue() {
-        ValueOperations<String, String> valueOperations = this.redisTemplateX.opsForValue();
+        ValueOperations<String, String> valueOperations = this.stringKeyRedisTemplateX.opsForValue();
         valueOperations.set("zcq", "Qicz");
         valueOperations.append("zcq", "123");
         String zcq = valueOperations.get("zcq");
