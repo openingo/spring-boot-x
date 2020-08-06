@@ -41,8 +41,6 @@ public interface SessionCallbackX<T> {
 
     /**
      * Executes all the given operations inside the same session.
-     *
-     * @return return value
      */
     @Nullable
     void execute();

@@ -91,7 +91,7 @@ public class RedisConfig {
     }
 
     /**
-     * @param redisConnectionFactory
+     * @param redisConnectionFactory redisConnectionFactory
      * @return RedisTemplate using FST for values and StringRedisSerializer for keys
      */
     @Bean
@@ -117,7 +117,7 @@ public class RedisConfig {
      if {@code KeyNamingKit.getNaming()} is "null" return key,
      * otherwise return {@code KeyNamingKit.getNaming()}+{@code KeyNamingKit.NAMING_SEPARATOR}+key
      *
-     * @see {@linkplain KeyNamingKit#get()}
+     * @see KeyNamingKit#get()
      * @return the default key naming policy
      */
     @Bean
