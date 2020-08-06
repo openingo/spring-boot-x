@@ -29,12 +29,16 @@ package org.openingo.spring.extension.data.redis.commands;
 
 import org.openingo.jdkits.collection.ListKit;
 import org.openingo.jdkits.validate.ValidateKit;
+import org.openingo.spring.extension.data.redis.callback.SessionCallbackX;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.*;
 import org.springframework.data.redis.connection.BitFieldSubCommands;
 import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.connection.RedisZSetCommands;
 import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.core.query.SortQuery;
+import org.springframework.data.redis.serializer.RedisSerializer;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -44,7 +48,11 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Qicz
  */
+@SuppressWarnings("all")
 public abstract class AbstractRedisCommands<K, V> implements IRedisCommands<K, V> {
+
+    @Autowired
+    protected RedisTemplate<K, V> redisTemplate;
 
     public abstract ClusterOperations<K, V> opsForCluster();
     public abstract GeoOperations<K, V> opsForGeo();
@@ -60,6 +68,14 @@ public abstract class AbstractRedisCommands<K, V> implements IRedisCommands<K, V
     public abstract ValueOperations<K, V> opsForValue();
     public abstract BoundZSetOperations<K, V> boundZSetOps(K key);
     public abstract ZSetOperations<K, V> opsForZSet();
+
+    public RedisTemplate<K, V> getRedisTemplate() {
+        return this.redisTemplate;
+    }
+
+    public void setEnableTransactionSupport(Boolean enableTransactionSupport) {
+        this.redisTemplate.setEnableTransactionSupport(enableTransactionSupport);
+    }
 
     /**
      * Set {@code value} for {@code key}.
@@ -1699,5 +1715,232 @@ public abstract class AbstractRedisCommands<K, V> implements IRedisCommands<K, V
     @Override
     public Long pfMerge(K destination, K... sourceKeys) {
         return this.opsForHyperLogLog().union(destination, sourceKeys);
+    }
+
+    /**
+     * Unlink the {@code key} from the keyspace. Unlike with {@link IValueCommands#del(Object)} the actual memory reclaiming here
+     * happens asynchronously.
+     *
+     * @param key must not be {@literal null}.
+     * @return The number of keys that were removed. {@literal null} when used in pipeline / transaction.
+     * @see <a href="https://redis.io/commands/unlink">Redis Documentation: UNLINK</a>
+     * @since 2.1
+     */
+    @Override
+    public Boolean unlink(K key) {
+        return this.redisTemplate.unlink(key);
+    }
+
+    /**
+     * Unlink the {@code keys} from the keyspace. Unlike with {@link IValueCommands#del(Collection)} the actual memory reclaiming
+     * here happens asynchronously.
+     *
+     * @param keys must not be {@literal null}.
+     * @return The number of keys that were removed. {@literal null} when used in pipeline / transaction.
+     * @see <a href="https://redis.io/commands/unlink">Redis Documentation: UNLINK</a>
+     * @since 2.1
+     */
+    @Override
+    public Long unlink(Collection<K> keys) {
+        return this.redisTemplate.unlink(keys);
+    }
+
+    /**
+     * Move given {@code key} to database with {@code index}.
+     *
+     * @param key     must not be {@literal null}.
+     * @param dbIndex
+     * @return {@literal null} when used in pipeline / transaction.
+     * @see <a href="https://redis.io/commands/move">Redis Documentation: MOVE</a>
+     */
+    @Override
+    public Boolean move(K key, int dbIndex) {
+        return this.redisTemplate.move(key, dbIndex);
+    }
+
+    /**
+     * Sort the elements for {@code query}.
+     *
+     * @param query must not be {@literal null}.
+     * @return the results of sort. {@literal null} when used in pipeline / transaction.
+     * @see <a href="https://redis.io/commands/sort">Redis Documentation: SORT</a>
+     */
+    @Override
+    public List<V> sort(SortQuery<K> query) {
+        return this.redisTemplate.sort(query);
+    }
+
+    /**
+     * Sort the elements for {@code query} applying {@link RedisSerializer}.
+     *
+     * @param query            must not be {@literal null}.
+     * @param resultSerializer
+     * @return the deserialized results of sort. {@literal null} when used in pipeline / transaction.
+     * @see <a href="https://redis.io/commands/sort">Redis Documentation: SORT</a>
+     */
+    @Override
+    public <T> List<T> sort(SortQuery<K> query, RedisSerializer<T> resultSerializer) {
+        return this.redisTemplate.sort(query, resultSerializer);
+    }
+
+    /**
+     * Sort the elements for {@code query} applying {@link BulkMapper}.
+     *
+     * @param query      must not be {@literal null}.
+     * @param bulkMapper
+     * @return the deserialized results of sort. {@literal null} when used in pipeline / transaction.
+     * @see <a href="https://redis.io/commands/sort">Redis Documentation: SORT</a>
+     */
+    @Override
+    public <T> List<T> sort(SortQuery<K> query, BulkMapper<T, V> bulkMapper) {
+        return this.redisTemplate.sort(query, bulkMapper);
+    }
+
+    /**
+     * Sort the elements for {@code query} applying {@link BulkMapper} and {@link RedisSerializer}.
+     *
+     * @param query            must not be {@literal null}.
+     * @param bulkMapper
+     * @param resultSerializer
+     * @return the deserialized results of sort. {@literal null} when used in pipeline / transaction.
+     * @see <a href="https://redis.io/commands/sort">Redis Documentation: SORT</a>
+     */
+    @Override
+    public <T, S> List<T> sort(SortQuery<K> query, BulkMapper<T, S> bulkMapper, RedisSerializer<S> resultSerializer) {
+        return this.redisTemplate.sort(query, bulkMapper, resultSerializer);
+    }
+
+    /**
+     * Sort the elements for {@code query} and store result in {@code storeKey}.
+     *
+     * @param query    must not be {@literal null}.
+     * @param storeKey must not be {@literal null}.
+     * @return number of values. {@literal null} when used in pipeline / transaction.
+     * @see <a href="https://redis.io/commands/sort">Redis Documentation: SORT</a>
+     */
+    @Override
+    public Long sort(SortQuery<K> query, K storeKey) {
+        return this.redisTemplate.sort(query, storeKey);
+    }
+
+    /**
+     * Executes a Redis session. Allows multiple operations to be executed in the same session enabling 'transactional'
+     * capabilities through {@link #multi()} and {@link #watch(Collection)} operations.
+     *
+     * @param session session callback. Must not be {@literal null}.
+     * @return result object returned by the action or <tt>null</tt>
+     */
+    @Override
+    public <T> T execute(SessionCallbackX<T> session) {
+        DefaultSessionCallback<T> defaultSessionCallback = new DefaultSessionCallback<>(session);
+        return this.redisTemplate.execute(defaultSessionCallback);
+    }
+
+    /**
+     * Executes the given Redis session on a pipelined connection. Allows transactions to be pipelined. Note that the
+     * callback <b>cannot</b> return a non-null value as it gets overwritten by the pipeline.
+     *
+     * @param session Session callback
+     * @return list of objects returned by the pipeline
+     */
+    @Override
+    public List<Object> executePipelined(SessionCallbackX<?> session) {
+        DefaultSessionCallback<?> defaultSessionCallback = new DefaultSessionCallback<>(session);
+        return this.redisTemplate.executePipelined(defaultSessionCallback);
+    }
+
+    /**
+     * Executes the given Redis session on a pipelined connection, returning the results using a dedicated serializer.
+     * Allows transactions to be pipelined. Note that the callback <b>cannot</b> return a non-null value as it gets
+     * overwritten by the pipeline.
+     *
+     * @param session          Session callback
+     * @param resultSerializer
+     * @return list of objects returned by the pipeline
+     */
+    @Override
+    public List<Object> executePipelined(SessionCallbackX<?> session, RedisSerializer<?> resultSerializer) {
+        DefaultSessionCallback<?> defaultSessionCallback = new DefaultSessionCallback<>(session);
+        return this.redisTemplate.executePipelined(defaultSessionCallback, resultSerializer);
+    }
+
+    /**
+     * Watch given {@code key} for modifications during transaction started with {@link #multi()}.
+     *
+     * @param key must not be {@literal null}.
+     * @see <a href="https://redis.io/commands/watch">Redis Documentation: WATCH</a>
+     */
+    @Override
+    public void watch(K key) {
+        this.redisTemplate.watch(key);
+    }
+
+    /**
+     * Watch given {@code keys} for modifications during transaction started with {@link #multi()}.
+     *
+     * @param keys must not be {@literal null}.
+     * @see <a href="https://redis.io/commands/watch">Redis Documentation: WATCH</a>
+     */
+    @Override
+    public void watch(Collection<K> keys) {
+        this.redisTemplate.watch(keys);
+    }
+
+    /**
+     * Flushes all the previously {@link #watch(Object)} keys.
+     *
+     * @see <a href="https://redis.io/commands/unwatch">Redis Documentation: UNWATCH</a>
+     */
+    @Override
+    public void unwatch() {
+        this.redisTemplate.unwatch();
+    }
+
+    /**
+     * Mark the start of a transaction block. <br>
+     * Commands will be queued and can then be executed by calling {@link #exec()} or rolled back using {@link #discard()}
+     * <p>
+     *
+     * @see <a href="https://redis.io/commands/multi">Redis Documentation: MULTI</a>
+     */
+    @Override
+    public void multi() {
+        this.redisTemplate.multi();
+    }
+
+    /**
+     * Discard all commands issued after {@link #multi()}.
+     *
+     * @see <a href="https://redis.io/commands/discard">Redis Documentation: DISCARD</a>
+     */
+    @Override
+    public void discard() {
+        this.redisTemplate.discard();
+    }
+
+    /**
+     * Executes all queued commands in a transaction started with {@link #multi()}. <br>
+     * If used along with {@link #watch(Object)} the operation will fail if any of watched keys has been modified.
+     *
+     * @return List of replies for each executed command.
+     * @see <a href="https://redis.io/commands/exec">Redis Documentation: EXEC</a>
+     */
+    @Override
+    public List<Object> exec() {
+        return this.redisTemplate.exec();
+    }
+
+    /**
+     * Execute a transaction, using the provided {@link RedisSerializer} to deserialize any results that are byte[]s or
+     * Collections of byte[]s. If a result is a Map, the provided {@link RedisSerializer} will be used for both the keys
+     * and values. Other result types (Long, Boolean, etc) are left as-is in the converted results. Tuple results are
+     * automatically converted to TypedTuples.
+     *
+     * @param valueSerializer The {@link RedisSerializer} to use for deserializing the results of transaction exec
+     * @return The deserialized results of transaction exec
+     */
+    @Override
+    public List<Object> exec(RedisSerializer<?> valueSerializer) {
+        return this.redisTemplate.exec(valueSerializer);
     }
 }

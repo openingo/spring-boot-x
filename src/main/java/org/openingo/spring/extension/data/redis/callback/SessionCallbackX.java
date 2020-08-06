@@ -25,27 +25,25 @@
  * SOFTWARE.
  */
 
-package org.openingo.x;
+package org.openingo.spring.extension.data.redis.callback;
 
-import lombok.Data;
-import org.openingo.jdkits.validate.ValidateKit;
-import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
-import org.openingo.spring.extension.data.redis.naming.KeyNamingKit;
+import org.springframework.lang.Nullable;
 
 /**
- * KeyNamingPolicy
+ * SessionCallbackX
+ *
+ * Callback executing all operations against a surrogate 'session' (basically against the same underlying Redis
+ * connection). Allows 'transactions' to take place through the use of multi/discard/exec/watch/unwatch commands.
  *
  * @author Qicz
  */
-@Data
-public class KeyNamingPolicy implements IKeyNamingPolicy {
+public interface SessionCallbackX<T> {
 
-    @Override
-    public String getKeyName(String key) {
-        String s = KeyNamingKit.get();
-        if (ValidateKit.isNotNull(s)) {
-            return s + ":qicz:" + key;
-        }
-        return "qicz:" + key;
-    }
+    /**
+     * Executes all the given operations inside the same session.
+     *
+     * @return return value
+     */
+    @Nullable
+    T execute();
 }

@@ -31,16 +31,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openingo.jdkits.http.RespData;
 import org.openingo.spring.exception.ServiceException;
 import org.openingo.spring.extension.data.redis.RedisTemplateX;
+import org.openingo.spring.extension.data.redis.callback.SessionCallbackX;
+import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
 import org.openingo.spring.extension.data.redis.naming.KeyNamingKit;
 import org.openingo.x.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.SortParameters;
+import org.springframework.data.redis.core.query.DefaultStringSortQuery;
+import org.springframework.data.redis.core.query.SortQuery;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,6 +62,9 @@ public class UserController {
     @Autowired
     RedisTemplateX redisTemplateX;
 
+    @Autowired
+    IKeyNamingPolicy keyNamingPolicy;
+
     @GetMapping("/user")
     public String user(@RequestBody User user) {
         return "ok";
@@ -67,9 +77,45 @@ public class UserController {
 
     @GetMapping("/save")
     public String save() {
-        KeyNamingKit.setNaming("openingo");
+        KeyNamingKit.set("openingo");
         redisTemplateX.set("name", "Qicz");
         return "ok";
+    }
+
+    @GetMapping("/saveex")
+    public String saveex() {
+        try {
+            KeyNamingKit.set("openingo");
+            redisTemplateX.setEnableTransactionSupport(true);
+            redisTemplateX.multi();
+            redisTemplateX.set("name", "Qicz");
+            redisTemplateX.expire("name", 48*3600);
+            List exec = redisTemplateX.exec();
+            System.out.println("exec=========="+exec);
+            return "ok";
+        } finally {
+            KeyNamingKit.remove();
+        }
+    }
+    @GetMapping("/saveexe")
+    public String saveexe() {
+        try {
+            KeyNamingKit.set("openingo");
+            Object exec = redisTemplateX.execute(new SessionCallbackX<Object>() {
+                @Override
+                public Object execute() {
+                    redisTemplateX.multi();
+                    redisTemplateX.set("name", "Qicz");
+                    redisTemplateX.expire("name", 48 * 3600);
+                    return redisTemplateX.exec();
+                }
+            });
+
+            System.out.println("exec=========="+exec);
+            return "ok";
+        } finally {
+            KeyNamingKit.remove();
+        }
     }
 
     @GetMapping("/json")
@@ -104,5 +150,41 @@ public class UserController {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.readValue("[{asd}]", Map.class);
         return RespData.success();
+    }
+
+    @GetMapping("/sort")
+    public void sort() {
+        DefaultStringSortQuery defaultStringSortQuery = new DefaultStringSortQuery(this.keyNamingPolicy, new SortQuery<String>() {
+            @Override
+            public String getKey() {
+                return "qiczkey";
+            }
+
+            @Override
+            public SortParameters.Order getOrder() {
+                return SortParameters.Order.ASC;
+            }
+
+            @Override
+            public Boolean isAlphabetic() {
+                return true;
+            }
+
+            @Override
+            public SortParameters.Range getLimit() {
+                return new SortParameters.Range(0, 1);
+            }
+
+            @Override
+            public String getBy() {
+                return "qiczkey";
+            }
+
+            @Override
+            public List<String> getGetPattern() {
+                return Arrays.asList("qiczkey", "qiccc");
+            }
+        });
+        System.out.println(defaultStringSortQuery);
     }
 }

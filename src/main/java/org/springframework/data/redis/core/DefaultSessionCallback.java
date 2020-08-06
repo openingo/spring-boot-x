@@ -25,27 +25,32 @@
  * SOFTWARE.
  */
 
-package org.openingo.x;
+package org.springframework.data.redis.core;
 
-import lombok.Data;
-import org.openingo.jdkits.validate.ValidateKit;
-import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
-import org.openingo.spring.extension.data.redis.naming.KeyNamingKit;
+import org.openingo.spring.extension.data.redis.callback.SessionCallbackX;
+import org.springframework.dao.DataAccessException;
 
 /**
- * KeyNamingPolicy
+ * DefaultSessionCallback
  *
  * @author Qicz
  */
-@Data
-public class KeyNamingPolicy implements IKeyNamingPolicy {
+public class DefaultSessionCallback<T> implements SessionCallback<T> {
 
+    private SessionCallbackX<T> sessionCallbackX;
+
+    public DefaultSessionCallback(SessionCallbackX<T> sessionCallbackX) {
+        this.sessionCallbackX = sessionCallbackX;
+    }
+
+    /**
+     * Executes all the given operations inside the same session.
+     *
+     * @param operations Redis operations
+     * @return return value
+     */
     @Override
-    public String getKeyName(String key) {
-        String s = KeyNamingKit.get();
-        if (ValidateKit.isNotNull(s)) {
-            return s + ":qicz:" + key;
-        }
-        return "qicz:" + key;
+    public <K, V> T execute(RedisOperations<K, V> operations) throws DataAccessException {
+        return this.sessionCallbackX.execute();
     }
 }

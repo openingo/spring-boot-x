@@ -44,7 +44,7 @@ public class DefaultKeyNamingPolicy implements IKeyNamingPolicy {
      */
     @Override
     public String getKeyName(String key) {
-        String naming = KeyNamingKit.getNaming();
+        String naming = KeyNamingKit.get();
         if (ValidateKit.isNull(naming)) {
             return key;
         }

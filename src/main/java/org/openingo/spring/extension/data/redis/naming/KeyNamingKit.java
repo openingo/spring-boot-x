@@ -44,11 +44,15 @@ public final class KeyNamingKit {
 
     private static final ThreadLocalX<String> NAMING_DATA_HOLDER = new ThreadLocalX<>();
 
-    public static void setNaming(String naming) {
+    public static void set(String naming) {
         NAMING_DATA_HOLDER.set(naming);
     }
 
-    public static String getNaming() {
-        return NAMING_DATA_HOLDER.getRemove();
+    public static String get() {
+        return NAMING_DATA_HOLDER.get();
+    }
+
+    public static void remove() {
+        NAMING_DATA_HOLDER.remove();
     }
 }
