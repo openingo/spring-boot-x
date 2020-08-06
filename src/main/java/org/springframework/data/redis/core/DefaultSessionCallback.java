@@ -35,6 +35,7 @@ import org.springframework.dao.DataAccessException;
  *
  * @author Qicz
  */
+@SuppressWarnings("unchecked")
 public class DefaultSessionCallback<T> implements SessionCallback<T> {
 
     private SessionCallbackX<T> sessionCallbackX;
@@ -51,6 +52,8 @@ public class DefaultSessionCallback<T> implements SessionCallback<T> {
      */
     @Override
     public <K, V> T execute(RedisOperations<K, V> operations) throws DataAccessException {
-        return this.sessionCallbackX.execute();
+        operations.multi();
+        this.sessionCallbackX.execute();
+        return (T)operations.exec();
     }
 }

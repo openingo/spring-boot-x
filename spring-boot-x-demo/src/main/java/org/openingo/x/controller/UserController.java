@@ -101,13 +101,11 @@ public class UserController {
     public String saveexe() {
         try {
             KeyNamingKit.set("openingo");
-            Object exec = stringKeyRedisTemplateX.execute(new SessionCallbackX<Object>() {
+            Object exec = stringKeyRedisTemplateX.execute(new SessionCallbackX() {
                 @Override
-                public Object execute() {
-                    stringKeyRedisTemplateX.multi();
+                public void execute() {
                     stringKeyRedisTemplateX.set("name", "Qicz");
                     stringKeyRedisTemplateX.expire("name", 48 * 3600);
-                    return stringKeyRedisTemplateX.exec();
                 }
             });
 

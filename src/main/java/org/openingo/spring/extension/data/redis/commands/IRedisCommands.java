@@ -146,7 +146,7 @@ public interface IRedisCommands<K, V> extends
      * @return result object returned by the action or <tt>null</tt>
      */
     @Nullable
-    <T> T execute(SessionCallbackX<T> session);
+    <T> T execute(SessionCallbackX session);
 
     /**
      * Executes the given Redis session on a pipelined connection. Allows transactions to be pipelined. Note that the
@@ -155,7 +155,7 @@ public interface IRedisCommands<K, V> extends
      * @param session Session callback
      * @return list of objects returned by the pipeline
      */
-    List<Object> executePipelined(final SessionCallbackX<?> session);
+    List<Object> executePipelined(final SessionCallbackX session);
 
     /**
      * Executes the given Redis session on a pipelined connection, returning the results using a dedicated serializer.
@@ -166,5 +166,5 @@ public interface IRedisCommands<K, V> extends
      * @param resultSerializer
      * @return list of objects returned by the pipeline
      */
-    List<Object> executePipelined(final SessionCallbackX<?> session, final RedisSerializer<?> resultSerializer);
+    List<Object> executePipelined(final SessionCallbackX session, final RedisSerializer<?> resultSerializer);
 }

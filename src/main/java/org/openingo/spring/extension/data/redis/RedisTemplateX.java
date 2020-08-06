@@ -1874,7 +1874,7 @@ public class RedisTemplateX<K, V> implements IRedisCommands<K, V> {
      * @return result object returned by the action or <tt>null</tt>
      */
     @Override
-    public <T> T execute(SessionCallbackX<T> session) {
+    public <T> T execute(SessionCallbackX session) {
         DefaultSessionCallback<T> defaultSessionCallback = new DefaultSessionCallback<>(session);
         return this.redisTemplate.execute(defaultSessionCallback);
     }
@@ -1887,7 +1887,7 @@ public class RedisTemplateX<K, V> implements IRedisCommands<K, V> {
      * @return list of objects returned by the pipeline
      */
     @Override
-    public List<Object> executePipelined(SessionCallbackX<?> session) {
+    public List<Object> executePipelined(SessionCallbackX session) {
         DefaultSessionCallback<?> defaultSessionCallback = new DefaultSessionCallback<>(session);
         return this.redisTemplate.executePipelined(defaultSessionCallback);
     }
@@ -1902,7 +1902,7 @@ public class RedisTemplateX<K, V> implements IRedisCommands<K, V> {
      * @return list of objects returned by the pipeline
      */
     @Override
-    public List<Object> executePipelined(SessionCallbackX<?> session, RedisSerializer<?> resultSerializer) {
+    public List<Object> executePipelined(SessionCallbackX session, RedisSerializer<?> resultSerializer) {
         DefaultSessionCallback<?> defaultSessionCallback = new DefaultSessionCallback<>(session);
         return this.redisTemplate.executePipelined(defaultSessionCallback, resultSerializer);
     }

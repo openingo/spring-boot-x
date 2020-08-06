@@ -45,5 +45,5 @@ public interface SessionCallbackX<T> {
      * @return return value
      */
     @Nullable
-    T execute();
+    void execute();
 }
