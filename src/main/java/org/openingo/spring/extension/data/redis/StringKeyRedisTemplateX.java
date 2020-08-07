@@ -292,7 +292,7 @@ public class StringKeyRedisTemplateX<V> extends RedisTemplateX<String, V> {
      */
     @Override
     public Boolean unlink(String key) {
-        return this.redisTemplate.unlink(this.keyNamingPolicy.getKeyName(key));
+        return super.unlink(this.keyNamingPolicy.getKeyName(key));
     }
 
     /**
@@ -306,7 +306,7 @@ public class StringKeyRedisTemplateX<V> extends RedisTemplateX<String, V> {
      */
     @Override
     public Long unlink(Collection<String> keys) {
-        return this.redisTemplate.unlink(this.keyNamingPolicy.getKeyNames(keys));
+        return super.unlink(this.keyNamingPolicy.getKeyNames(keys));
     }
 
     /**
@@ -319,7 +319,7 @@ public class StringKeyRedisTemplateX<V> extends RedisTemplateX<String, V> {
      */
     @Override
     public Boolean move(String key, int dbIndex) {
-        return this.redisTemplate.move(this.keyNamingPolicy.getKeyName(key), dbIndex);
+        return super.move(this.keyNamingPolicy.getKeyName(key), dbIndex);
     }
 
     /**
@@ -332,7 +332,7 @@ public class StringKeyRedisTemplateX<V> extends RedisTemplateX<String, V> {
     @Override
     public List<V> sort(SortQuery<String> query) {
         SortQuery<String> sortQuery = new DefaultStringSortQuery(this.keyNamingPolicy, query);
-        return this.redisTemplate.sort(sortQuery);
+        return super.sort(sortQuery);
     }
 
     /**
@@ -346,7 +346,7 @@ public class StringKeyRedisTemplateX<V> extends RedisTemplateX<String, V> {
     @Override
     public <T> List<T> sort(SortQuery<String> query, RedisSerializer<T> resultSerializer) {
         SortQuery<String> sortQuery = new DefaultStringSortQuery(this.keyNamingPolicy, query);
-        return this.redisTemplate.sort(sortQuery, resultSerializer);
+        return super.sort(sortQuery, resultSerializer);
     }
 
     /**
@@ -360,7 +360,7 @@ public class StringKeyRedisTemplateX<V> extends RedisTemplateX<String, V> {
     @Override
     public <T> List<T> sort(SortQuery<String> query, BulkMapper<T, V> bulkMapper) {
         SortQuery<String> sortQuery = new DefaultStringSortQuery(this.keyNamingPolicy, query);
-        return this.redisTemplate.sort(sortQuery, bulkMapper);
+        return super.sort(sortQuery, bulkMapper);
     }
 
     /**
@@ -375,7 +375,7 @@ public class StringKeyRedisTemplateX<V> extends RedisTemplateX<String, V> {
     @Override
     public <T, S> List<T> sort(SortQuery<String> query, BulkMapper<T, S> bulkMapper, RedisSerializer<S> resultSerializer) {
         SortQuery<String> sortQuery = new DefaultStringSortQuery(this.keyNamingPolicy, query);
-        return this.redisTemplate.sort(sortQuery, bulkMapper, resultSerializer);
+        return super.sort(sortQuery, bulkMapper, resultSerializer);
     }
 
     /**
@@ -389,7 +389,7 @@ public class StringKeyRedisTemplateX<V> extends RedisTemplateX<String, V> {
     @Override
     public Long sort(SortQuery<String> query, String storeKey) {
         SortQuery<String> sortQuery = new DefaultStringSortQuery(this.keyNamingPolicy, query);
-        return this.redisTemplate.sort(sortQuery, this.keyNamingPolicy.getKeyName(storeKey));
+        return super.sort(sortQuery, this.keyNamingPolicy.getKeyName(storeKey));
     }
 
     /**
@@ -400,7 +400,7 @@ public class StringKeyRedisTemplateX<V> extends RedisTemplateX<String, V> {
      */
     @Override
     public void watch(String key) {
-        this.redisTemplate.watch(this.keyNamingPolicy.getKeyName(key));
+        super.watch(this.keyNamingPolicy.getKeyName(key));
     }
 
     /**
@@ -411,6 +411,6 @@ public class StringKeyRedisTemplateX<V> extends RedisTemplateX<String, V> {
      */
     @Override
     public void watch(Collection<String> keys) {
-        this.redisTemplate.watch(this.keyNamingPolicy.getKeyNames(keys));
+        super.watch(this.keyNamingPolicy.getKeyNames(keys));
     }
 }
