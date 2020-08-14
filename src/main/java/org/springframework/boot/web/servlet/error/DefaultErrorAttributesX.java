@@ -177,6 +177,7 @@ public class DefaultErrorAttributesX extends DefaultErrorAttributes {
     /**
      * @return Current Error Message
      */
+    @Deprecated
     protected String getMessage(Map<String, Object> errorAttributes) {
         return errorAttributes.get("message").toString();
     }

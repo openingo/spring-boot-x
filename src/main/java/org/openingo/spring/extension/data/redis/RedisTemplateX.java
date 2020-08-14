@@ -146,6 +146,115 @@ public class RedisTemplateX<K, V> implements IRedisCommands<K, V> {
     }
 
     /**
+     * Set the {@code value} and expiration {@code timeout} for {@code key}.
+     *
+     * @param key     must not be {@literal null}.
+     * @param timeout the key expiration timeout.
+     * @param value   must not be {@literal null}.
+     * @param unit    must not be {@literal null}.
+     * @see <a href="https://redis.io/commands/setex">Redis Documentation: SETEX</a>
+     */
+    @Override
+    public void setEx(K key, long timeout, V value, TimeUnit unit) {
+        this.opsForValue().set(key, value, timeout, unit);
+    }
+
+    /**
+     * Set {@code key} to hold the string {@code value} if {@code key} is absent.
+     *
+     * @param key   must not be {@literal null}.
+     * @param value must not be {@literal null}.
+     * @return {@literal null} when used in pipeline / transaction.
+     * @see <a href="https://redis.io/commands/setnx">Redis Documentation: SETNX</a>
+     */
+    @Override
+    public Boolean setNx(K key, V value) {
+        return this.opsForValue().setIfAbsent(key, value);
+    }
+
+    /**
+     * Set {@code key} to hold the string {@code value} and expiration {@code timeout} if {@code key} is absent.
+     *
+     * @param key            must not be {@literal null}.
+     * @param value          must not be {@literal null}.
+     * @param timeoutSeconds the key expiration timeout.
+     * @return {@literal null} when used in pipeline / transaction.
+     * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+     * @since 2.1
+     */
+    @Override
+    public Boolean setNx(K key, V value, long timeoutSeconds) {
+        return this.opsForValue().setIfAbsent(key, value, timeoutSeconds, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Set {@code key} to hold the string {@code value} and expiration {@code timeout} if {@code key} is absent.
+     *
+     * @param key     must not be {@literal null}.
+     * @param value   must not be {@literal null}.
+     * @param timeout the key expiration timeout.
+     * @param unit    must not be {@literal null}.
+     * @return {@literal null} when used in pipeline / transaction.
+     * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+     * @since 2.1
+     */
+    @Override
+    public Boolean setNx(K key, V value, long timeout, TimeUnit unit) {
+        return this.opsForValue().setIfAbsent(key, value, timeout, unit);
+    }
+
+    /**
+     * Set {@code key} to hold the string {@code value} if {@code key} is present.
+     *
+     * redis: SET key value XX
+     *
+     * @param key   must not be {@literal null}.
+     * @param value must not be {@literal null}.
+     * @return command result indicating if the key has been set.
+     * @throws IllegalArgumentException if either {@code key} or {@code value} is not present.
+     * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+     */
+    @Override
+    public Boolean setXx(K key, V value) {
+        return this.opsForValue().setIfPresent(key, value);
+    }
+
+    /**
+     * Set {@code key} to hold the string {@code value} and expiration {@code timeout} if {@code key} is present.
+     *
+     * redis: SET key value EX seconds XX
+     *
+     * @param key            must not be {@literal null}.
+     * @param value          must not be {@literal null}.
+     * @param timeoutSeconds the key expiration timeout.
+     * @return command result indicating if the key has been set.
+     * @throws IllegalArgumentException if either {@code key}, {@code value} or {@code timeout} is not present.
+     * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+     */
+    @Override
+    public Boolean setXx(K key, V value, long timeoutSeconds) {
+        return this.opsForValue().setIfPresent(key, value, timeoutSeconds, TimeUnit.SECONDS);
+    }
+
+    /**
+     * Set {@code key} to hold the string {@code value} and expiration {@code timeout} if {@code key} is present.
+     *
+     * redis: SET key value [EX seconds|PX milliseconds] XX
+     *
+     * @param key     must not be {@literal null}.
+     * @param value   must not be {@literal null}.
+     * @param timeout the key expiration timeout.
+     * @param unit    must not be {@literal null}.
+     * @return command result indicating if the key has been set.
+     * @throws IllegalArgumentException if either {@code key}, {@code value} or {@code timeout} is not present.
+     * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+     */
+    @Override
+    public Boolean setXx(K key, V value, long timeout, TimeUnit unit) {
+        return this.opsForValue().setIfPresent(key, value, timeout, unit);
+    }
+
+    /**
      * Get the value of {@code key}.
      *
      * @param key must not be {@literal null}.

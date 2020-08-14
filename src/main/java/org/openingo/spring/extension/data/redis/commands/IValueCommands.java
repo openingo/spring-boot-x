@@ -35,6 +35,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * IValueCommands
@@ -61,6 +62,93 @@ public interface IValueCommands<K, V> {
      * @see <a href="https://redis.io/commands/setex">Redis Documentation: SETEX</a>
      */
     void setEx(K key, long timeoutSeconds, V value);
+
+    /**
+     * Set the {@code value} and expiration {@code timeout} for {@code key}.
+     *
+     * @param key must not be {@literal null}.
+     * @param value must not be {@literal null}.
+     * @param timeout the key expiration timeout.
+     * @param unit must not be {@literal null}.
+     * @see <a href="https://redis.io/commands/setex">Redis Documentation: SETEX</a>
+     */
+    void setEx(K key, long timeout, V value, TimeUnit unit);
+
+    /**
+     * Set {@code key} to hold the string {@code value} if {@code key} is absent.
+     *
+     * @param key must not be {@literal null}.
+     * @param value must not be {@literal null}.
+     * @return {@literal null} when used in pipeline / transaction.
+     * @see <a href="https://redis.io/commands/setnx">Redis Documentation: SETNX</a>
+     */
+    @Nullable
+    Boolean setNx(K key, V value);
+
+    /**
+     * Set {@code key} to hold the string {@code value} and expiration {@code timeout} if {@code key} is absent.
+     *
+     * @param key must not be {@literal null}.
+     * @param value must not be {@literal null}.
+     * @param timeoutSeconds the key expiration timeout.
+     * @return {@literal null} when used in pipeline / transaction.
+     * @since 2.1
+     * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+     */
+    @Nullable
+    Boolean setNx(K key, V value, long timeoutSeconds);
+
+    /**
+     * Set {@code key} to hold the string {@code value} and expiration {@code timeout} if {@code key} is absent.
+     *
+     * @param key must not be {@literal null}.
+     * @param value must not be {@literal null}.
+     * @param timeout the key expiration timeout.
+     * @param unit must not be {@literal null}.
+     * @return {@literal null} when used in pipeline / transaction.
+     * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+     */
+    @Nullable
+    Boolean setNx(K key, V value, long timeout, TimeUnit unit);
+
+    /**
+     * Set {@code key} to hold the string {@code value} if {@code key} is present.
+     *
+     * @param key must not be {@literal null}.
+     * @param value must not be {@literal null}.
+     * @return command result indicating if the key has been set.
+     * @throws IllegalArgumentException if either {@code key} or {@code value} is not present.
+     * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+     */
+    @Nullable
+    Boolean setXx(K key, V value);
+
+    /**
+     * Set {@code key} to hold the string {@code value} and expiration {@code timeout} if {@code key} is present.
+     *
+     * @param key must not be {@literal null}.
+     * @param value must not be {@literal null}.
+     * @param timeoutSeconds the key expiration timeout.
+     * @return command result indicating if the key has been set.
+     * @throws IllegalArgumentException if either {@code key}, {@code value} or {@code timeout} is not present.
+     * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+     */
+    @Nullable
+    Boolean setXx(K key, V value, long timeoutSeconds);
+
+    /**
+     * Set {@code key} to hold the string {@code value} and expiration {@code timeout} if {@code key} is present.
+     *
+     * @param key must not be {@literal null}.
+     * @param value must not be {@literal null}.
+     * @param timeout the key expiration timeout.
+     * @param unit must not be {@literal null}.
+     * @return command result indicating if the key has been set.
+     * @throws IllegalArgumentException if either {@code key}, {@code value} or {@code timeout} is not present.
+     * @see <a href="https://redis.io/commands/set">Redis Documentation: SET</a>
+     */
+    @Nullable
+    Boolean setXx(K key, V value, long timeout, TimeUnit unit);
 
     /**
      * Get the value of {@code key}.
