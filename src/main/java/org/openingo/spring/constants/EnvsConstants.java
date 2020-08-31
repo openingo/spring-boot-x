@@ -42,6 +42,7 @@ public final class EnvsConstants {
     // dev profile: application-dev.yml
     public final static String DEV = "dev";
 
+    // test profile: application-test.yml
     public final static String TEST = "test";
 
     // prod profile: application-prod.yml
