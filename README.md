@@ -4,6 +4,9 @@
 
 ![maven](https://img.shields.io/maven-central/v/org.openingo.spring/spring-boot-x.svg)
 
+
+### [Release Notes](RELEASENOTES.md)
+
 ### Features
 
 - request log:
