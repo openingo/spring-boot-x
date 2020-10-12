@@ -79,6 +79,8 @@ public class FeignConfig {
                 String name = requestHeaderNames.nextElement();
                 String value = request.getHeader(name);
                 Collection<String> values = requestTemplateHeaders.get(name);
+                // convert to writeable
+                values = new ArrayList<>(values);
                 if (!lowerCaseRequestTemplateHeaders.contains(name.toLowerCase())) {
                     // None of the same names exist
                     // first time create new collection, the second time use the created

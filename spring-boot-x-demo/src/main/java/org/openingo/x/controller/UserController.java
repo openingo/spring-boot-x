@@ -185,4 +185,9 @@ public class UserController {
         });
         System.out.println(defaultStringSortQuery);
     }
+
+    @GetMapping("/resp")
+    public RespData resp() {
+        return RespData.success(Arrays.asList("d1","d2","d3"));
+    }
 }
