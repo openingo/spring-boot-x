@@ -36,8 +36,6 @@ import org.openingo.java.lang.ThreadLocalX;
 import org.openingo.jdkits.sys.SystemClockKit;
 import org.openingo.jdkits.validate.ValidateKit;
 import org.openingo.spring.constants.Constants;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -51,9 +49,6 @@ import javax.servlet.http.HttpServletRequest;
 @Aspect
 @Slf4j
 public class HttpRequestLogAspect {
-
-    @Autowired
-    MappingJackson2HttpMessageConverter converter;
 
     private final ThreadLocalX<Long> PROCESSING_TIME_HOLDER = new ThreadLocalX<>();
 
@@ -72,6 +67,7 @@ public class HttpRequestLogAspect {
 
     @Around("log()")
     public Object around(ProceedingJoinPoint point) throws Throwable {
+        ProceedingJoinPointHolder.setProceedingJoinPoint(point);
         this.handlerStart();
         Object proceed = point.proceed();
         float processingTime = this.getProcessingSeconds();
@@ -85,7 +81,6 @@ public class HttpRequestLogAspect {
         // current request processing time
         httpRequestReporter.setProcessingTime(processingTime);
         httpRequestReporter.setPoint(point);
-        httpRequestReporter.setConverter(this.converter);
         httpRequestReporter.setRequest(request);
         httpRequestReporter.setResponseData(proceed);
 
@@ -93,4 +88,5 @@ public class HttpRequestLogAspect {
         httpRequestReporter.report();
         return proceed;
     }
+
 }

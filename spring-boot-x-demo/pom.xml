@@ -38,11 +38,11 @@
     <properties>
         <spring-boot.version>2.1.8.RELEASE</spring-boot.version>
         <springcloud.version>Greenwich.SR2</springcloud.version>
-        <spring-boot-x.version>1.9.1-RELEASE</spring-boot-x.version>
+        <spring-boot-x.version>2.0-RELEASE</spring-boot-x.version>
         <mysql.sersion>8.0.17</mysql.sersion>
-
         <druid.version>1.1.23</druid.version>
         <hikaricp.version>3.2.0</hikaricp.version>
+        <fastjson.version>1.2.68</fastjson.version>
     </properties>
 
     <dependencyManagement>
@@ -72,6 +72,12 @@
                 <version>${spring-boot-x.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <scope>${fastjson.version}</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

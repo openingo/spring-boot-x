@@ -36,14 +36,19 @@ import org.openingo.jdkits.reflect.ClassKit;
 import org.openingo.jdkits.sys.IPKit;
 import org.openingo.jdkits.validate.ValidateKit;
 import org.openingo.spring.constants.Constants;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * HttpRequest Reporter
@@ -67,9 +72,6 @@ public final class HttpRequestReporter {
 
 	// action handler
 	private HandlerMethod handler;
-
-	// body message converter
-	private MappingJackson2HttpMessageConverter converter;
 
 	// exception
 	private Exception exception;
@@ -112,6 +114,26 @@ public final class HttpRequestReporter {
 		return null;
 	}
 
+	public Object getBody() {
+		ProceedingJoinPoint proceedingJoinPoint = ProceedingJoinPointHolder.getProceedingJoinPoint();
+		if (ValidateKit.isNull(proceedingJoinPoint)) {
+			return null;
+		}
+		Object[] joinPointArgs = proceedingJoinPoint.getArgs();
+		Stream<?> stream = ValidateKit.isNull(joinPointArgs) ? Stream.empty() : Arrays.asList(joinPointArgs).stream();
+		List<Object> bodyParams = stream
+				.filter(arg -> (!(arg instanceof HttpServletRequest) && !(arg instanceof HttpServletResponse)))
+				.collect(Collectors.toList());
+		if (bodyParams.size() > 0) {
+			Object bodyParam = bodyParams.get(0);
+			if (!(bodyParam instanceof File
+					|| bodyParam instanceof MultipartFile)) {
+				return bodyParam;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Current Request report
 	 */
@@ -138,22 +160,13 @@ public final class HttpRequestReporter {
 
 		// print all bodyData params
 		// bodyData data
-		Object body = null;
-		if (ValidateKit.isNotNull(this.request.getContentType())) {
-			body = "<File>";
-			try {
-				body = this.converter.read(Object.class, serverHttpRequest);
-				body = JacksonKit.toJson(body);
-			} catch (Exception e) {
-				if (e instanceof IOException) {
-					body = null;
-				}
-				log.error(e.toString());
-			}
-		}
+		Object body = this.getBody();
 		if (ValidateKit.isNotNull(body)) {
-			reportInfoBuilder.append("Body  : ").append(body).append("\n");
+			body = JacksonKit.toJson(body);
+		} else {
+			body = "<File>";
 		}
+		reportInfoBuilder.append("Body  : ").append(body).append("\n");
 
 		String urlQuery = this.request.getQueryString();
 		if (ValidateKit.isNotNull(urlQuery)) {

@@ -70,6 +70,11 @@ public class UserController {
         return "ok";
     }
 
+    @GetMapping("/userex")
+    public String userex(@RequestBody User user) {
+        throw new ServiceException("123111zczc", "user ex exception");
+    }
+
     @GetMapping("/user1/{name}")
     public String user1(@PathVariable("name") String name) {
         return "ok";

@@ -36,7 +36,6 @@ import org.openingo.spring.extension.http.config.HttpConfigProperties;
 import org.openingo.spring.http.request.HttpRequestReporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.HandlerMethod;
@@ -53,9 +52,6 @@ import java.util.Map;
  */
 @Slf4j
 public class DefaultErrorAttributesX extends DefaultErrorAttributes {
-
-    @Autowired
-    MappingJackson2HttpMessageConverter converter;
 
     @Autowired
     HttpConfigProperties.HttpRequestLogConfigProperties httpRequestLogConfigProperties;
@@ -128,7 +124,6 @@ public class DefaultErrorAttributesX extends DefaultErrorAttributes {
         // when log enable print request information
         if (this.httpRequestLogConfigProperties.isEnable()) {
             HttpRequestReporter httpRequestReporter = HttpRequestReporter.getInstance();
-            httpRequestReporter.setConverter(this.converter);
             httpRequestReporter.setRequest(request);
             httpRequestReporter.setException(exception);
             if (ValidateKit.isNotNull(handler)) {

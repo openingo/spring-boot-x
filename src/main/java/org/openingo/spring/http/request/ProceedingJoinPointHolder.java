@@ -25,19 +25,27 @@
  * SOFTWARE.
  */
 
-package org.openingo.x.entity;
+package org.openingo.spring.http.request;
 
-import lombok.Data;
-
-import java.io.Serializable;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.openingo.java.lang.ThreadLocalX;
 
 /**
- * User
+ * ProceedingJoinPointHolder
  *
  * @author Qicz
  */
-@Data
-public class User implements Serializable {
+public final class ProceedingJoinPointHolder {
 
-    String name;
+    private ProceedingJoinPointHolder() {}
+
+    private static final ThreadLocalX<ProceedingJoinPoint> PROCEEDING_JOIN_POINT_HOLDER = new ThreadLocalX<>();
+
+    public static void setProceedingJoinPoint(ProceedingJoinPoint proceedingJoinPoint) {
+        PROCEEDING_JOIN_POINT_HOLDER.set(proceedingJoinPoint);
+    }
+
+    public static ProceedingJoinPoint getProceedingJoinPoint() {
+        return PROCEEDING_JOIN_POINT_HOLDER.getRemove();
+    }
 }
