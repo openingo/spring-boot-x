@@ -114,15 +114,17 @@ public final class HttpRequestReporter {
 		return null;
 	}
 
+	@SneakyThrows
 	public Object getBody() {
 		ProceedingJoinPoint proceedingJoinPoint = ProceedingJoinPointHolder.getProceedingJoinPoint();
 		if (ValidateKit.isNull(proceedingJoinPoint)) {
-			return null;
+			return "Error";
 		}
 		Object[] joinPointArgs = proceedingJoinPoint.getArgs();
 		Stream<?> stream = ValidateKit.isNull(joinPointArgs) ? Stream.empty() : Arrays.asList(joinPointArgs).stream();
 		List<Object> bodyParams = stream
-				.filter(arg -> (!(arg instanceof HttpServletRequest) && !(arg instanceof HttpServletResponse)))
+				.filter(arg -> (!(arg instanceof HttpServletRequest)
+						&& !(arg instanceof HttpServletResponse)))
 				.collect(Collectors.toList());
 		if (bodyParams.size() > 0) {
 			Object bodyParam = bodyParams.get(0);
@@ -131,7 +133,7 @@ public final class HttpRequestReporter {
 				return bodyParam;
 			}
 		}
-		return null;
+		return "Nothing or A File";
 	}
 
 	/**
@@ -159,12 +161,11 @@ public final class HttpRequestReporter {
 		reportInfoBuilder.append("Header(s)  : ").append(serverHttpRequest.getHeaders()).append("\n");
 
 		// print all bodyData params
-		// bodyData data
 		Object body = this.getBody();
 		if (ValidateKit.isNotNull(body)) {
 			body = JacksonKit.toJson(body);
 		} else {
-			body = "<File>";
+			body = "Nothing or A File";
 		}
 		reportInfoBuilder.append("Body  : ").append(body).append("\n");
 

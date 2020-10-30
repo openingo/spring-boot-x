@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -135,6 +136,11 @@ public class UserController {
         //map.put("a", "A");
         throw new ServiceException("123111zczc", "testing exception");
         //return map;
+    }
+
+    @GetMapping("/file")
+    public String file(MultipartFile file) {
+        return "ok";
     }
 
     @GetMapping("/non")
