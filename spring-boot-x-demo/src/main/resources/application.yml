@@ -18,3 +18,9 @@ spring:
     username: root
     password: dbadmin
     url: jdbc:mysql://127.0.0.1/test?useSSL=false&serverTimezone=GMT%2B8
+
+  redis:
+    cluster:
+      nodes: 172.15.33.211:7001,172.15.33.211:7002,172.15.33.211:7003,172.15.33.211:7004,172.15.33.211:7005,172.15.33.211:7006
+    password: 123456
+#    host: localhost

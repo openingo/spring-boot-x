@@ -29,9 +29,9 @@ package org.openingo.x.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openingo.jdkits.http.RespData;
+import org.openingo.jdkits.sys.SystemClockKit;
 import org.openingo.spring.exception.ServiceException;
 import org.openingo.spring.extension.data.redis.StringKeyRedisTemplateX;
-import org.openingo.spring.extension.data.redis.callback.SessionCallbackX;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
 import org.openingo.spring.extension.data.redis.naming.KeyNamingKit;
 import org.openingo.x.entity.User;
@@ -107,16 +107,17 @@ public class UserController {
     public String saveexe() {
         try {
             KeyNamingKit.set("openingo");
-            Object exec = stringKeyRedisTemplateX.execute(new SessionCallbackX() {
-                @Override
-                public void execute() {
-                    stringKeyRedisTemplateX.set("name", "Qicz");
-                    stringKeyRedisTemplateX.expire("name", 48 * 3600);
-                }
-            });
+//            Object exec = stringKeyRedisTemplateX.execute(new SessionCallbackX() {
+//                @Override
+//                public void execute() {
+//                    stringKeyRedisTemplateX.set("name", "Qicz" + SystemClockKit.now());
+//                    stringKeyRedisTemplateX.expire("name", 48 * 3600);
+//                }
+//            });
 
-            System.out.println("exec=========="+exec);
-            return "ok";
+            stringKeyRedisTemplateX.set("name", "Qicz" + SystemClockKit.now());
+            stringKeyRedisTemplateX.expire("name", 48 * 3600);
+            return "ok" + stringKeyRedisTemplateX.get("name");
         } finally {
             KeyNamingKit.remove();
         }
