@@ -39,22 +39,14 @@ import org.openingo.spring.extension.data.redis.serializer.FstRedisSerializer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisNode;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.util.Assert;
 
 import java.net.UnknownHostException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * RedisConfig
@@ -96,41 +88,6 @@ public class RedisConfig {
     @ConditionalOnMissingBean(name = "stringRedisTemplateX")
     public StringRedisTemplateX stringRedisTemplateX() {
         return new StringRedisTemplateX();
-    }
-
-    /**
-     * redis ConnectionFactory if the cluster configured will using RedisClusterConfiguration or using RedisStandaloneConfiguration
-     * @param redisProperties spring redis configurations
-     */
-    @Bean
-    @ConditionalOnMissingBean(name = "redisConnectionFactory")
-    public RedisConnectionFactory redisConnectionFactory(RedisProperties redisProperties) {
-        RedisProperties.Cluster cluster = redisProperties.getCluster();
-        LettuceConnectionFactory connectionFactory = null;
-        if (null != cluster) {
-            RedisClusterConfiguration clusterConfiguration = new RedisClusterConfiguration();
-            Set<RedisNode> redisNodes = new HashSet<>();
-            List<String> nodes = cluster.getNodes();
-            Assert.notEmpty(nodes, "the cluster nodes is empty.");
-            for (String node : nodes) {
-                if (node == null || node.equals("")) {
-                    continue;
-                }
-                String ip = node.split(":")[0];
-                int port = Integer.parseInt(node.split(":")[1]);
-                redisNodes.add(new RedisNode(ip, port));
-            }
-            clusterConfiguration.setClusterNodes(redisNodes);
-            clusterConfiguration.setPassword(redisProperties.getPassword());
-            Integer maxRedirects = cluster.getMaxRedirects();
-            if (null != maxRedirects) {
-                clusterConfiguration.setMaxRedirects(maxRedirects);
-            }
-            connectionFactory = new LettuceConnectionFactory(clusterConfiguration);
-        } else {
-            connectionFactory = new LettuceConnectionFactory(redisProperties.getHost(), redisProperties.getPort());
-        }
-        return connectionFactory;
     }
 
     /**

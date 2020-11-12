@@ -23,4 +23,9 @@ spring:
     cluster:
       nodes: 172.15.33.211:7001,172.15.33.211:7002,172.15.33.211:7003,172.15.33.211:7004,172.15.33.211:7005,172.15.33.211:7006
     password: 123456
+    lettuce:
+      pool:
+        max-active: 1000
 #    host: localhost
+server:
+  port: 18080

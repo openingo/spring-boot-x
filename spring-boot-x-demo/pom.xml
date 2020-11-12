@@ -38,11 +38,12 @@
     <properties>
         <spring-boot.version>2.1.8.RELEASE</spring-boot.version>
         <springcloud.version>Greenwich.SR2</springcloud.version>
-        <spring-boot-x.version>2.2-RELEASE</spring-boot-x.version>
+        <spring-boot-x.version>2.2.1-RELEASE</spring-boot-x.version>
         <mysql.sersion>8.0.17</mysql.sersion>
         <druid.version>1.1.23</druid.version>
         <hikaricp.version>3.2.0</hikaricp.version>
         <fastjson.version>1.2.68</fastjson.version>
+        <pool>2.2</pool>
     </properties>
 
     <dependencyManagement>
@@ -120,6 +121,11 @@
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-starter</artifactId>
             <version>${druid.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+            <version>${pool}</version>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
