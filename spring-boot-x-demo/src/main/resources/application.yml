@@ -26,6 +26,10 @@ spring:
     lettuce:
       pool:
         max-active: 1000
+  data:
+    elasticsearch:
+      cluster-name: elasticsearch
+      cluster-nodes: localhost:9300
 #    host: localhost
 server:
   port: 18080

@@ -33,7 +33,7 @@
 
     <groupId>org.openingo.spring</groupId>
     <artifactId>spring-boot-x</artifactId>
-    <version>2.2.1-RELEASE</version>
+    <version>2.3-RELEASE</version>
 
     <name>spring-boot extensions</name>
     <description>spring-boot extensions</description>
@@ -145,6 +145,13 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- es -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
             <scope>provided</scope>
         </dependency>
 

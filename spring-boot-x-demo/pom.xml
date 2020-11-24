@@ -38,7 +38,7 @@
     <properties>
         <spring-boot.version>2.1.8.RELEASE</spring-boot.version>
         <springcloud.version>Greenwich.SR2</springcloud.version>
-        <spring-boot-x.version>2.2.1-RELEASE</spring-boot-x.version>
+        <spring-boot-x.version>2.3-RELEASE</spring-boot-x.version>
         <mysql.sersion>8.0.17</mysql.sersion>
         <druid.version>1.1.23</druid.version>
         <hikaricp.version>3.2.0</hikaricp.version>
@@ -142,6 +142,18 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-config-server</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!-- es -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
     </dependencies>
