@@ -62,6 +62,18 @@ public class ElasticsearchTemplateLite extends ElasticsearchTemplate {
     }
 
     /**
+     * create or update a doc
+     * @param entity doc content
+     * @param parentId parent doc id
+     * @return document id
+     */
+    public String put(Object entity, String parentId) {
+        Assert.hasText(parentId, "the parentId is null.");
+        IndexQuery indexQuery = new IndexQueryBuilder().withId(this.getPersistentEntityId(entity)).withParentId(parentId).withObject(entity).build();
+        return this.index(indexQuery);
+    }
+
+    /**
      * delete a doc by id
      * @param entity doc content
      * @param <T>
@@ -115,8 +127,9 @@ public class ElasticsearchTemplateLite extends ElasticsearchTemplate {
      * @return doc pageable
      */
     public <T> Page<T> findForPage(PageParamBuilder<T> pageParamBuilder) {
+        Assert.notNull(pageParamBuilder, "the pageable builder is null.");
         Class<T> clazz = pageParamBuilder.getClazz();
-        Assert.notNull(clazz, "the pageable builder class is null.");
+        Assert.notNull(clazz, "the pageable builder clazz property is null.");
         QueryBuilder queryBuilder = pageParamBuilder.getQueryBuilder();
         NativeSearchQueryBuilder searchQueryBuilder = null;
         String keyword = pageParamBuilder.getKeyword();
@@ -131,6 +144,11 @@ public class ElasticsearchTemplateLite extends ElasticsearchTemplate {
         Pageable pageable = pageParamBuilder.getPageable();
         if (ValidateKit.isNotNull(pageable)) {
             searchQueryBuilder.withPageable(pageable);
+        }
+        // filter
+        QueryBuilder filterBuilder = pageParamBuilder.getFilterBuilder();
+        if (ValidateKit.isNotNull(filterBuilder)) {
+            searchQueryBuilder.withFilter(filterBuilder);
         }
         // sort
         SortBuilder<?> sortBuilder = pageParamBuilder.getSortBuilder();
@@ -164,7 +182,8 @@ public class ElasticsearchTemplateLite extends ElasticsearchTemplate {
             if (hits.getHits().length > 0) {
                 for (SearchHit searchHit : hits) {
                     Map<String, HighlightField> highlightFields = searchHit.getHighlightFields();
-                    T item = JacksonKit.toObj(searchHit.getSourceAsString(), clazz);
+                    String sourceAsString = searchHit.getSourceAsString();
+                    T item = JacksonKit.toObj(sourceAsString, clazz);
                     Field[] fields = clazz.getDeclaredFields();
                     for (Field field : fields) {
                         field.setAccessible(true);

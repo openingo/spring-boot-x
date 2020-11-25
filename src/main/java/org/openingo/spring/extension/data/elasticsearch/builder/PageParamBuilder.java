@@ -28,6 +28,7 @@ public final class PageParamBuilder<T> {
     private Pageable pageable;
     private HighlightBuilder.Field[] highlightFields;
     private QueryBuilder queryBuilder;
+    private QueryBuilder filterBuilder;
     private SortBuilder<?> sortBuilder;
 
     public static <T> PageParamBuilder<T> builder() {
@@ -80,6 +81,11 @@ public final class PageParamBuilder<T> {
         return this;
     }
 
+    public PageParamBuilder<T> filter(QueryBuilder filterBuilder) {
+        this.filterBuilder = filterBuilder;
+        return this;
+    }
+
     public PageParamBuilder<T> sort(String fieldSort, SortOrder order, String unmappedType) {
         Assert.hasText(fieldSort, "the sort field is not exist");
         Assert.notNull(order, "the sort order is null");
@@ -113,6 +119,10 @@ public final class PageParamBuilder<T> {
 
     public QueryBuilder getQueryBuilder() {
         return queryBuilder;
+    }
+
+    public QueryBuilder getFilterBuilder() {
+        return filterBuilder;
     }
 
     public SortBuilder<?> getSortBuilder() {

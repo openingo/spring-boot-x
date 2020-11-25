@@ -27,6 +27,11 @@ public class EsController {
         return elasticsearchTemplateLite.put(user);
     }
 
+    @PostMapping("/putdoc")
+    public String putUserDoc(@RequestBody User.UserDoc userDoc, String parentId) {
+        return elasticsearchTemplateLite.put(userDoc, parentId);
+    }
+
     @GetMapping("/user/{id}")
     public User findOneById(@PathVariable("id") Integer id) {
         return this.elasticsearchTemplateLite.findById(id, User.class);
@@ -41,16 +46,20 @@ public class EsController {
     public Page<?> findForPage(int pageNum, int pageSize, String keywords) {
         PageParamBuilder<User> pageParamBuilder = PageParamBuilder.<User>builder().clazz(User.class).pageable(pageNum, pageSize);
         if (ValidateKit.isNotNull(keywords)) {
-//            String keyword = KeywordKit.toKeyword(keywords);
+            String keyword = KeywordKit.toKeyword(keywords);
 //            BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery().must(QueryBuilders.termQuery("name", keyword))
 //                    .should(QueryBuilders.queryStringQuery(keyword))
 //                    ;
 //            pageParamBuilder.query(queryBuilder)
 
 
-                   pageParamBuilder.keyword(keywords)
+             pageParamBuilder.keyword(keywords)
+//            HasChildQueryBuilder docContent = JoinQueryBuilders.hasChildQuery("x-user-doc", QueryBuilders.matchQuery("docContent", keyword), ScoreMode.None).innerHit(new InnerHitBuilder());
+//            pageParamBuilder.query(docContent)
 //                    .highlightFields(new HighlightBuilder.Field("addr"))
-                           .highlightColor("red");
+                           .highlightColor("red")
+             ;
+
         }
         return this.elasticsearchTemplateLite.findForPage(pageParamBuilder);
     }

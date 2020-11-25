@@ -48,4 +48,20 @@ public class User implements Serializable {
     String name;
 
     String addr;
+
+    UserDoc userDoc;
+
+    @Data
+    public static class UserDoc {
+
+        Integer id;
+
+        String parentId;
+
+        String name;
+
+        String docType;
+
+        String docContent;
+    }
 }
