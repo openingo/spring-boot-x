@@ -2,6 +2,7 @@ package org.openingo.spring.extension.data.elasticsearch;
 
 import lombok.SneakyThrows;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
@@ -12,13 +13,13 @@ import org.elasticsearch.search.sort.SortBuilder;
 import org.openingo.jdkits.json.JacksonKit;
 import org.openingo.jdkits.validate.ValidateKit;
 import org.openingo.spring.extension.data.elasticsearch.builder.PageParamBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.SearchResultMapper;
 import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.aggregation.impl.AggregatedPageImpl;
+import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
 import org.springframework.data.elasticsearch.core.mapping.ElasticsearchPersistentEntity;
 import org.springframework.data.elasticsearch.core.query.GetQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
@@ -36,21 +37,18 @@ import java.util.Map;
  *
  * @author Qicz
  */
-public class ElasticsearchTemplateLite {
+public class ElasticsearchTemplateLite extends ElasticsearchTemplate {
 
-    @Autowired
-    ElasticsearchTemplate elasticsearchTemplate;
+    public ElasticsearchTemplateLite(Client client, ElasticsearchConverter elasticsearchConverter) {
+        super(client, elasticsearchConverter);
+    }
 
     private String getPersistentEntityId(Object entity) {
         Assert.notNull(entity, "the document can not be null");
-        ElasticsearchPersistentEntity<?> persistentEntity = this.elasticsearchTemplate.getPersistentEntityFor(entity.getClass());
+        ElasticsearchPersistentEntity<?> persistentEntity = getPersistentEntityFor(entity.getClass());
         Object identifier = persistentEntity.getIdentifierAccessor(entity).getIdentifier();
         Assert.notNull(identifier, "the document id can not be null");
         return identifier.toString();
-    }
-
-    public ElasticsearchTemplate getElasticsearchTemplate() {
-        return this.elasticsearchTemplate;
     }
 
     /**
@@ -60,7 +58,7 @@ public class ElasticsearchTemplateLite {
      */
     public String put(Object entity) {
         IndexQuery indexQuery = new IndexQueryBuilder().withId(this.getPersistentEntityId(entity)).withObject(entity).build();
-        return this.elasticsearchTemplate.index(indexQuery);
+        return this.index(indexQuery);
     }
 
     /**
@@ -72,7 +70,7 @@ public class ElasticsearchTemplateLite {
     public String put(Object entity, String parentId) {
         Assert.hasText(parentId, "the parentId is null.");
         IndexQuery indexQuery = new IndexQueryBuilder().withId(this.getPersistentEntityId(entity)).withParentId(parentId).withObject(entity).build();
-        return this.elasticsearchTemplate.index(indexQuery);
+        return this.index(indexQuery);
     }
 
     /**
@@ -82,7 +80,7 @@ public class ElasticsearchTemplateLite {
      * @return document id
      */
     public <T> String deleteById(Object entity) {
-        return this.elasticsearchTemplate.delete(entity.getClass(), this.getPersistentEntityId(entity));
+        return this.delete(entity.getClass(), this.getPersistentEntityId(entity));
     }
 
     /**
@@ -94,7 +92,7 @@ public class ElasticsearchTemplateLite {
      */
     public <T> String deleteById(Class<T> clazz, Object id) {
         Assert.notNull(id, "the document id can not be null");
-        return this.elasticsearchTemplate.delete(clazz, id.toString());
+        return this.delete(clazz, id.toString());
     }
 
     /**
@@ -107,7 +105,7 @@ public class ElasticsearchTemplateLite {
     public <T> T findById(Object id, Class<T> clazz) {
         GetQuery getQuery = new GetQuery();
         getQuery.setId(id.toString());
-        return this.elasticsearchTemplate.queryForObject(getQuery, clazz);
+        return this.queryForObject(getQuery, clazz);
     }
 
     /**
@@ -119,7 +117,7 @@ public class ElasticsearchTemplateLite {
     public <T> T findById(Object entity) {
         GetQuery getQuery = new GetQuery();
         getQuery.setId(this.getPersistentEntityId(entity));
-        return (T) this.elasticsearchTemplate.queryForObject(getQuery, entity.getClass());
+        return (T) this.queryForObject(getQuery, entity.getClass());
     }
 
     /**
@@ -160,7 +158,7 @@ public class ElasticsearchTemplateLite {
         // highlight
         String highlightColor = pageParamBuilder.getHighlightColor();
         if (ValidateKit.isNull(highlightColor)) {
-            return this.elasticsearchTemplate.queryForPage(searchQueryBuilder.build(), clazz);
+            return this.queryForPage(searchQueryBuilder.build(), clazz);
         }
         HighlightBuilder.Field[] highlightFields = pageParamBuilder.getHighlightFields();
         if (ValidateKit.isNull(highlightFields)) {
@@ -171,7 +169,7 @@ public class ElasticsearchTemplateLite {
         } else {
             searchQueryBuilder.withHighlightFields(highlightFields);
         }
-        return this.elasticsearchTemplate.queryForPage(searchQueryBuilder.build(), clazz, new HighlightResultMapper());
+        return this.queryForPage(searchQueryBuilder.build(), clazz, new HighlightResultMapper());
     }
 
     public static class HighlightResultMapper implements SearchResultMapper {

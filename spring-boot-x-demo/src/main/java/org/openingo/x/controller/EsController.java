@@ -9,14 +9,7 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.rest.RestStatus;
-import org.elasticsearch.search.sort.SortOrder;
-import org.openingo.jdkits.validate.ValidateKit;
-import org.openingo.spring.extension.data.elasticsearch.ElasticsearchTemplateLite;
-import org.openingo.spring.extension.data.elasticsearch.builder.PageParamBuilder;
-import org.openingo.spring.extension.data.elasticsearch.kit.KeywordKit;
-import org.openingo.x.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -120,58 +113,58 @@ public class EsController {
 
 // == template
 
-    @Autowired
-    ElasticsearchTemplateLite elasticsearchTemplateLite;
-
-    @PostMapping("/put2")
-    public String putDoc(@RequestBody User user) {
-        return elasticsearchTemplateLite.put(user);
-    }
-
-    @PostMapping("/putdoc2")
-    public String putUserDoc(@RequestBody User.UserDoc userDoc, String parentId) {
-        return elasticsearchTemplateLite.put(userDoc, parentId);
-    }
-
-    @GetMapping("/user2/{id}")
-    public User findOneById2(@PathVariable("id") Integer id) {
-        return this.elasticsearchTemplateLite.findById(id, User.class);
-    }
-
-    @GetMapping("/user2")
-    public User findOneByUser(@RequestBody User user) {
-        return this.elasticsearchTemplateLite.findById(user);
-    }
-
-    @GetMapping("/list2")
-    public Page<?> findForPage(int pageNum, int pageSize, String keywords) {
-        PageParamBuilder<User> pageParamBuilder = PageParamBuilder.<User>builder().clazz(User.class).pageable(pageNum, pageSize);
-        if (ValidateKit.isNotNull(keywords)) {
-            String keyword = KeywordKit.toKeyword(keywords);
-//            BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery().must(QueryBuilders.termQuery("name", keyword))
-//                    .should(QueryBuilders.queryStringQuery(keyword))
-//                    ;
-//            pageParamBuilder.query(queryBuilder)
-
-
-             pageParamBuilder.keyword(keywords)
-//            HasChildQueryBuilder docContent = JoinQueryBuilders.hasChildQuery("x-user-doc", QueryBuilders.matchQuery("docContent", keyword), ScoreMode.None).innerHit(new InnerHitBuilder());
-//            pageParamBuilder.query(docContent)
-//                    .highlightFields(new HighlightBuilder.Field("addr"))
-                           .highlightColor("red")
-             ;
-
-        }
-        return this.elasticsearchTemplateLite.findForPage(pageParamBuilder);
-    }
-
-    @GetMapping("/list_sort2")
-    public Page<?> findForPageByIdSort(int pageNum, int pageSize, String... keywords) {
-        PageParamBuilder<User> pageParamBuilder = PageParamBuilder.<User>builder().clazz(User.class).pageable(pageNum, pageSize).sort("id", SortOrder.DESC, "long");
-        if (ValidateKit.isNotNull(keywords)) {
-            String keyword = KeywordKit.toKeyword(keywords);
-            pageParamBuilder.keyword(keyword).highlightColor("green");
-        }
-        return this.elasticsearchTemplateLite.findForPage(pageParamBuilder);
-    }
+//    @Autowired
+//    ElasticsearchTemplateLite elasticsearchTemplateLite;
+//
+//    @PostMapping("/put2")
+//    public String putDoc(@RequestBody User user) {
+//        return elasticsearchTemplateLite.put(user);
+//    }
+//
+//    @PostMapping("/putdoc2")
+//    public String putUserDoc(@RequestBody User.UserDoc userDoc, String parentId) {
+//        return elasticsearchTemplateLite.put(userDoc, parentId);
+//    }
+//
+//    @GetMapping("/user2/{id}")
+//    public User findOneById2(@PathVariable("id") Integer id) {
+//        return this.elasticsearchTemplateLite.findById(id, User.class);
+//    }
+//
+//    @GetMapping("/user2")
+//    public User findOneByUser(@RequestBody User user) {
+//        return this.elasticsearchTemplateLite.findById(user);
+//    }
+//
+//    @GetMapping("/list2")
+//    public Page<?> findForPage(int pageNum, int pageSize, String keywords) {
+//        PageParamBuilder<User> pageParamBuilder = PageParamBuilder.<User>builder().clazz(User.class).pageable(pageNum, pageSize);
+//        if (ValidateKit.isNotNull(keywords)) {
+//            String keyword = KeywordKit.toKeyword(keywords);
+////            BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery().must(QueryBuilders.termQuery("name", keyword))
+////                    .should(QueryBuilders.queryStringQuery(keyword))
+////                    ;
+////            pageParamBuilder.query(queryBuilder)
+//
+//
+//             pageParamBuilder.keyword(keywords)
+////            HasChildQueryBuilder docContent = JoinQueryBuilders.hasChildQuery("x-user-doc", QueryBuilders.matchQuery("docContent", keyword), ScoreMode.None).innerHit(new InnerHitBuilder());
+////            pageParamBuilder.query(docContent)
+////                    .highlightFields(new HighlightBuilder.Field("addr"))
+//                           .highlightColor("red")
+//             ;
+//
+//        }
+//        return this.elasticsearchTemplateLite.findForPage(pageParamBuilder);
+//    }
+//
+//    @GetMapping("/list_sort2")
+//    public Page<?> findForPageByIdSort(int pageNum, int pageSize, String... keywords) {
+//        PageParamBuilder<User> pageParamBuilder = PageParamBuilder.<User>builder().clazz(User.class).pageable(pageNum, pageSize).sort("id", SortOrder.DESC, "long");
+//        if (ValidateKit.isNotNull(keywords)) {
+//            String keyword = KeywordKit.toKeyword(keywords);
+//            pageParamBuilder.keyword(keyword).highlightColor("green");
+//        }
+//        return this.elasticsearchTemplateLite.findForPage(pageParamBuilder);
+//    }
 }
