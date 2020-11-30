@@ -6,13 +6,24 @@ import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.text.Text;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.rest.RestStatus;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,11 +52,6 @@ public class EsController {
         return response.getId();
     }
 
-//    @PostMapping("/putdoc")
-//    public String putUserDoc(@RequestBody User.UserDoc userDoc, String parentId) {
-//        return elasticsearchTemplateLite.put(userDoc, parentId);
-//    }
-//
     @GetMapping("/user/{id}")
     public Map findOneById(@PathVariable("id") Integer id) {
         GetRequest getRequest = new GetRequest("qicz").type("abc").id(id.toString());
@@ -73,6 +79,59 @@ public class EsController {
         assert response != null;
         return response.status();
     }
+
+    @GetMapping("/user/find")
+    public Object find(String q) {
+        SearchRequest searchRequest = new SearchRequest("qicz");
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder.should(QueryBuilders.queryStringQuery(q));
+        sourceBuilder.query(boolQueryBuilder);
+
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        highlightBuilder.requireFieldMatch(true); //如果该属性中有多个关键字 则都高亮
+        highlightBuilder.field("name");
+        highlightBuilder.field("addr");
+        highlightBuilder.field("userDoc.docContent");
+        highlightBuilder.preTags("<span style='color:red'>");
+        highlightBuilder.postTags("</span>");
+
+        sourceBuilder.highlighter(highlightBuilder);
+        searchRequest.source(sourceBuilder);
+        try {
+            SearchResponse response = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+            SearchHit[] hits = response.getHits().getHits();
+            List<Object> ret = new ArrayList<>();
+            for (SearchHit hit : hits) {
+                Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+                Map<String, Object> sourceAsMap = hit.getSourceAsMap();
+                highlightFields.keySet().forEach(key -> {
+                    HighlightField highlightField = highlightFields.get(key);
+                    StringBuilder newData = new StringBuilder();
+                    if (highlightField != null){
+                        Text[] fragments = highlightField.getFragments();
+                        for (Text fragment : fragments) {
+                            newData.append(fragment.toString());
+                        }
+                    }
+                    sourceAsMap.put(key, newData.toString());
+                });
+                ret.add(sourceAsMap);
+            }
+            return ret;
+//            SearchHits hits = response.getHits();
+//            List<Object> ret = new ArrayList<>();
+//            for (SearchHit hit : hits) {
+//                ret.add(hit.getSourceAsMap());
+//            }
+//            return ret;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 //
 //    @GetMapping("/user")
 //    public User findOneByUser(@RequestBody User user) {
