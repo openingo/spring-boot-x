@@ -155,6 +155,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- datasource pool -->
         <dependency>
             <groupId>com.alibaba</groupId>

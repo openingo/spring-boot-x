@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
 
 /**
  * ElasticsearchConfig
@@ -22,17 +21,9 @@ import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverte
 @AutoConfigureAfter(ElasticsearchAutoConfiguration.class)
 public class ElasticsearchConfig {
 
-    /**
-     * @return the default elasticsearch template lite
-     */
     @Bean
     @ConditionalOnMissingBean(name = "elasticsearchTemplateLite")
-    public ElasticsearchTemplateLite elasticsearchTemplateLite(Client elasticsearchClient, ElasticsearchConverter converter) {
-        try {
-            return new ElasticsearchTemplateLite(elasticsearchClient, converter);
-        }
-        catch (Exception ex) {
-            throw new IllegalStateException(ex);
-        }
+    public ElasticsearchTemplateLite elasticsearchTemplateLite() {
+        return new ElasticsearchTemplateLite();
     }
 }

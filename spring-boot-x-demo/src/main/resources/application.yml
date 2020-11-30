@@ -26,10 +26,14 @@ spring:
     lettuce:
       pool:
         max-active: 1000
+  elasticsearch:
+    rest:
+      uris: http://172.15.33.36:9200
   data:
     elasticsearch:
       cluster-name: elasticsearch
-      cluster-nodes: localhost:9300
+      cluster-nodes: 172.15.33.36:9300
 #    host: localhost
 server:
   port: 18080
+
