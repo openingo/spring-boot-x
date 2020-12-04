@@ -259,6 +259,10 @@ public class RestHighLevelClientX extends RestHighLevelClient {
             if (highlight) {
                 Map<String, HighlightField> highlightFields = hit.getHighlightFields();
                 highlightFields.keySet().forEach(key -> {
+                    Object val = sourceAsMap.get(key);
+                    if (!(val instanceof String)) {
+                        return;// = continue;
+                    }
                     StringBuilder newData = new StringBuilder();
                     HighlightField highlightField = highlightFields.get(key);
                     if (ValidateKit.isNotNull(highlightField)) {
@@ -267,7 +271,7 @@ public class RestHighLevelClientX extends RestHighLevelClient {
                             newData.append(fragment.toString());
                         }
                     } else {
-                        newData.append(sourceAsMap.get(key).toString());
+                        newData.append(val.toString());
                     }
                     sourceAsMap.put(key, newData.toString());
                 });
