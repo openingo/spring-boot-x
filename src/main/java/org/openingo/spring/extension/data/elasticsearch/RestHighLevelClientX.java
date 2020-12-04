@@ -45,7 +45,6 @@ import java.util.Map;
 @Slf4j
 public class RestHighLevelClientX extends RestHighLevelClient {
 
-
     private static final String ASYNC = "async";
 
     private static final String SYNC = "sync";
@@ -190,19 +189,30 @@ public class RestHighLevelClientX extends RestHighLevelClient {
         return ret[0];
     }
 
-    public <T> Page<T> searchForPage(Class<T> clazz, String index, SearchSourceBuilder sourceBuilder, int pageNumber, int pageSize) throws IOException {
-        Assert.notNull(sourceBuilder, "the sourceBuilder cannot be null");
-        if (--pageNumber <= 0) {
+    /**
+     * search for page, automatic highlight the result ref the searchSourceBuilder.
+     * @param clazz result class
+     * @param index es doc index
+     * @param searchSourceBuilder search source parameter
+     * @param pageNumber page number
+     * @param pageSize result size per page
+     * @param <T>
+     * @return paged result data
+     * @throws IOException
+     */
+    public <T> Page<T> searchForPage(Class<T> clazz, String index, SearchSourceBuilder searchSourceBuilder, int pageNumber, int pageSize) throws IOException {
+        Assert.notNull(searchSourceBuilder, "the searchSourceBuilder cannot be null");
+        if (pageNumber <= 0) {
             pageNumber = 0;
         }
         if (pageSize <= 0) {
             pageSize = 10;
         }
         SearchRequest searchRequest = new SearchRequest(index);
-        searchRequest.source(sourceBuilder);
+        searchRequest.source(searchSourceBuilder);
         PageRequest pageable = PageRequest.of(pageNumber, pageSize);
         SearchResponse response = this.search(searchRequest, RequestOptions.DEFAULT);
-        AggregatedPageImpl<T> aggregatedPage = this.pagination(clazz, response, pageable);
+        AggregatedPageImpl<T> aggregatedPage = this.pagination(clazz, ValidateKit.isNotNull(searchSourceBuilder.highlighter()), response, pageable);
         if (ValidateKit.isNull(aggregatedPage)) {
             aggregatedPage = new AggregatedPageImpl<>(ListKit.emptyList(), pageable, 0);
         }
@@ -215,12 +225,12 @@ public class RestHighLevelClientX extends RestHighLevelClient {
      * @param pageable pagination parameters
      * @throws IOException
      */
-    private <T> AggregatedPageImpl<T> pagination(Class<T> clazz, SearchResponse response, PageRequest pageable) throws IOException {
+    private <T> AggregatedPageImpl<T> pagination(Class<T> clazz, boolean highlight, SearchResponse response, PageRequest pageable) throws IOException {
         AggregatedPageImpl<T> aggregatedPage = null;
         if (ValidateKit.isNotNull(response) && RestStatus.OK.equals(response.status())) {
             List<T> searchRet = ListKit.emptyArrayList();
            SearchHits responseHits = response.getHits();
-            if (this.highlightPageData(clazz, searchRet, responseHits)) {
+            if (this.highlightPageData(clazz, highlight, searchRet, responseHits)) {
                 long total = 0;
                 TotalHits totalHits = responseHits.getTotalHits();
                 if (ValidateKit.isNotNull(totalHits)) {
@@ -238,26 +248,28 @@ public class RestHighLevelClientX extends RestHighLevelClient {
      * @param responseHits resp hits
      * @throws JsonProcessingException
      */
-    private <T> boolean highlightPageData(Class<T> clazz, List<T> searchRet, SearchHits responseHits) throws JsonProcessingException {
+    private <T> boolean highlightPageData(Class<T> clazz, boolean highlight, List<T> searchRet, SearchHits responseHits) throws JsonProcessingException {
         SearchHit[] hits = responseHits.getHits();
         if (ValidateKit.isEmpty(hits)) {
             return false;
         }
         List<Map<String, Object>> tmpRet = ListKit.emptyArrayList();
         for (SearchHit hit : hits) {
-            Map<String, HighlightField> highlightFields = hit.getHighlightFields();
             Map<String, Object> sourceAsMap = hit.getSourceAsMap();
-            highlightFields.keySet().forEach(key -> {
-                HighlightField highlightField = highlightFields.get(key);
-                StringBuilder newData = new StringBuilder();
-                if (ValidateKit.isNotNull(highlightField)){
-                    Text[] fragments = highlightField.getFragments();
-                    for (Text fragment : fragments) {
-                        newData.append(fragment.toString());
+            if (highlight) {
+                Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+                highlightFields.keySet().forEach(key -> {
+                    HighlightField highlightField = highlightFields.get(key);
+                    StringBuilder newData = new StringBuilder();
+                    if (ValidateKit.isNotNull(highlightField)) {
+                        Text[] fragments = highlightField.getFragments();
+                        for (Text fragment : fragments) {
+                            newData.append(fragment.toString());
+                        }
                     }
-                }
-                sourceAsMap.put(key, newData.toString());
-            });
+                    sourceAsMap.put(key, newData.toString());
+                });
+            }
             tmpRet.add(sourceAsMap);
         }
         searchRet.addAll(JacksonKit.toList(JacksonKit.toJson(tmpRet), clazz));
