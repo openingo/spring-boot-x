@@ -1,5 +1,6 @@
 package org.openingo.x.controller;
 
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetRequest;
@@ -15,10 +16,14 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.elasticsearch.core.aggregation.impl.AggregatedPageImpl;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -81,27 +86,33 @@ public class EsController {
     }
 
     @GetMapping("/user/find")
-    public Object find(String q) {
-        SearchRequest searchRequest = new SearchRequest("qicz");
+    public Page<?> find(String q) {
+        SearchRequest searchRequest = new SearchRequest("lc_smart_so_doc_index");
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        //q = "q+-&&||!(){}[]^\"~*?:\\";
+        q = QueryParser.escape(q);
         boolQueryBuilder.should(QueryBuilders.queryStringQuery(q));
         sourceBuilder.query(boolQueryBuilder);
 
         HighlightBuilder highlightBuilder = new HighlightBuilder();
         highlightBuilder.requireFieldMatch(true); //如果该属性中有多个关键字 则都高亮
-        highlightBuilder.field("name");
-        highlightBuilder.field("addr");
-        highlightBuilder.field("userDoc.docContent");
+        highlightBuilder.field("docType");
+        highlightBuilder.field("docTitle");
+        highlightBuilder.field("docContent");
         highlightBuilder.preTags("<span style='color:red'>");
         highlightBuilder.postTags("</span>");
 
+        sourceBuilder.from(1);
+        sourceBuilder.size(10);
+        PageRequest pageable = PageRequest.of(sourceBuilder.from(), sourceBuilder.size());
         sourceBuilder.highlighter(highlightBuilder);
         searchRequest.source(sourceBuilder);
         try {
             SearchResponse response = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-            SearchHit[] hits = response.getHits().getHits();
+            SearchHits responseHits = response.getHits();
+            SearchHit[] hits = responseHits.getHits();
             List<Object> ret = new ArrayList<>();
             for (SearchHit hit : hits) {
                 Map<String, HighlightField> highlightFields = hit.getHighlightFields();
@@ -119,7 +130,8 @@ public class EsController {
                 });
                 ret.add(sourceAsMap);
             }
-            return ret;
+            return new AggregatedPageImpl<>(ret, pageable, responseHits.totalHits);
+            //return ret;
 //            SearchHits hits = response.getHits();
 //            List<Object> ret = new ArrayList<>();
 //            for (SearchHit hit : hits) {

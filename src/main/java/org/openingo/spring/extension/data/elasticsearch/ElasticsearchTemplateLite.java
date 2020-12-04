@@ -1,6 +1,7 @@
 package org.openingo.spring.extension.data.elasticsearch;
 
 import lombok.SneakyThrows;
+import org.apache.lucene.search.TotalHits;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -176,7 +177,7 @@ public class ElasticsearchTemplateLite extends ElasticsearchTemplate {
         @SneakyThrows
         @Override
         public <T> AggregatedPage<T> mapResults(SearchResponse searchResponse, Class<T> clazz, Pageable pageable) {
-            long totalHits = searchResponse.getHits().getTotalHits();
+            TotalHits totalHits = searchResponse.getHits().getTotalHits();
             List<T> list = new ArrayList<>();
             SearchHits hits = searchResponse.getHits();
             if (hits.getHits().length > 0) {
@@ -198,7 +199,12 @@ public class ElasticsearchTemplateLite extends ElasticsearchTemplate {
                     list.add(item);
                 }
             }
-            return new AggregatedPageImpl<>(list, pageable, totalHits);
+
+            long total = 0;
+            if (ValidateKit.isNotNull(totalHits)) {
+                total = totalHits.value;
+            }
+            return new AggregatedPageImpl<>(list, pageable, total);
         }
     }
 }

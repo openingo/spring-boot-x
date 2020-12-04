@@ -15,14 +15,14 @@ import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
 
 /**
- * ElasticsearchConfig
+ * ElasticsearchTemplateConfig
  *
  * @author Qicz
  */
 @Configuration
 @ConditionalOnClass({Client.class, ElasticsearchTemplate.class, ElasticsearchOperations.class})
 @AutoConfigureAfter(ElasticsearchAutoConfiguration.class)
-public class ElasticsearchConfig {
+public class ElasticsearchTemplateConfig {
 
     /**
      * @return the default elasticsearch template lite
