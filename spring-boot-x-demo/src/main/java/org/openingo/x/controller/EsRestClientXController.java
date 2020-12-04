@@ -64,7 +64,7 @@ public class EsRestClientXController {
         deleteRequest.id(id.toString());
         DeleteResponse response = null;
         try {
-            response = this.restHighLevelClientX.restClient().delete(deleteRequest, RequestOptions.DEFAULT);
+            response = this.restHighLevelClientX.client().delete(deleteRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             e.printStackTrace();
         }

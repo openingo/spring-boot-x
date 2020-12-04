@@ -59,7 +59,7 @@ public class RestHighLevelClientX {
         this.restHighLevelClient = restHighLevelClient;
     }
 
-    public RestHighLevelClient restClient() {
+    public RestHighLevelClient client() {
         return restHighLevelClient;
     }
 
