@@ -7,14 +7,14 @@ import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.WriteRequest;
 import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -26,6 +26,7 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.openingo.java.lang.ThreadLocalX;
 import org.openingo.jdkits.collection.ListKit;
 import org.openingo.jdkits.json.JacksonKit;
+import org.openingo.jdkits.reflect.ClassKit;
 import org.openingo.jdkits.validate.ValidateKit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +35,7 @@ import org.springframework.util.Assert;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +45,7 @@ import java.util.Map;
  * @author Qicz
  */
 @Slf4j
-public class RestHighLevelClientX extends RestHighLevelClient {
+public class RestHighLevelClientX {
 
     private static final String ASYNC = "async";
 
@@ -51,12 +53,14 @@ public class RestHighLevelClientX extends RestHighLevelClient {
 
     private static final ThreadLocalX<String> PROCESSING_WAY_HOLDER = new ThreadLocalX<>();
 
-    /**
-     * Creates a {@link RestHighLevelClient} given the low level {@link RestClientBuilder} that allows to build the
-     * {@link RestClient} to be used to perform requests.
-     */
-    public RestHighLevelClientX(RestClientBuilder restClientBuilder) {
-        super(restClientBuilder);
+    private RestHighLevelClient restHighLevelClient;
+
+    public RestHighLevelClientX(RestHighLevelClient restHighLevelClient) {
+        this.restHighLevelClient = restHighLevelClient;
+    }
+
+    public RestHighLevelClient restClient() {
+        return restHighLevelClient;
     }
 
     /**
@@ -106,28 +110,26 @@ public class RestHighLevelClientX extends RestHighLevelClient {
     }
 
     public boolean putDoc(String index, String docId, String source, XContentType xContentType, WriteRequest.RefreshPolicy refreshPolicy) throws IOException {
-        IndexRequest indexRequest = new IndexRequest(index);
-        indexRequest.id(docId);
+        IndexRequest indexRequest = new IndexRequest(index).id(docId).source(source, xContentType);
         indexRequest.setRefreshPolicy(refreshPolicy);
-        indexRequest.source(source, xContentType);
-        return this.putDocByIndexRequest(indexRequest);
+        return this.putDoc(indexRequest);
     }
 
-    public boolean putDocByIndexRequest(IndexRequest indexRequest) throws IOException {
-        return this.putDocByIndexRequest(indexRequest, RequestOptions.DEFAULT);
+    public boolean putDoc(IndexRequest indexRequest) throws IOException {
+        return this.putDoc(indexRequest, RequestOptions.DEFAULT);
     }
 
-    public boolean putDocByIndexRequest(IndexRequest indexRequest, RequestOptions options) throws IOException {
+    public boolean putDoc(IndexRequest indexRequest, RequestOptions options) throws IOException {
         String holder = this.getHolder();
         final boolean[] ret = {true};
         switch (holder) {
             case SYNC: {
-                IndexResponse response = this.index(indexRequest, options);
+                IndexResponse response = this.restHighLevelClient.index(indexRequest, options);
                 ret[0] = ValidateKit.isNotNull(response) && RestStatus.CREATED.equals(response.status());
             }
             break;
             case ASYNC: {
-                this.indexAsync(indexRequest, options, new ActionListener<IndexResponse>() {
+                this.restHighLevelClient.indexAsync(indexRequest, options, new ActionListener<IndexResponse>() {
                     @Override
                     public void onResponse(IndexResponse indexResponse) {
                         ret[0] = ValidateKit.isNotNull(indexResponse) && RestStatus.CREATED.equals(indexResponse.status());
@@ -167,12 +169,12 @@ public class RestHighLevelClientX extends RestHighLevelClient {
         final boolean[] ret = {true};
         switch (holder) {
             case SYNC: {
-                BulkResponse bulkResponse = this.bulk(bulkRequest, RequestOptions.DEFAULT);
+                BulkResponse bulkResponse = this.restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
                 ret[0] = ValidateKit.isNotNull(bulkResponse) && RestStatus.OK.equals(bulkResponse.status());
             }
                 break;
             case ASYNC: {
-                this.bulkAsync(bulkRequest, RequestOptions.DEFAULT, new ActionListener<BulkResponse>() {
+                this.restHighLevelClient.bulkAsync(bulkRequest, RequestOptions.DEFAULT, new ActionListener<BulkResponse>() {
                     @Override
                     public void onResponse(BulkResponse bulkItemResponses) {
                         ret[0] = ValidateKit.isNotNull(bulkItemResponses) && RestStatus.OK.equals(bulkItemResponses.status());
@@ -187,6 +189,51 @@ public class RestHighLevelClientX extends RestHighLevelClient {
                 break;
         }
         return ret[0];
+    }
+
+    private GetResponse findOneAsResponse(String index, String docId) throws IOException {
+        GetRequest getRequest = new GetRequest(index).id(docId);
+        String holder = this.getHolder();
+        final GetResponse[] documentFields = {null};
+        switch (holder) {
+            case SYNC: {
+                documentFields[0] = this.restHighLevelClient.get(getRequest, RequestOptions.DEFAULT);
+
+            }
+            break;
+            case ASYNC: {
+                this.restHighLevelClient.getAsync(getRequest, RequestOptions.DEFAULT, new ActionListener<GetResponse>() {
+                    @Override
+                    public void onResponse(GetResponse asyncDocumentFields) {
+                        documentFields[0] = asyncDocumentFields;
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        log.info("async get failure => \"{}\"", e.getLocalizedMessage());
+                    }
+                });
+            }
+        }
+        return documentFields[0];
+    }
+
+    public Map<String, Object> findOneAsMapById(String index, String docId) throws IOException {
+        GetResponse documentFields = this.findOneAsResponse(index, docId);
+        if (ValidateKit.isNull(documentFields)) {
+            return new HashMap<>();
+        }
+        return documentFields.getSourceAsMap();
+    }
+
+    public <T> T findOneById(Class<T> clazz, String index, String docId) throws IOException {
+        GetResponse documentFields = this.findOneAsResponse(index, docId);
+        if (ValidateKit.isNull(documentFields)) {
+            return ClassKit.newInstance(clazz);
+        }
+        // json string
+        String sourceAsString = documentFields.getSourceAsString();
+        return JacksonKit.toObj(sourceAsString, clazz);
     }
 
     /**
@@ -211,7 +258,7 @@ public class RestHighLevelClientX extends RestHighLevelClient {
         SearchRequest searchRequest = new SearchRequest(index);
         searchRequest.source(searchSourceBuilder);
         PageRequest pageable = PageRequest.of(pageNumber, pageSize);
-        SearchResponse response = this.search(searchRequest, RequestOptions.DEFAULT);
+        SearchResponse response = this.restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
         AggregatedPageImpl<T> aggregatedPage = this.pagination(clazz, ValidateKit.isNotNull(searchSourceBuilder.highlighter()), response, pageable);
         if (ValidateKit.isNull(aggregatedPage)) {
             aggregatedPage = new AggregatedPageImpl<>(ListKit.emptyList(), pageable, 0);

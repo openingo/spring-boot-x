@@ -130,7 +130,7 @@ public class EsController {
                 });
                 ret.add(sourceAsMap);
             }
-            return new AggregatedPageImpl<>(ret, pageable, responseHits.totalHits);
+            return new AggregatedPageImpl<>(ret, pageable, responseHits.getTotalHits().value);
             //return ret;
 //            SearchHits hits = response.getHits();
 //            List<Object> ret = new ArrayList<>();
