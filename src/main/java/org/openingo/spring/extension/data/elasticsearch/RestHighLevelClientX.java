@@ -28,7 +28,6 @@ import org.openingo.jdkits.collection.ListKit;
 import org.openingo.jdkits.json.JacksonKit;
 import org.openingo.jdkits.reflect.ClassKit;
 import org.openingo.jdkits.validate.ValidateKit;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.aggregation.impl.AggregatedPageImpl;
 import org.springframework.util.Assert;
@@ -247,7 +246,7 @@ public class RestHighLevelClientX {
      * @return paged result data
      * @throws IOException
      */
-    public <T> Page<T> searchForPage(Class<T> clazz, String index, SearchSourceBuilder searchSourceBuilder, int pageNumber, int pageSize) throws IOException {
+    public <T> AggregatedPageImpl<T> searchForPage(Class<T> clazz, String index, SearchSourceBuilder searchSourceBuilder, int pageNumber, int pageSize) throws IOException {
         Assert.notNull(searchSourceBuilder, "the searchSourceBuilder cannot be null");
         if (pageNumber <= 0) {
             pageNumber = 0;
