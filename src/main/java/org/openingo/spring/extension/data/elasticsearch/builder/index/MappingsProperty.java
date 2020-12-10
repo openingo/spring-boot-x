@@ -44,6 +44,10 @@ public final class MappingsProperty extends HashMap<String, Object> {
         return new MappingsProperty();
     }
 
+    public static MappingsProperty me(String name) {
+        return new MappingsProperty().name(name);
+    }
+
     public MappingsProperty name(String name) {
         this.name = name;
         return this;
