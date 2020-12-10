@@ -40,6 +40,8 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.openingo.jdkits.json.JacksonKit;
 import org.openingo.spring.extension.data.elasticsearch.RestHighLevelClientX;
+import org.openingo.spring.extension.data.elasticsearch.builder.index.MappingsProperties;
+import org.openingo.spring.extension.data.elasticsearch.builder.index.MappingsProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -53,11 +55,24 @@ import java.util.Map;
  * @author zhucongqi
  */
 @RestController
-@RequestMapping("/es")
+@RequestMapping("/esx")
 public class EsRestClientXController {
 
     @Autowired
     RestHighLevelClientX restHighLevelClientX;
+
+    @GetMapping("/add")
+    public String addIndex() {
+        try {
+            MappingsProperties mappingsProperties = MappingsProperties.me();
+            mappingsProperties.add("id", MappingsProperty.me().type("text"));
+            mappingsProperties.add("name", MappingsProperty.me().type("text").analyzer("ik_smart"));
+            restHighLevelClientX.createIndex("aaabc", null, mappingsProperties);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "ok";
+    }
 
     @PostMapping("/put")
     public String putDoc(@RequestBody Map user) {
@@ -66,7 +81,7 @@ public class EsRestClientXController {
         indexRequest.id("123");
         try {
             indexRequest.source(JacksonKit.toJson(user), XContentType.JSON);
-            ret = this.restHighLevelClientX.putDoc(indexRequest, RequestOptions.DEFAULT);
+            ret = this.restHighLevelClientX.saveOrUpdate(indexRequest);
         } catch (IOException e) {
             e.printStackTrace();
         }

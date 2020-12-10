@@ -78,4 +78,32 @@ public class LocalDemo {
         }
     }
 
+
+    @Test
+    public void testPJson() {
+        String CREATE_INDEX = "{\n" +
+                "    \"properties\": {\n" +
+                "      \"id\":{\n" +
+                "        \"type\":\"integer\"\n" +
+                "      },\n" +
+                "      \"userId\":{\n" +
+                "        \"type\":\"integer\"\n" +
+                "      },\n" +
+                "      \"name\":{\n" +
+                "        \"type\":\"text\",\n" +
+                "        \"analyzer\": \"ik_max_word\",\n" +
+                "        \"search_analyzer\": \"ik_smart\"\n" +
+                "      },\n" +
+                "      \"url\":{\n" +
+                "        \"type\":\"text\",\n" +
+                "        \"index\": true,\n" +
+                "        \"analyzer\": \"ik_max_word\",\n" +
+                "        \"search_analyzer\": \"ik_smart\"\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }";
+
+        System.out.println(CREATE_INDEX);
+    }
+
 }

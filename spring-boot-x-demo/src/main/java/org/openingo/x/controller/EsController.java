@@ -112,7 +112,7 @@ public class EsController {
         return response.status();
     }
 
-    @GetMapping("/user/find")
+    @GetMapping("/user/finda")
     public Page<?> find(String q) {
         SearchRequest searchRequest = new SearchRequest("lc_smart_so_doc_index");
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();

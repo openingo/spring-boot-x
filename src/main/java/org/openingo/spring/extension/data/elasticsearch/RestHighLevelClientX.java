@@ -37,12 +37,15 @@ import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.WriteRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.client.indices.CreateIndexResponse;
+import org.elasticsearch.client.indices.GetIndexRequest;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.rest.RestStatus;
@@ -55,6 +58,8 @@ import org.openingo.jdkits.collection.ListKit;
 import org.openingo.jdkits.json.JacksonKit;
 import org.openingo.jdkits.reflect.ClassKit;
 import org.openingo.jdkits.validate.ValidateKit;
+import org.openingo.spring.extension.data.elasticsearch.builder.DocBuilder;
+import org.openingo.spring.extension.data.elasticsearch.builder.index.MappingsProperties;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.aggregation.impl.AggregatedPageImpl;
 import org.springframework.util.Assert;
@@ -113,63 +118,90 @@ public class RestHighLevelClientX {
         return holder;
     }
 
-    public boolean putMapDoc(String index, String docId, Map<String, Object> map) throws IOException {
-        return this.putMapDoc(index, docId, map, WriteRequest.RefreshPolicy.NONE);
-    }
-
-    public boolean putMapDoc(String index, String docId, Map<String, Object> map, WriteRequest.RefreshPolicy refreshPolicy) throws IOException {
-        Assert.notNull(map, "the map can not be null");
-        String json = JacksonKit.toJson(map);
-        return this.putDoc(index, docId, json, XContentType.JSON, refreshPolicy);
-    }
-
-    public boolean putJsonDoc(String index, String docId, String json) throws IOException {
-        return this.putDoc(index, docId, json, XContentType.JSON, WriteRequest.RefreshPolicy.NONE);
-    }
-
-    public boolean putJsonDoc(String index, String docId, String json, WriteRequest.RefreshPolicy refreshPolicy) throws IOException {
-        return this.putDoc(index, docId, json, XContentType.JSON, refreshPolicy);
-    }
-
-    public boolean putDoc(String index, String docId, String source, XContentType xContentType) throws IOException {
-        return this.putDoc(index, docId, source, xContentType, WriteRequest.RefreshPolicy.NONE);
-    }
-
-    public boolean putDoc(String index, String docId, String source, XContentType xContentType, WriteRequest.RefreshPolicy refreshPolicy) throws IOException {
-        IndexRequest indexRequest = new IndexRequest(index).id(docId).source(source, xContentType);
-        indexRequest.setRefreshPolicy(refreshPolicy);
-        return this.putDoc(indexRequest);
-    }
-
-    public boolean putDoc(IndexRequest indexRequest) throws IOException {
-        return this.putDoc(indexRequest, RequestOptions.DEFAULT);
-    }
-
-    public boolean putDoc(IndexRequest indexRequest, RequestOptions options) throws IOException {
-        String holder = this.getHolder();
-        final boolean[] ret = {true};
-        switch (holder) {
-            case SYNC: {
-                IndexResponse response = this.restHighLevelClient.index(indexRequest, options);
-                ret[0] = ValidateKit.isNotNull(response) && RestStatus.CREATED.equals(response.status());
-            }
-            break;
-            case ASYNC: {
-                this.restHighLevelClient.indexAsync(indexRequest, options, new ActionListener<IndexResponse>() {
-                    @Override
-                    public void onResponse(IndexResponse indexResponse) {
-                        ret[0] = ValidateKit.isNotNull(indexResponse) && RestStatus.CREATED.equals(indexResponse.status());
-                    }
-
-                    @Override
-                    public void onFailure(Exception e) {
-                        ret[0] = false;
-                    }
-                });
-            }
-            break;
+    public boolean createIndex(String index, Settings settings, MappingsProperties mappingsProperties) throws IOException {
+        boolean exists = this.restHighLevelClient.indices().exists(new GetIndexRequest(index), RequestOptions.DEFAULT);
+        if (exists) {
+            log.debug("index {} is exist!", index);
+            return true;
         }
-        return ret[0];
+        CreateIndexRequest createIndexRequest = new CreateIndexRequest(index);
+        if (ValidateKit.isNotNull(settings)) {
+            createIndexRequest.settings(settings);
+        }
+        if (ValidateKit.isNotNull(mappingsProperties)) {
+            createIndexRequest.mapping(mappingsProperties.toJson(), XContentType.JSON);
+        }
+        CreateIndexResponse createIndexResponse = this.restHighLevelClient.indices().create(createIndexRequest, RequestOptions.DEFAULT);
+        return ValidateKit.isNotNull(createIndexResponse) && createIndexResponse.isAcknowledged();
+    }
+
+    public boolean saveOrUpdate(String index, String docId, Map<String, Object> map) throws IOException {
+        return this.saveOrUpdate(index, docId, map, WriteRequest.RefreshPolicy.NONE);
+    }
+
+    public boolean saveOrUpdate(String index, String docId, Map<String, Object> map, WriteRequest.RefreshPolicy refreshPolicy) throws IOException {
+        Assert.notNull(map, "the map must not be null!");
+        String json = JacksonKit.toJson(map);
+        return this.saveOrUpdate(index, docId, json, XContentType.JSON, refreshPolicy);
+    }
+
+    public boolean saveOrUpdate(String index, String docId, String json) throws IOException {
+        return this.saveOrUpdate(index, docId, json, XContentType.JSON, WriteRequest.RefreshPolicy.NONE);
+    }
+
+    public boolean saveOrUpdate(String index, String docId, String json, WriteRequest.RefreshPolicy refreshPolicy) throws IOException {
+        return this.saveOrUpdate(index, docId, json, XContentType.JSON, refreshPolicy);
+    }
+
+    public boolean saveOrUpdate(String index, String docId, String source, XContentType xContentType) throws IOException {
+        return this.saveOrUpdate(index, docId, source, xContentType, WriteRequest.RefreshPolicy.NONE);
+    }
+
+    public boolean saveOrUpdate(String index, String docId, String source, XContentType xContentType, WriteRequest.RefreshPolicy refreshPolicy) throws IOException {
+        IndexRequest indexRequest = new IndexRequest(index).id(docId).source(source, xContentType);
+        if (ValidateKit.isNotNull(refreshPolicy)) {
+            indexRequest.setRefreshPolicy(refreshPolicy);
+        }
+        return this.saveOrUpdate(indexRequest);
+    }
+
+    public boolean saveOrUpdate(IndexRequest indexRequest) throws IOException {
+        return this.saveOrUpdateDocs(Collections.singletonList(indexRequest), indexRequest.getRefreshPolicy());
+    }
+
+    public boolean saveOrUpdateDocs(List<IndexRequest> indexRequests) throws IOException {
+        Assert.notNull(indexRequests, "the indexRequests must not be null!");
+        return this.saveOrUpdateDocs(indexRequests, WriteRequest.RefreshPolicy.NONE);
+    }
+
+    public boolean saveOrUpdateDocs(List<IndexRequest> indexRequests, WriteRequest.RefreshPolicy refreshPolicy) throws IOException {
+        return this.saveOrUpdateDocs(indexRequests, refreshPolicy, RequestOptions.DEFAULT);
+    }
+
+    public boolean saveOrUpdateDocs(List<IndexRequest> indexRequests, WriteRequest.RefreshPolicy refreshPolicy, RequestOptions options) throws IOException {
+        BulkRequest bulkRequest = new BulkRequest();
+        if (ValidateKit.isNotNull(refreshPolicy)) {
+            bulkRequest.setRefreshPolicy(refreshPolicy);
+        }
+        indexRequests.forEach(bulkRequest::add);
+        return this.bulkRequest(bulkRequest, options);
+    }
+
+    public boolean saveOrUpdateByDocBuilders(List<DocBuilder> builders) throws IOException {
+        return this.saveOrUpdateByDocBuilders(builders, WriteRequest.RefreshPolicy.NONE, RequestOptions.DEFAULT);
+    }
+
+    public boolean saveOrUpdateByDocBuilders(List<DocBuilder> builders, WriteRequest.RefreshPolicy refreshPolicy, RequestOptions options) throws IOException {
+        Assert.notNull(builders, "the builders must not be null!");
+        BulkRequest bulkRequest = new BulkRequest();
+        for (DocBuilder docBuilder : builders) {
+            IndexRequest indexRequest = new IndexRequest(docBuilder.getDocIndex()).id(docBuilder.getDocId()).source(docBuilder.getDocSource(), XContentType.JSON);
+            bulkRequest.add(indexRequest);
+        }
+        if (ValidateKit.isNotNull(refreshPolicy)) {
+            bulkRequest.setRefreshPolicy(refreshPolicy);
+        }
+        return this.bulkRequest(bulkRequest, options);
     }
 
     public boolean deleteByDocId(String index, String docId) throws IOException {
@@ -185,20 +217,25 @@ public class RestHighLevelClientX {
     }
 
     public boolean deleteByDocIds(String index, List<String> docIds, WriteRequest.RefreshPolicy refreshPolicy) throws IOException {
-        String holder = this.getHolder();
+        return this.deleteByDocIds(index, docIds, refreshPolicy, RequestOptions.DEFAULT);
+    }
+
+    public boolean deleteByDocIds(String index, List<String> docIds, WriteRequest.RefreshPolicy refreshPolicy, RequestOptions options) throws IOException {
         BulkRequest bulkRequest = new BulkRequest();
-        docIds.forEach(docId -> {
-            DeleteRequest deleteRequest = new DeleteRequest(index, docId);
-            bulkRequest.add(deleteRequest);
-        });
+        docIds.forEach(docId -> bulkRequest.add(new DeleteRequest(index, docId)));
         bulkRequest.setRefreshPolicy(refreshPolicy);
+        return this.bulkRequest(bulkRequest, options);
+    }
+
+    private boolean bulkRequest(BulkRequest bulkRequest, RequestOptions options) throws IOException {
+        String holder = this.getHolder();
         final boolean[] ret = {true};
         switch (holder) {
             case SYNC: {
                 BulkResponse bulkResponse = this.restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
                 ret[0] = ValidateKit.isNotNull(bulkResponse) && RestStatus.OK.equals(bulkResponse.status());
             }
-                break;
+            break;
             case ASYNC: {
                 this.restHighLevelClient.bulkAsync(bulkRequest, RequestOptions.DEFAULT, new ActionListener<BulkResponse>() {
                     @Override
@@ -208,11 +245,12 @@ public class RestHighLevelClientX {
 
                     @Override
                     public void onFailure(Exception e) {
+                        log.error("the bulk request error \"{}\"", e.getLocalizedMessage());
                         ret[0] = false;
                     }
                 });
             }
-                break;
+            break;
         }
         return ret[0];
     }
@@ -236,7 +274,7 @@ public class RestHighLevelClientX {
 
                     @Override
                     public void onFailure(Exception e) {
-                        log.info("async get failure => \"{}\"", e.getLocalizedMessage());
+                        log.error("the async get failure => \"{}\"", e.getLocalizedMessage());
                     }
                 });
             }
@@ -312,7 +350,7 @@ public class RestHighLevelClientX {
                 aggregatedPage = new AggregatedPageImpl<>(searchRet, pageable, total);
             }
         }
-        log.debug("pagination = \"{}\",  response => \"{}\"", aggregatedPage, response);
+        log.info("the pagination = \"{}\",  response => \"{}\"", aggregatedPage, response);
         return aggregatedPage;
     }
 
