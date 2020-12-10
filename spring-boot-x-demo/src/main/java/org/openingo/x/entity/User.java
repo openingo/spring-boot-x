@@ -30,6 +30,7 @@ package org.openingo.x.entity;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
 
 import java.io.Serializable;
 
@@ -49,6 +50,7 @@ public class User implements Serializable {
 
     String addr;
 
+    @Field
     UserDoc userDoc;
 
     @Data

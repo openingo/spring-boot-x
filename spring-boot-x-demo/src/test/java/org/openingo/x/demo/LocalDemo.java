@@ -27,9 +27,12 @@
 
 package org.openingo.x.demo;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.aspectj.lang.annotation.Pointcut;
 import org.junit.Test;
 import org.openingo.spring.boot.SpringApplicationX;
+import org.openingo.spring.extension.data.elasticsearch.builder.index.MappingsProperties;
+import org.openingo.spring.extension.data.elasticsearch.builder.index.MappingsProperty;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
@@ -106,4 +109,11 @@ public class LocalDemo {
         System.out.println(CREATE_INDEX);
     }
 
+    @Test
+    public void abc() throws JsonProcessingException {
+        MappingsProperties me = MappingsProperties.me();
+        me.add("addr", MappingsProperty.me().type("text").keyword(256));
+        me.add("name", MappingsProperty.me().type("text").keyword(256));
+        System.out.println(me.toJson());
+    }
 }

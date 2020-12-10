@@ -29,7 +29,9 @@ package org.openingo.spring.extension.data.elasticsearch.builder.index;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.openingo.jdkits.json.JacksonKit;
+import org.springframework.util.Assert;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,7 +40,7 @@ import java.util.Map;
  *
  * @author Qicz
  */
-public final class MappingsProperties {
+public final class MappingsProperties implements Serializable {
 
     private Map<String, Object> properties = new HashMap<>();
 
@@ -48,7 +50,9 @@ public final class MappingsProperties {
         return new MappingsProperties();
     }
 
-    public MappingsProperties add(String name, MappingsProperty property) {
+    public MappingsProperties add(MappingsProperty property) {
+        String name = property.name();
+        Assert.hasText(name, "the property name must not be null!");
         this.properties.put(name, property);
         return this;
     }

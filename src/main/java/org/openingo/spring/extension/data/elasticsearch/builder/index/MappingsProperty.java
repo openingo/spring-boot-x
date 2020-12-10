@@ -36,29 +36,73 @@ import java.util.HashMap;
  */
 public final class MappingsProperty extends HashMap<String, Object> {
 
+    private String name;
+
     private MappingsProperty() {}
 
     public static MappingsProperty me() {
         return new MappingsProperty();
     }
 
-    public MappingsProperty type(String type) {
-        this.put("type", type);
+    public MappingsProperty name(String name) {
+        this.name = name;
         return this;
+    }
+
+    public String name() {
+        return this.name;
+    }
+
+    public MappingsProperty type(String type) {
+        return this.add("type", type);
     }
 
     public MappingsProperty index(boolean index) {
-        this.put("index", index);
-        return this;
+        return this.add("index", index);
     }
 
     public MappingsProperty analyzer(String analyzer) {
-        this.put("analyzer", analyzer);
-        return this;
+        return this.add("analyzer", analyzer);
     }
 
     public MappingsProperty searchAnalyzer(String searchAnalyzer) {
-        this.put("search_analyzer", searchAnalyzer);
+        return this.add("search_analyzer", searchAnalyzer);
+    }
+
+    public MappingsProperty format(String format) {
+        return this.add("format", format);
+    }
+
+    public MappingsProperty pattern(String pattern) {
+        return this.add("pattern", pattern);
+    }
+
+    public MappingsProperty store(boolean store) {
+        return this.add("store", store);
+    }
+
+    public MappingsProperty fielddata(boolean fielddata) {
+        return this.add("fielddata", fielddata);
+    }
+
+    public MappingsProperty normalizer(String normalizer) {
+        return this.add("normalizer", normalizer);
+    }
+
+    public MappingsProperty keyword() {
+        return this.keyword(0);
+    }
+
+    public MappingsProperty keyword(int ignoreAbove) {
+        MappingsProperty keyword = MappingsProperty.me().type("keyword");
+        if (ignoreAbove != 0) {
+            keyword.add("ignore_above", ignoreAbove);
+        }
+        return this.add("fields", MappingsProperty.me().add("keyword", keyword));
+    }
+
+    public MappingsProperty add(String key, Object value) {
+        this.put(key, value);
         return this;
     }
 }

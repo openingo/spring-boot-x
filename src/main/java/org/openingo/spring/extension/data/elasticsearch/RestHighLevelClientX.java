@@ -34,8 +34,9 @@ import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
-import org.elasticsearch.action.get.GetRequest;
-import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.get.MultiGetItemResponse;
+import org.elasticsearch.action.get.MultiGetRequest;
+import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -110,18 +111,18 @@ public class RestHighLevelClientX {
         return this;
     }
 
-    private String getHolder() {
-        String holder = PROCESSING_WAY_HOLDER.getRemove();
-        if (ValidateKit.isNull(holder)) {
-            holder = SYNC;
+    private String getProcessingWay() {
+        String way = PROCESSING_WAY_HOLDER.getRemove();
+        if (ValidateKit.isNull(way)) {
+            way = SYNC;
         }
-        return holder;
+        return way;
     }
 
     public boolean createIndex(String index, Settings settings, MappingsProperties mappingsProperties) throws IOException {
         boolean exists = this.restHighLevelClient.indices().exists(new GetIndexRequest(index), RequestOptions.DEFAULT);
         if (exists) {
-            log.debug("index {} is exist!", index);
+            log.debug("index \"{}\" is exist!", index);
             return true;
         }
         CreateIndexRequest createIndexRequest = new CreateIndexRequest(index);
@@ -159,14 +160,16 @@ public class RestHighLevelClientX {
 
     public boolean saveOrUpdate(String index, String docId, String source, XContentType xContentType, WriteRequest.RefreshPolicy refreshPolicy) throws IOException {
         IndexRequest indexRequest = new IndexRequest(index).id(docId).source(source, xContentType);
-        if (ValidateKit.isNotNull(refreshPolicy)) {
-            indexRequest.setRefreshPolicy(refreshPolicy);
-        }
-        return this.saveOrUpdate(indexRequest);
+        return this.saveOrUpdate(indexRequest, refreshPolicy);
     }
 
     public boolean saveOrUpdate(IndexRequest indexRequest) throws IOException {
-        return this.saveOrUpdateDocs(Collections.singletonList(indexRequest), indexRequest.getRefreshPolicy());
+        return this.saveOrUpdate(indexRequest, WriteRequest.RefreshPolicy.NONE);
+    }
+
+    public boolean saveOrUpdate(IndexRequest indexRequest, WriteRequest.RefreshPolicy refreshPolicy) throws IOException {
+        Assert.notNull(indexRequest, "the indexRequest must not be null!");
+        return this.saveOrUpdateDocs(Collections.singletonList(indexRequest), refreshPolicy);
     }
 
     public boolean saveOrUpdateDocs(List<IndexRequest> indexRequests) throws IOException {
@@ -228,9 +231,9 @@ public class RestHighLevelClientX {
     }
 
     private boolean bulkRequest(BulkRequest bulkRequest, RequestOptions options) throws IOException {
-        String holder = this.getHolder();
+        String way = this.getProcessingWay();
         final boolean[] ret = {true};
-        switch (holder) {
+        switch (way) {
             case SYNC: {
                 BulkResponse bulkResponse = this.restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
                 ret[0] = ValidateKit.isNotNull(bulkResponse) && RestStatus.OK.equals(bulkResponse.status());
@@ -255,49 +258,66 @@ public class RestHighLevelClientX {
         return ret[0];
     }
 
-    private GetResponse findOneAsResponse(String index, String docId) throws IOException {
-        GetRequest getRequest = new GetRequest(index).id(docId);
-        String holder = this.getHolder();
-        final GetResponse[] documentFields = {null};
-        switch (holder) {
+    private MultiGetItemResponse[] findAsResponse(String index, List<String> docIds) throws IOException {
+        Assert.notNull(docIds, "the docIds must not be null!");
+        String way = this.getProcessingWay();
+        MultiGetRequest multiGetRequest = new MultiGetRequest();
+        docIds.forEach(docId -> multiGetRequest.add(index, docId));
+        final MultiGetResponse[] multiGetResponses = new MultiGetResponse[1];
+        switch (way) {
             case SYNC: {
-                documentFields[0] = this.restHighLevelClient.get(getRequest, RequestOptions.DEFAULT);
-
+                multiGetResponses[0] = this.restHighLevelClient.mget(multiGetRequest, RequestOptions.DEFAULT);
             }
             break;
             case ASYNC: {
-                this.restHighLevelClient.getAsync(getRequest, RequestOptions.DEFAULT, new ActionListener<GetResponse>() {
+                this.restHighLevelClient.mgetAsync(multiGetRequest, RequestOptions.DEFAULT, new ActionListener<MultiGetResponse>() {
                     @Override
-                    public void onResponse(GetResponse asyncDocumentFields) {
-                        documentFields[0] = asyncDocumentFields;
+                    public void onResponse(MultiGetResponse multiGetItemResponses) {
+                        multiGetResponses[0] = multiGetItemResponses;
                     }
 
                     @Override
                     public void onFailure(Exception e) {
-                        log.error("the async get failure => \"{}\"", e.getLocalizedMessage());
+                        log.error("the async mget failure => \"{}\"", e.getLocalizedMessage());
                     }
                 });
             }
         }
-        return documentFields[0];
+        if (ValidateKit.isNull(multiGetResponses[0])) {
+            return null;
+        }
+        return multiGetResponses[0].getResponses();
     }
 
-    public Map<String, Object> findOneAsMapById(String index, String docId) throws IOException {
-        GetResponse documentFields = this.findOneAsResponse(index, docId);
-        if (ValidateKit.isNull(documentFields)) {
+    public Map<String, Object> findAsMapById(String index, String docId) throws IOException {
+        MultiGetItemResponse[] multiGetItemResponses = this.findAsResponse(index, Collections.singletonList(docId));
+        if (ValidateKit.isNull(multiGetItemResponses)) {
             return new HashMap<>();
         }
-        return documentFields.getSourceAsMap();
+        return multiGetItemResponses[0].getResponse().getSourceAsMap();
     }
 
-    public <T> T findOneById(Class<T> clazz, String index, String docId) throws IOException {
-        GetResponse documentFields = this.findOneAsResponse(index, docId);
-        if (ValidateKit.isNull(documentFields)) {
+    public <T> T findById(Class<T> clazz, String index, String docId) throws IOException {
+        MultiGetItemResponse[] multiGetItemResponses = this.findAsResponse(index, Collections.singletonList(docId));
+        if (ValidateKit.isNull(multiGetItemResponses)) {
             return ClassKit.newInstance(clazz);
         }
         // json string
-        String sourceAsString = documentFields.getSourceAsString();
+        String sourceAsString = multiGetItemResponses[0].getResponse().getSourceAsString();
         return JacksonKit.toObj(sourceAsString, clazz);
+    }
+
+    public <T> List<T> findByIds(Class<T> clazz, String index, List<String> docIds) throws IOException {
+        MultiGetItemResponse[] multiGetItemResponses = this.findAsResponse(index, docIds);
+        if (ValidateKit.isNull(multiGetItemResponses)) {
+            return ListKit.emptyArrayList();
+        }
+        List<Map<String, Object>> docMaps = ListKit.emptyArrayList();
+        for (MultiGetItemResponse multiGetItemResponse : multiGetItemResponses) {
+            Map<String, Object> sourceAsMap = multiGetItemResponse.getResponse().getSourceAsMap();
+            docMaps.add(sourceAsMap);
+        }
+        return JacksonKit.toList(JacksonKit.toJson(docMaps), clazz);
     }
 
     /**

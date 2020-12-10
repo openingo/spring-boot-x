@@ -65,8 +65,8 @@ public class EsRestClientXController {
     public String addIndex() {
         try {
             MappingsProperties mappingsProperties = MappingsProperties.me();
-            mappingsProperties.add("id", MappingsProperty.me().type("text"));
-            mappingsProperties.add("name", MappingsProperty.me().type("text").analyzer("ik_smart"));
+            mappingsProperties.add(MappingsProperty.me().name("id").type("text"));
+            mappingsProperties.add(MappingsProperty.me().name("name").type("text").analyzer("ik_smart"));
             restHighLevelClientX.createIndex("aaabc", null, mappingsProperties);
         } catch (IOException e) {
             e.printStackTrace();
@@ -93,7 +93,7 @@ public class EsRestClientXController {
     public Map findOneById(@PathVariable("id") Integer id) {
         Map<String, Object> ret = null;
         try {
-            ret = this.restHighLevelClientX.findOneAsMapById("qicz", id.toString());
+            ret = this.restHighLevelClientX.findAsMapById("qicz", id.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
