@@ -33,7 +33,7 @@
 
     <groupId>org.openingo.spring</groupId>
     <artifactId>spring-boot-x</artifactId>
-    <version>2.4.1-RELEASE</version>
+    <version>2.5.RELEASE</version>
 
     <name>spring-boot extensions</name>
     <description>spring-boot extensions</description>

@@ -41,11 +41,11 @@ public final class MappingsProperty extends HashMap<String, Object> {
     private MappingsProperty() {}
 
     public static MappingsProperty me() {
-        return new MappingsProperty();
+        return new MappingsProperty().keyword();
     }
 
     public static MappingsProperty me(String name) {
-        return new MappingsProperty().name(name);
+        return MappingsProperty.me().name(name);
     }
 
     public MappingsProperty name(String name) {
@@ -61,8 +61,8 @@ public final class MappingsProperty extends HashMap<String, Object> {
         return this.add("type", type);
     }
 
-    public MappingsProperty index(boolean index) {
-        return this.add("index", index);
+    public MappingsProperty textType() {
+        return this.add("type", "text");
     }
 
     public MappingsProperty analyzer(String analyzer) {
@@ -75,10 +75,6 @@ public final class MappingsProperty extends HashMap<String, Object> {
 
     public MappingsProperty format(String format) {
         return this.add("format", format);
-    }
-
-    public MappingsProperty pattern(String pattern) {
-        return this.add("pattern", pattern);
     }
 
     public MappingsProperty store(boolean store) {
@@ -94,15 +90,19 @@ public final class MappingsProperty extends HashMap<String, Object> {
     }
 
     public MappingsProperty keyword() {
+        return this.keyword(256);
+    }
+
+    public MappingsProperty keyword0() {
         return this.keyword(0);
     }
 
     public MappingsProperty keyword(int ignoreAbove) {
-        MappingsProperty keyword = MappingsProperty.me().type("keyword");
+        MappingsProperty keyword = new MappingsProperty().type("keyword");
         if (ignoreAbove != 0) {
             keyword.add("ignore_above", ignoreAbove);
         }
-        return this.add("fields", MappingsProperty.me().add("keyword", keyword));
+        return this.add("fields", new MappingsProperty().add("keyword", keyword));
     }
 
     public MappingsProperty add(String key, Object value) {
