@@ -34,8 +34,6 @@ import lombok.Data;
 import org.openingo.jdkits.json.JacksonKit;
 import org.openingo.jdkits.validate.ValidateKit;
 
-import java.util.Map;
-
 /**
  * DocBuilder
  *
@@ -49,16 +47,16 @@ public class DocBuilder {
 
     String docId;
 
-    String json;
+    Object doc;
 
-    Map<String, Object> map;
+    String json;
 
     public String getDocSource() throws JsonProcessingException {
         String doc = "";
         if (ValidateKit.isNotNull(json)) {
             doc = json;
-        } else if (ValidateKit.isNotNull(map)) {
-            doc = JacksonKit.toJson(map, JsonInclude.Include.NON_NULL);
+        } else if (ValidateKit.isNotNull(doc)) {
+            doc = JacksonKit.toJson(doc, JsonInclude.Include.NON_NULL);
         }
         return doc;
     }
