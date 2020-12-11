@@ -122,7 +122,7 @@ public class RestHighLevelClientX {
     public boolean createIndex(String index, Settings settings, MappingsProperties mappingsProperties) throws IOException {
         boolean exists = this.restHighLevelClient.indices().exists(new GetIndexRequest(index), RequestOptions.DEFAULT);
         if (exists) {
-            log.debug("index \"{}\" is exist!", index);
+            log.info("index \"{}\" is exist!", index);
             return true;
         }
         CreateIndexRequest createIndexRequest = new CreateIndexRequest(index);
@@ -192,6 +192,10 @@ public class RestHighLevelClientX {
 
     public boolean saveOrUpdateByDocBuilders(List<DocBuilder> builders) throws IOException {
         return this.saveOrUpdateByDocBuilders(builders, WriteRequest.RefreshPolicy.NONE, RequestOptions.DEFAULT);
+    }
+
+    public boolean saveOrUpdateByDocBuilders(List<DocBuilder> builders, WriteRequest.RefreshPolicy refreshPolicy) throws IOException {
+        return this.saveOrUpdateByDocBuilders(builders, refreshPolicy, RequestOptions.DEFAULT);
     }
 
     public boolean saveOrUpdateByDocBuilders(List<DocBuilder> builders, WriteRequest.RefreshPolicy refreshPolicy, RequestOptions options) throws IOException {
