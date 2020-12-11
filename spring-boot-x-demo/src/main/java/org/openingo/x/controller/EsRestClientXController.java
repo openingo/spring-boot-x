@@ -65,8 +65,8 @@ public class EsRestClientXController {
     public String addIndex() {
         try {
             MappingsProperties mappingsProperties = MappingsProperties.me();
-            mappingsProperties.add(MappingsProperty.me().name("id").type("text"));
-            mappingsProperties.add(MappingsProperty.me().name("name").type("text").analyzer("ik_smart"));
+            mappingsProperties.add(MappingsProperty.me().name("id").type("long"));
+            mappingsProperties.add(MappingsProperty.me().name("name").textType().analyzer("ik_smart"));
             restHighLevelClientX.createIndex("aaabc", null, mappingsProperties);
         } catch (IOException e) {
             e.printStackTrace();
