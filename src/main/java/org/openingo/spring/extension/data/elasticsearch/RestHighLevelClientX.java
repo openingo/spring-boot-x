@@ -48,6 +48,7 @@ import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.text.Text;
+import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHit;
@@ -337,12 +338,24 @@ public class RestHighLevelClientX {
      */
     public <T> AggregatedPageImpl<T> searchForPage(Class<T> clazz, String index, SearchSourceBuilder searchSourceBuilder, int pageNumber, int pageSize) throws IOException {
         Assert.notNull(searchSourceBuilder, "the searchSourceBuilder cannot be null");
+        // fix the pageable parameters
         if (pageNumber < 0) {
             pageNumber = 0;
         }
         if (pageSize < 0) {
             pageSize = 10;
         }
+        // reset searchSourceBuilder from size
+        if (searchSourceBuilder.from() == -1) {
+            searchSourceBuilder.from(pageNumber * pageSize);
+        }
+        if (searchSourceBuilder.size() == -1) {
+            searchSourceBuilder.size(pageSize);
+        }
+
+        searchSourceBuilder.trackTotalHits(true);
+        searchSourceBuilder.timeout(TimeValue.timeValueSeconds(2L));
+
         SearchRequest searchRequest = new SearchRequest(index);
         searchRequest.source(searchSourceBuilder);
         PageRequest pageable = PageRequest.of(pageNumber, pageSize);
