@@ -337,10 +337,10 @@ public class RestHighLevelClientX {
      */
     public <T> AggregatedPageImpl<T> searchForPage(Class<T> clazz, String index, SearchSourceBuilder searchSourceBuilder, int pageNumber, int pageSize) throws IOException {
         Assert.notNull(searchSourceBuilder, "the searchSourceBuilder cannot be null");
-        if (pageNumber <= 0) {
+        if (pageNumber < 0) {
             pageNumber = 0;
         }
-        if (pageSize <= 0) {
+        if (pageSize < 0) {
             pageSize = 10;
         }
         SearchRequest searchRequest = new SearchRequest(index);
@@ -364,7 +364,7 @@ public class RestHighLevelClientX {
         AggregatedPageImpl<T> aggregatedPage = null;
         if (ValidateKit.isNotNull(response) && RestStatus.OK.equals(response.status())) {
             List<T> searchRet = ListKit.emptyArrayList();
-           SearchHits responseHits = response.getHits();
+            SearchHits responseHits = response.getHits();
             if (this.highlightPageData(clazz, highlight, searchRet, responseHits)) {
                 long total = 0;
                 TotalHits totalHits = responseHits.getTotalHits();
