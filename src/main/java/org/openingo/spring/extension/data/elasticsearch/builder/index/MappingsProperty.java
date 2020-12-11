@@ -62,7 +62,7 @@ public final class MappingsProperty extends HashMap<String, Object> {
     }
 
     public MappingsProperty textType() {
-        return this.add("type", "text");
+        return this.type("text");
     }
 
     public MappingsProperty analyzer(String analyzer) {
