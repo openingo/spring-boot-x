@@ -41,7 +41,7 @@ import org.openingo.jdkits.validate.ValidateKit;
  */
 @Data
 @Builder
-public class DocBuilder {
+public final class DocBuilder {
 
     String docIndex;
 
@@ -50,6 +50,8 @@ public class DocBuilder {
     Object doc;
 
     String json;
+
+    private DocBuilder() {}
 
     public String getDocSource() throws JsonProcessingException {
         String doc = "";
