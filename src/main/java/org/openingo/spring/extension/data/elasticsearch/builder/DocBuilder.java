@@ -50,7 +50,7 @@ public final class DocBuilder {
     Object doc;
 
     String json;
-    
+
     public String getDocSource() throws JsonProcessingException {
         String doc = "";
         if (ValidateKit.isNotNull(json)) {

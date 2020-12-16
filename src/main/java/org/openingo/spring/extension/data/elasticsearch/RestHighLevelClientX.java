@@ -312,7 +312,7 @@ public class RestHighLevelClientX {
         return JacksonKit.toObj(sourceAsString, clazz);
     }
 
-    public <T> List<T> findByIds(Class<T> clazz, String index, List<String> docIds) throws IOException {
+    public List<Map<String, Object>> findAsMapByIds(String index, List<String> docIds) throws IOException {
         MultiGetItemResponse[] multiGetItemResponses = this.findAsResponse(index, docIds);
         if (ValidateKit.isNull(multiGetItemResponses)) {
             return ListKit.emptyArrayList();
@@ -321,6 +321,14 @@ public class RestHighLevelClientX {
         for (MultiGetItemResponse multiGetItemResponse : multiGetItemResponses) {
             Map<String, Object> sourceAsMap = multiGetItemResponse.getResponse().getSourceAsMap();
             docMaps.add(sourceAsMap);
+        }
+        return docMaps;
+    }
+
+    public <T> List<T> findByIds(Class<T> clazz, String index, List<String> docIds) throws IOException {
+        List<Map<String, Object>> docMaps = this.findAsMapByIds(index, docIds);
+        if (ValidateKit.isNull(docMaps)) {
+            return ListKit.emptyArrayList();
         }
         return JacksonKit.toList(JacksonKit.toJson(docMaps), clazz);
     }

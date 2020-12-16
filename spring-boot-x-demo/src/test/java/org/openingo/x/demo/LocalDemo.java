@@ -112,8 +112,8 @@ public class LocalDemo {
     @Test
     public void abc() throws JsonProcessingException {
         MappingsProperties me = MappingsProperties.me();
-        me.add("addr", MappingsProperty.me().type("text").keyword(256));
-        me.add("name", MappingsProperty.me().type("text").keyword(256));
+        me.add(MappingsProperty.me("addr").type("text").keyword(256));
+        me.add(MappingsProperty.me("name").type("text").keyword(256));
         System.out.println(me.toJson());
     }
 }
