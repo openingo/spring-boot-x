@@ -410,9 +410,14 @@ public class RestHighLevelClientX {
             return false;
         }
         List<Map<String, Object>> tmpRet = ListKit.emptyArrayList();
-        for (SearchHit hit : hits) {
-            Map<String, Object> sourceAsMap = hit.getSourceAsMap();
-            if (highlight) {
+        if (!highlight) {
+            for (SearchHit hit : hits) {
+                Map<String, Object> sourceAsMap = hit.getSourceAsMap();
+                tmpRet.add(sourceAsMap);
+            }
+        } else {
+            for (SearchHit hit : hits) {
+                Map<String, Object> sourceAsMap = hit.getSourceAsMap();
                 Map<String, HighlightField> highlightFields = hit.getHighlightFields();
                 highlightFields.keySet().forEach(key -> {
                     Object val = sourceAsMap.get(key);
@@ -431,10 +436,12 @@ public class RestHighLevelClientX {
                     }
                     sourceAsMap.put(key, newData.toString());
                 });
+                tmpRet.add(sourceAsMap);
             }
-            tmpRet.add(sourceAsMap);
         }
-        searchRet.addAll(JacksonKit.toList(JacksonKit.toJson(tmpRet), clazz));
+        if (ValidateKit.isNotEmpty(tmpRet)) {
+            searchRet.addAll(JacksonKit.toList(JacksonKit.toJson(tmpRet), clazz));
+        }
         return true;
     }
 }
