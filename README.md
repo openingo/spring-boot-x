@@ -11,7 +11,7 @@
 
 - Elasticsearch supports 
 
-  - the `RestHighLevelClientX` extension for `RestHighLevelClient`, simplification for doc operations:`put`,`delete`,`search`.
+  - the `RestHighLevelClientX` extension for `RestHighLevelClient`, simplification for doc operations:`saveOrUpdate`,`deleteById(s)`,`findById(s)`,`search`.
   - the `ElasticsearchTemplateLite` extension for `ElasticsearchTemplate`
   - base on ElasticsearchTemplate `7.2.0` and dependency jars(rest client & rest high level client)
   
