@@ -43,7 +43,6 @@ import java.io.PrintStream;
  *
  * @author Qicz
  */
-@Configuration
 @ComponentScan(PackageConstants.EXTENSION_PACKAGE)
 public class ExtensionScanner {
 

@@ -25,7 +25,7 @@
  * SOFTWARE.
  */
 
-package org.openingo.x.controller;
+package orgg.openingo.x.controller;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.elasticsearch.action.delete.DeleteRequest;

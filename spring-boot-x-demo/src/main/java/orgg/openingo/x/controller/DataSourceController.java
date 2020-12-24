@@ -25,18 +25,40 @@
  * SOFTWARE.
  */
 
-package org.openingo.x.datasource;
-
-import java.sql.SQLException;
+package orgg.openingo.x.controller;
 
 /**
- * IDataSourceService
+ * DataSourceController
  *
  * @author Qicz
  */
-public interface IDataSourceService {
 
-    void switchDataSource(String name) throws SQLException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import orgg.openingo.x.datasource.IDataSourceService;
 
-    void add(String name);
+import java.sql.SQLException;
+
+@RestController
+@RequestMapping("/ds")
+public class DataSourceController {
+
+    @Autowired
+    IDataSourceService iDataSourceService;
+
+    @GetMapping("/add/{name}")
+    public String add(@PathVariable("name") String name) {
+        iDataSourceService.add(name);
+        return "ok";
+    }
+
+    @GetMapping("/sw/{name}")
+    public String sw(@PathVariable("name") String name) throws SQLException {
+        iDataSourceService.switchDataSource(name);
+        return "ok";
+    }
+
 }

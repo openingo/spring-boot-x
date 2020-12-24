@@ -23,7 +23,7 @@
   ****************************************************************
   Client IP  : 127.0.0.1 
   Request Time  : 2020-07-12T19:24:40.249 
-  Controller  : org.openingo.x.controller.UserController.(UserController.java:1)
+  Controller  : orgg.openingo.x.controller.UserController.(UserController.java:1)
   URI  : http://localhost:8080/json 
   Handler(Action)  : json
   Method  : GET
@@ -236,7 +236,7 @@ public class App {
       2020-07-13 23:56:00.587 ERROR 35387 --- [nio-8080-exec-2] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed; nested exception is java.lang.IndexOutOfBoundsException: IndexOutOfBoundsException message] with root cause
       
       java.lang.IndexOutOfBoundsException: IndexOutOfBoundsException message
-      	at org.openingo.x.controller.UserController.ex1(UserController.java:97) ~[classes/:na]
+      	at orgg.openingo.x.controller.UserController.ex1(UserController.java:97) ~[classes/:na]
       ```
 
   - `/ex2`output

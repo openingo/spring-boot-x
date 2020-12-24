@@ -25,7 +25,7 @@
  * SOFTWARE.
  */
 
-package org.openingo.x;
+package orgg.openingo.x;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.openingo.spring.http.request.error.DefaultServiceErrorAttributes;

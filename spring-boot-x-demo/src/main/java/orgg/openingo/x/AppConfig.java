@@ -25,27 +25,30 @@
  * SOFTWARE.
  */
 
-package org.openingo.x;
+package orgg.openingo.x;
 
-import lombok.Data;
-import org.openingo.jdkits.validate.ValidateKit;
-import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
-import org.openingo.spring.extension.data.redis.naming.KeyNamingKit;
+import org.springframework.boot.web.context.WebServerInitializedEvent;
+import org.springframework.boot.web.embedded.tomcat.TomcatWebServer;
+import org.springframework.boot.web.server.WebServer;
+import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;
 
 /**
- * KeyNamingPolicy
+ * AppConfig
  *
  * @author Qicz
  */
-@Data
-public class KeyNamingPolicy implements IKeyNamingPolicy {
+@Component
+public class AppConfig implements ApplicationListener<WebServerInitializedEvent> {
 
     @Override
-    public String getKeyName(String key) {
-        String s = KeyNamingKit.get();
-        if (ValidateKit.isNotNull(s)) {
-            return s + ":qicz:" + key;
+    public void onApplicationEvent(WebServerInitializedEvent webServerInitializedEvent) {
+        System.out.println("webServerInitializedEvent===="+webServerInitializedEvent);
+        WebServer webServer = webServerInitializedEvent.getWebServer();
+        if (webServer instanceof TomcatWebServer) {
+            TomcatWebServer tomcatWebServer = (TomcatWebServer)webServer;
+            System.out.println("server address==="+tomcatWebServer.getTomcat().getServer().getAddress());
         }
-        return "qicz:" + key;
+        System.out.println("webServerInitializedEvent=port==="+ webServer.getPort());
     }
 }

@@ -25,40 +25,45 @@
  * SOFTWARE.
  */
 
-package org.openingo.x.controller;
+package orgg.openingo.x.entity;
+
+import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+
+import java.io.Serializable;
 
 /**
- * DataSourceController
+ * User
  *
  * @author Qicz
  */
+@Data
+@Document(indexName = "x-user")
+public class User implements Serializable {
 
-import org.openingo.x.datasource.IDataSourceService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+    @Id
+    Integer id;
 
-import java.sql.SQLException;
+    String name;
 
-@RestController
-@RequestMapping("/ds")
-public class DataSourceController {
+    String addr;
 
-    @Autowired
-    IDataSourceService iDataSourceService;
+    @Field
+    UserDoc userDoc;
 
-    @GetMapping("/add/{name}")
-    public String add(@PathVariable("name") String name) {
-        iDataSourceService.add(name);
-        return "ok";
+    @Data
+    public static class UserDoc {
+
+        Integer id;
+
+        String parentId;
+
+        String name;
+
+        String docType;
+
+        String docContent;
     }
-
-    @GetMapping("/sw/{name}")
-    public String sw(@PathVariable("name") String name) throws SQLException {
-        iDataSourceService.switchDataSource(name);
-        return "ok";
-    }
-
 }

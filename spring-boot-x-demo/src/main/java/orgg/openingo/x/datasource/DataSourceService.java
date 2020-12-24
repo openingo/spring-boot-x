@@ -25,7 +25,7 @@
  * SOFTWARE.
  */
 
-package org.openingo.x.datasource;
+package orgg.openingo.x.datasource;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import lombok.extern.slf4j.Slf4j;

@@ -25,45 +25,16 @@
  * SOFTWARE.
  */
 
-package org.openingo.x.entity;
-
-import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-
-import java.io.Serializable;
+package orgg.openingo.x.controller;
 
 /**
- * User
+ * NonController
  *
  * @author Qicz
  */
-@Data
-@Document(indexName = "x-user")
-public class User implements Serializable {
+public class NonController {
 
-    @Id
-    Integer id;
-
-    String name;
-
-    String addr;
-
-    @Field
-    UserDoc userDoc;
-
-    @Data
-    public static class UserDoc {
-
-        Integer id;
-
-        String parentId;
-
-        String name;
-
-        String docType;
-
-        String docContent;
+    public void ok() {
+        System.out.println("ok...");
     }
 }

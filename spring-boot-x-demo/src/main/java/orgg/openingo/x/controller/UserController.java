@@ -25,7 +25,7 @@
  * SOFTWARE.
  */
 
-package org.openingo.x.controller;
+package orgg.openingo.x.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openingo.jdkits.http.RespData;
@@ -34,7 +34,6 @@ import org.openingo.spring.exception.ServiceException;
 import org.openingo.spring.extension.data.redis.StringKeyRedisTemplateX;
 import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
 import org.openingo.spring.extension.data.redis.naming.KeyNamingKit;
-import org.openingo.x.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.SortParameters;
 import org.springframework.data.redis.core.query.DefaultStringSortQuery;
@@ -44,6 +43,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import orgg.openingo.x.entity.User;
 
 import java.io.IOException;
 import java.util.Arrays;

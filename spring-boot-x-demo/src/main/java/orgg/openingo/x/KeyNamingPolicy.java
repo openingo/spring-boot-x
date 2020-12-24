@@ -25,16 +25,27 @@
  * SOFTWARE.
  */
 
-package org.openingo.x.controller;
+package orgg.openingo.x;
+
+import lombok.Data;
+import org.openingo.jdkits.validate.ValidateKit;
+import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
+import org.openingo.spring.extension.data.redis.naming.KeyNamingKit;
 
 /**
- * NonController
+ * KeyNamingPolicy
  *
  * @author Qicz
  */
-public class NonController {
+@Data
+public class KeyNamingPolicy implements IKeyNamingPolicy {
 
-    public void ok() {
-        System.out.println("ok...");
+    @Override
+    public String getKeyName(String key) {
+        String s = KeyNamingKit.get();
+        if (ValidateKit.isNotNull(s)) {
+            return s + ":qicz:" + key;
+        }
+        return "qicz:" + key;
     }
 }

@@ -25,7 +25,7 @@
  * SOFTWARE.
  */
 
-package org.openingo.x.demo;
+package orgg.openingo.x.demo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.aspectj.lang.annotation.Pointcut;

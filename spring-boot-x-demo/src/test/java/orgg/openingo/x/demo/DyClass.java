@@ -25,30 +25,19 @@
  * SOFTWARE.
  */
 
-package org.openingo.x;
+package orgg.openingo.x.demo;
 
-import org.springframework.boot.web.context.WebServerInitializedEvent;
-import org.springframework.boot.web.embedded.tomcat.TomcatWebServer;
-import org.springframework.boot.web.server.WebServer;
-import org.springframework.context.ApplicationListener;
-import org.springframework.stereotype.Component;
+import org.aspectj.lang.annotation.Pointcut;
 
 /**
- * AppConfig
+ * DyClass
  *
  * @author Qicz
  */
-@Component
-public class AppConfig implements ApplicationListener<WebServerInitializedEvent> {
+public class DyClass {
 
-    @Override
-    public void onApplicationEvent(WebServerInitializedEvent webServerInitializedEvent) {
-        System.out.println("webServerInitializedEvent===="+webServerInitializedEvent);
-        WebServer webServer = webServerInitializedEvent.getWebServer();
-        if (webServer instanceof TomcatWebServer) {
-            TomcatWebServer tomcatWebServer = (TomcatWebServer)webServer;
-            System.out.println("server address==="+tomcatWebServer.getTomcat().getServer().getAddress());
-        }
-        System.out.println("webServerInitializedEvent=port==="+ webServer.getPort());
+    @Pointcut
+    public void dy() {
+        System.out.println("dy invoking...😝");
     }
 }

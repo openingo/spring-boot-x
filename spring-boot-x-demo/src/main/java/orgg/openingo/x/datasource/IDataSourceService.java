@@ -25,23 +25,18 @@
  * SOFTWARE.
  */
 
-package org.openingo.x;
+package orgg.openingo.x.datasource;
 
-import org.openingo.spring.annotation.EnableExtension;
-import org.openingo.spring.boot.SpringApplicationX;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import java.sql.SQLException;
 
 /**
- * App
+ * IDataSourceService
  *
  * @author Qicz
  */
-@SpringBootApplication
-@EnableExtension
-public class App {
+public interface IDataSourceService {
 
-    public static void main(String[] args) throws InterruptedException {
-        SpringApplicationX.run(App.class, args);
-        SpringApplicationX.applicationInfo();
-    }
+    void switchDataSource(String name) throws SQLException;
+
+    void add(String name);
 }

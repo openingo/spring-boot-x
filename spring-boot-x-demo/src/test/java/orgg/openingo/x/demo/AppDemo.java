@@ -25,7 +25,7 @@
  * SOFTWARE.
  */
 
-package org.openingo.x.demo;
+package orgg.openingo.x.demo;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,13 +34,13 @@ import org.openingo.spring.boot.SpringApplicationX;
 import org.openingo.spring.extension.data.redis.StringKeyRedisTemplateX;
 import org.openingo.spring.extension.data.redis.naming.DefaultKeyNamingPolicy;
 import org.openingo.spring.extension.data.redis.serializer.FstRedisSerializer;
-import org.openingo.x.App;
-import org.openingo.x.datasource.IDataSourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import orgg.openingo.x.App;
+import orgg.openingo.x.datasource.IDataSourceService;
 
 import java.io.IOException;
 import java.util.Arrays;

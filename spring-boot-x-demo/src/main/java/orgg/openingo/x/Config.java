@@ -25,7 +25,7 @@
  * SOFTWARE.
  */
 
-package org.openingo.x;
+package orgg.openingo.x;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import org.openingo.jdkits.http.RespData;

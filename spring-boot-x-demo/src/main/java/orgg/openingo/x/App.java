@@ -25,19 +25,23 @@
  * SOFTWARE.
  */
 
-package org.openingo.x.demo;
+package orgg.openingo.x;
 
-import org.aspectj.lang.annotation.Pointcut;
+import org.openingo.spring.annotation.EnableExtension;
+import org.openingo.spring.boot.SpringApplicationX;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * DyClass
+ * App
  *
  * @author Qicz
  */
-public class DyClass {
+@SpringBootApplication
+@EnableExtension
+public class App {
 
-    @Pointcut
-    public void dy() {
-        System.out.println("dy invoking...😝");
+    public static void main(String[] args) throws InterruptedException {
+        SpringApplicationX.run(App.class, args);
+        SpringApplicationX.applicationInfo();
     }
 }
