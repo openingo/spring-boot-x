@@ -37,6 +37,16 @@ import java.util.Map;
 public class DefaultServiceErrorAttributes extends AbstractServiceErrorAttributes {
 
     /**
+     * Decorate exception message for your self.
+     *
+     * @param exception the exception that got thrown during handler execution
+     */
+    @Override
+    public String decorateExceptionMessage(Exception exception) {
+        return exception.getMessage();
+    }
+
+    /**
      * Decorate exception error code, custom for your business logic.
      * <code>
      * <pre>

@@ -33,12 +33,20 @@ import org.openingo.spring.exception.ServiceException;
 import org.openingo.spring.extension.http.config.HttpConfigProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributesX;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * AbstractServiceErrorAttributes
@@ -90,7 +98,7 @@ public abstract class AbstractServiceErrorAttributes extends DefaultErrorAttribu
             // can rewrite ServiceException using common code
             code = ValidateKit.isNull(code) ? this.decorateExceptionCode(exception) : code;
             // decorate exception message
-            message = ValidateKit.isNull(message) ? this.decorateExceptionMessage(exception) : message;
+            message = ValidateKit.isNull(message) ? this.decorateExceptionMessage0(exception) : message;
         }
         // services error attributes processing
         if (!RespData.Config.SM_ONLY) {
@@ -107,17 +115,44 @@ public abstract class AbstractServiceErrorAttributes extends DefaultErrorAttribu
     }
 
     /**
-     * Decorate exception, may be you can returns friendly message to user.
+     * Decorate exception message, may be you can returns friendly message to user.
      *
      * @param exception  the exception that got thrown during handler execution
      */
-    private String decorateExceptionMessage(Exception exception) {
+    private String decorateExceptionMessage0(Exception exception) {
         String friendlyFailureMessage = RespData.Config.FRIENDLY_FAILURE_MESSAGE;
         if (ValidateKit.isNotNull(friendlyFailureMessage)) {
             return friendlyFailureMessage;
         }
-        return exception.getMessage();
+        if (exception instanceof MethodArgumentNotValidException) {
+            return this.getErrorMessage(((MethodArgumentNotValidException)exception).getBindingResult());
+        }
+        if (exception instanceof BindException) {
+            return this.getErrorMessage(((BindException)exception).getBindingResult());
+        }
+        if (exception instanceof ConstraintViolationException) {
+            Optional<ConstraintViolation<?>> first = ((ConstraintViolationException)exception).getConstraintViolations().stream().findFirst();
+            return first.map(ConstraintViolation::getMessage).get();
+        }
+        return this.decorateExceptionMessage(exception);
     }
+
+    /**
+     * fetch the bindingResult error message.
+     * @param bindingResult bindingResult with errors
+     * @return the error message
+     */
+    private String getErrorMessage(BindingResult bindingResult) {
+        List<FieldError> errors = bindingResult.getFieldErrors();
+        return errors.get(0).getDefaultMessage();
+    }
+
+    /**
+     * Decorate exception message for your self.
+     *
+     * @param exception  the exception that got thrown during handler execution
+     */
+    public abstract String decorateExceptionMessage(Exception exception);
 
     /**
      * Decorate exception error code, custom for your business logic.
