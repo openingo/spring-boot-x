@@ -218,6 +218,7 @@
         <dependency>
             <groupId>org.openingo.kits</groupId>
             <artifactId>jdkits</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>de.ruedigermoeller</groupId>
