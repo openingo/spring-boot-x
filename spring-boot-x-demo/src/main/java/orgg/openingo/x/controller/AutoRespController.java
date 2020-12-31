@@ -25,32 +25,36 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.constants;
+package orgg.openingo.x.controller;
+
+import org.openingo.spring.exception.ServiceException;
+import org.openingo.spring.http.response.annotation.AutoMappingRespResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Constants
+ * AutoRespController
  *
  * @author Qicz
  */
-public final class Constants {
+@RestController
+@RequestMapping("/auto")
+@AutoMappingRespResult
+public class AutoRespController {
 
-    private Constants(){}
+    @GetMapping("/int")
+    public Integer toInt() {
+        return 123;
+    }
 
-    /**
-     * application name
-      */
-    public static final String SPRING_APPLICATION_X = ":: SpringApplicationX ::";
+    @GetMapping("/void")
+    public void toVoid() {
 
-    // true
-    public static final String TRUE = "true";
+    }
 
-    // false
-    public static final String FALSE = "false";
-
-    // http request report header
-    public static final String REQUEST_REPORT_HEADER =
-            "\n****************************************************************\n"
-            + SPRING_APPLICATION_X +
-            " for current request report information \n"
-            + "****************************************************************\n";
+    @GetMapping("/exception")
+    public void toException() {
+        throw new ServiceException("异常了");
+    }
 }

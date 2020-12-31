@@ -32,13 +32,17 @@ import org.apache.commons.logging.LogFactory;
 import org.openingo.jdkits.validate.ValidateKit;
 import org.openingo.spring.constants.Constants;
 import org.openingo.spring.constants.PropertiesConstants;
+import org.openingo.spring.http.mvc.HttpWebMvcConfigurer;
 import org.openingo.spring.http.request.HttpRequestLogAspect;
 import org.openingo.spring.http.request.error.DefaultServiceErrorAttributes;
+import org.openingo.spring.http.response.HttpResponseBodyAdvice;
 import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -170,5 +174,19 @@ public class HttpConfig  {
             source.registerCorsConfiguration(path, corsConfiguration);
         }
         return new CorsFilter(source);
+    }
+
+    /**
+     * the http mvn configure for some interceptors etc.
+     */
+    @Bean
+    public HttpWebMvcConfigurer httpWebMvcConfigurer() {
+        return new HttpWebMvcConfigurer();
+    }
+
+    @ControllerAdvice
+    @Order(-100)
+    static class HttpControllerAdvice extends HttpResponseBodyAdvice {
+
     }
 }

@@ -25,32 +25,19 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.constants;
+package org.openingo.spring.http.response.annotation;
+
+import java.lang.annotation.*;
 
 /**
- * Constants
+ * AutoMappingRespResult
  *
  * @author Qicz
  */
-public final class Constants {
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.METHOD})
+@Documented
+public @interface AutoMappingRespResult {
 
-    private Constants(){}
-
-    /**
-     * application name
-      */
-    public static final String SPRING_APPLICATION_X = ":: SpringApplicationX ::";
-
-    // true
-    public static final String TRUE = "true";
-
-    // false
-    public static final String FALSE = "false";
-
-    // http request report header
-    public static final String REQUEST_REPORT_HEADER =
-            "\n****************************************************************\n"
-            + SPRING_APPLICATION_X +
-            " for current request report information \n"
-            + "****************************************************************\n";
+    String ANNOTATION_NAME = "AUTO_MAPPING_RESP_RESULT_ANNOTATION";
 }
