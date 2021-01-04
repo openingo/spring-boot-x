@@ -27,6 +27,8 @@
 
 package org.openingo.spring.boot;
 
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.openingo.spring.constants.EnvsConstants;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryUtils;
@@ -35,12 +37,18 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringBootVersion;
+import org.springframework.boot.system.ApplicationHome;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 
-import java.util.Arrays;
-import java.util.List;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
 /**
  * SpringApplicationX
@@ -51,6 +59,7 @@ import java.util.List;
  *
  * @author Qicz
  */
+@Slf4j
 public final class SpringApplicationX {
 
     /**
@@ -71,8 +80,11 @@ public final class SpringApplicationX {
      * @param args the application arguments (usually passed from a Java main method)
      * @return the running {@link ApplicationContext}
      */
+    @SneakyThrows
     public static ConfigurableApplicationContext run(Class<?>[] primarySources, String[] args) {
         SpringApplicationX.springApplication = new SpringApplication(primarySources);
+        // auto cp configs
+        SpringApplicationX.copyConfigsInJar(SpringApplicationX.springApplication.getMainApplicationClass());
         SpringApplicationX.applicationContext = SpringApplicationX.springApplication.run(args);
         SpringApplicationX.springApplicationX = new SpringApplicationX();
         // init application X
@@ -175,5 +187,90 @@ public final class SpringApplicationX {
      */
     public static void applicationInfo() {
         System.out.println(applicationPackage);
+    }
+
+    /**
+     * whether current application running as a jar or yet
+     */
+    public static boolean isRunningAsJar = false;
+
+    /**
+     * copy configs that in 'config' path or some 'xml','yaml','yml','properties'
+     * @param mainApplicationClass spring boot mainApplicationClass
+     * @throws IOException io exception
+     */
+    public static void copyConfigsInJar(Class<?> mainApplicationClass) throws IOException {
+        ApplicationHome applicationHome = new ApplicationHome(mainApplicationClass);
+        File source = applicationHome.getSource();
+        if (source != null) {
+            String absolutePath = source.getAbsolutePath();
+            SpringApplicationX.isRunningAsJar = absolutePath.endsWith("jar");
+            if (!SpringApplicationX.isRunningAsJar) {
+                return;
+            }
+
+            final String configPath = "config/";
+            log.info("==starting copy configs...==");
+            File config = new File(System.getProperty("user.dir") + "/" + configPath);
+            if (!config.exists()) {
+                if (!config.mkdir()) {
+                    return;
+                }
+                JarFile jarFile = new JarFile(source);
+                final Set<String> configFiles = new HashSet<String>(){{
+                    add(".properties");
+                    add(".yaml");
+                    add(".yml");
+                    add(".xml");
+                }};
+                int copyFileCount = 0;
+                for (Enumeration<? extends ZipEntry> entries = jarFile.entries(); entries.hasMoreElements(); ) {
+                    ZipEntry entry = entries.nextElement();
+                    String entryName = entry.getName();
+                    boolean isConfig = false;
+                    int lastIndexOf = entryName.indexOf(configPath);
+                    String outPath = "";
+                    // has config dir
+                    if (lastIndexOf != -1) {
+                        outPath = entryName.substring(lastIndexOf);
+                        isConfig = true;
+                    } else {
+                        lastIndexOf = entryName.lastIndexOf(".");
+                        if (lastIndexOf != -1) {
+                            String file = entryName.substring(entryName.lastIndexOf("/") + 1);
+                            boolean pomFile = "pom.properties".equals(file) || "pom.xml".equals(file);
+                            isConfig = configFiles.contains(entryName.substring(lastIndexOf)) && !pomFile;
+                            if (isConfig) {
+                                outPath = String.join("", configPath, file);
+                            }
+                        }
+                    }
+
+                    if (!isConfig) {
+                        continue;
+                    }
+                    InputStream jarFileInputStream = jarFile.getInputStream(entry);
+                    File currentFile = new File(outPath.substring(0, outPath.lastIndexOf('/')));;
+                    if (!currentFile.exists() && !currentFile.mkdirs()) {
+                        continue;
+                    }
+                    if (new File(outPath).isDirectory()) {
+                        continue;
+                    }
+                    copyFileCount++;
+                    log.info("==copy \"{}\" to \"{}\"==", entryName, outPath);
+                    FileOutputStream out = new FileOutputStream(outPath);
+                    byte[] bytes = new byte[1024];
+                    int len;
+                    while ((len = jarFileInputStream.read(bytes)) > 0) {
+                        out.write(bytes, 0, len);
+                    }
+                    jarFileInputStream.close();
+                    out.close();
+                }
+                log.info("==copy \"{}\" files.==", copyFileCount);
+            }
+            log.info("==copy configs finished...==");
+        }
     }
 }
