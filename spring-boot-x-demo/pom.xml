@@ -45,6 +45,7 @@
         <fastjson.version>1.2.68</fastjson.version>
         <pool>2.2</pool>
         <elasticsearch.version>7.2.0</elasticsearch.version>
+        <jdkits.version>3.6.7</jdkits.version>
     </properties>
 
     <dependencyManagement>
@@ -107,6 +108,12 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <scope>${fastjson.version}</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.openingo.kits</groupId>
+                <artifactId>jdkits</artifactId>
+                <version>${jdkits.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -172,6 +179,11 @@
             <artifactId>spring-cloud-config-server</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <dependency>
+            <groupId>org.openingo.kits</groupId>
+            <artifactId>jdkits</artifactId>
+        </dependency>
         <!-- es -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -190,4 +202,22 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>orgg.openingo.x.App</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

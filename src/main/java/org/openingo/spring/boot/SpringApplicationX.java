@@ -210,66 +210,64 @@ public final class SpringApplicationX {
             }
 
             final String configPath = "config/";
-            log.info("==starting copy configs...==");
             File config = new File(System.getProperty("user.dir") + "/" + configPath);
-            if (!config.exists()) {
-                if (!config.mkdir()) {
-                    return;
-                }
-                JarFile jarFile = new JarFile(source);
-                final Set<String> configFiles = new HashSet<String>(){{
-                    add(".properties");
-                    add(".yaml");
-                    add(".yml");
-                    add(".xml");
-                }};
-                int copyFileCount = 0;
-                for (Enumeration<? extends ZipEntry> entries = jarFile.entries(); entries.hasMoreElements(); ) {
-                    ZipEntry entry = entries.nextElement();
-                    String entryName = entry.getName();
-                    boolean isConfig = false;
-                    int lastIndexOf = entryName.indexOf(configPath);
-                    String outPath = "";
-                    // has config dir
+            if (config.exists() || !config.mkdir()) {
+                return;
+            }
+            log.info("==starting copy configs...==");
+            JarFile jarFile = new JarFile(source);
+            final Set<String> configFiles = new HashSet<String>(){{
+                add(".properties");
+                add(".yaml");
+                add(".yml");
+                add(".xml");
+            }};
+            int copyFileCount = 0;
+            for (Enumeration<? extends ZipEntry> entries = jarFile.entries(); entries.hasMoreElements(); ) {
+                ZipEntry entry = entries.nextElement();
+                String entryName = entry.getName();
+                boolean isConfig = false;
+                int lastIndexOf = entryName.indexOf(configPath);
+                String outPath = "";
+                // has config dir
+                if (lastIndexOf != -1) {
+                    outPath = entryName.substring(lastIndexOf);
+                    isConfig = true;
+                } else {
+                    lastIndexOf = entryName.lastIndexOf(".");
                     if (lastIndexOf != -1) {
-                        outPath = entryName.substring(lastIndexOf);
-                        isConfig = true;
-                    } else {
-                        lastIndexOf = entryName.lastIndexOf(".");
-                        if (lastIndexOf != -1) {
-                            String file = entryName.substring(entryName.lastIndexOf("/") + 1);
-                            boolean pomFile = "pom.properties".equals(file) || "pom.xml".equals(file);
-                            isConfig = configFiles.contains(entryName.substring(lastIndexOf)) && !pomFile;
-                            if (isConfig) {
-                                outPath = String.join("", configPath, file);
-                            }
+                        String file = entryName.substring(entryName.lastIndexOf("/") + 1);
+                        boolean pomFile = "pom.properties".equals(file) || "pom.xml".equals(file);
+                        isConfig = configFiles.contains(entryName.substring(lastIndexOf)) && !pomFile;
+                        if (isConfig) {
+                            outPath = String.join("", configPath, file);
                         }
                     }
-
-                    if (!isConfig) {
-                        continue;
-                    }
-                    InputStream jarFileInputStream = jarFile.getInputStream(entry);
-                    File currentFile = new File(outPath.substring(0, outPath.lastIndexOf('/')));;
-                    if (!currentFile.exists() && !currentFile.mkdirs()) {
-                        continue;
-                    }
-                    if (new File(outPath).isDirectory()) {
-                        continue;
-                    }
-                    copyFileCount++;
-                    log.info("==copy \"{}\" to \"{}\"==", entryName, outPath);
-                    FileOutputStream out = new FileOutputStream(outPath);
-                    byte[] bytes = new byte[1024];
-                    int len;
-                    while ((len = jarFileInputStream.read(bytes)) > 0) {
-                        out.write(bytes, 0, len);
-                    }
-                    jarFileInputStream.close();
-                    out.close();
                 }
-                log.info("==copy \"{}\" files.==", copyFileCount);
+
+                if (!isConfig) {
+                    continue;
+                }
+                InputStream jarFileInputStream = jarFile.getInputStream(entry);
+                File currentFile = new File(outPath.substring(0, outPath.lastIndexOf('/')));;
+                if (!currentFile.exists() && !currentFile.mkdirs()) {
+                    continue;
+                }
+                if (new File(outPath).isDirectory()) {
+                    continue;
+                }
+                copyFileCount++;
+                log.info("==copy \"{}\" to \"{}\"==", entryName, outPath);
+                FileOutputStream out = new FileOutputStream(outPath);
+                byte[] bytes = new byte[1024];
+                int len;
+                while ((len = jarFileInputStream.read(bytes)) > 0) {
+                    out.write(bytes, 0, len);
+                }
+                jarFileInputStream.close();
+                out.close();
             }
+            log.info("==copy \"{}\" files.==", copyFileCount);
             log.info("==copy configs finished...==");
         }
     }
