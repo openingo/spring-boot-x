@@ -67,7 +67,7 @@
         <spring-boot.version>2.1.8.RELEASE</spring-boot.version>
         <spring-cloud.version>Greenwich.SR2</spring-cloud.version>
         <lombok.version>1.18.8</lombok.version>
-        <jdkits.version>3.3</jdkits.version>
+        <jdkits.version>3.6.8</jdkits.version>
         <fst.version>2.57</fst.version>
         <druid.version>1.1.23</druid.version>
         <hikaricp.version>3.2.0</hikaricp.version>

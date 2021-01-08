@@ -50,11 +50,18 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.TermsQueryBuilder;
+import org.elasticsearch.index.query.functionscore.RandomScoreFunctionBuilder;
 import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
+import org.elasticsearch.search.sort.SortBuilders;
 import org.openingo.java.lang.ThreadLocalX;
 import org.openingo.jdkits.collection.ListKit;
 import org.openingo.jdkits.json.JacksonKit;
@@ -259,6 +266,8 @@ public class RestHighLevelClientX {
                 });
             }
             break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + way);
         }
         return ret[0];
     }
@@ -287,6 +296,9 @@ public class RestHighLevelClientX {
                     }
                 });
             }
+            break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + way);
         }
         if (ValidateKit.isNull(multiGetResponses[0])) {
             return null;
@@ -376,6 +388,91 @@ public class RestHighLevelClientX {
     }
 
     /**
+     * random Recommend some docs
+     * @param clazz result class
+     * @param index es doc index
+     * @param recommendSize recommend doc size, if size <= 0 reset to  8
+     * @param <T>
+     * @return recommend result
+     * @throws IOException
+     */
+    public <T> List<T> randomRecommend(Class<T> clazz, String index, int recommendSize) throws IOException {
+        return randomRecommend(clazz, index, recommendSize, null, null,null, null);
+    }
+
+    /**
+     * random Recommend some docs
+     * @param clazz result class
+     * @param index es doc index
+     * @param recommendSize recommend doc size, if size <= 0 reset to  8
+     * @param highlightBuilder highlight or not
+     * @param <T>
+     * @return recommend result
+     * @throws IOException
+     */
+    public <T> List<T> randomRecommend(Class<T> clazz,
+                                       String index,
+                                       int recommendSize,
+                                       QueryBuilder queryBuilder,
+                                       HighlightBuilder highlightBuilder) throws IOException {
+        return randomRecommend(clazz, index, recommendSize, queryBuilder, highlightBuilder, null, null);
+    }
+
+    /**
+     * random Recommend some docs
+     * @param clazz result class
+     * @param index es doc index
+     * @param recommendSize recommend doc size, if size <= 0 reset to  8
+     * @param queryBuilder query data for highlightBuilder
+     * @param highlightBuilder highlight or not
+     * @param docIdFieldName doc id field name
+     * @param excludeDocIds exclude doc ids
+     * @param <T>
+     * @return recommend result
+     * @throws IOException
+     */
+    public <T> List<T> randomRecommend(Class<T> clazz,
+                                       String index,
+                                       int recommendSize,
+                                       QueryBuilder queryBuilder,
+                                       HighlightBuilder highlightBuilder,
+                                       String docIdFieldName,
+                                       List<String> excludeDocIds) throws IOException {
+        if (recommendSize <= 0) {
+            recommendSize = 8;
+        }
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.size(recommendSize);
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        // parser queryBuilder
+        if (ValidateKit.isNotNull(queryBuilder)) {
+            if (queryBuilder instanceof BoolQueryBuilder) {
+                boolQueryBuilder = (BoolQueryBuilder)queryBuilder;
+            } else {
+                boolQueryBuilder.must(queryBuilder);
+            }
+        }
+        // exclude docs
+        if (ValidateKit.isAllNotNull(docIdFieldName, excludeDocIds)) {
+            boolQueryBuilder.must(new TermsQueryBuilder(docIdFieldName, excludeDocIds));
+        }
+        // random the query data, must not use custom order
+        boolQueryBuilder.must(QueryBuilders.functionScoreQuery(new RandomScoreFunctionBuilder()));
+        searchSourceBuilder.sort(SortBuilders.scoreSort());
+        searchSourceBuilder.query(boolQueryBuilder);
+        searchSourceBuilder.highlighter(highlightBuilder);
+
+        // do search action
+        SearchRequest searchRequest = new SearchRequest(index);
+        searchRequest.source(searchSourceBuilder);
+        SearchResponse response = this.restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        List<T> searchRet = ListKit.emptyArrayList();
+        this.highlightPageData(clazz, ValidateKit.isNotNull(highlightBuilder), searchRet, response.getHits());
+        return searchRet;
+    }
+
+    /**
      * pagination and response data package
      * @param response search response
      * @param pageable pagination parameters
@@ -401,6 +498,8 @@ public class RestHighLevelClientX {
 
     /**
      * highlight the page data
+     * @param highlight highlight or not
+     * @param searchRet result
      * @param responseHits resp hits
      * @throws JsonProcessingException
      */

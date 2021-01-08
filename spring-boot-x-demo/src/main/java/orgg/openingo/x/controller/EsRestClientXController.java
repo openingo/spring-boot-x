@@ -27,6 +27,7 @@
 
 package orgg.openingo.x.controller;
 
+import lombok.SneakyThrows;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -47,6 +48,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -60,6 +62,25 @@ public class EsRestClientXController {
 
     @Autowired
     RestHighLevelClientX restHighLevelClientX;
+
+    @SneakyThrows
+    @GetMapping("/recommend")
+    public List<Map> recommends(String q) {
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        // 如果该属性中有多个关键字 则都高亮
+        highlightBuilder.requireFieldMatch(true);
+        highlightBuilder.field("name");
+        highlightBuilder.field("addr");
+        highlightBuilder.preTags("<span style='color:red'>");
+        highlightBuilder.postTags("</span>");
+
+        BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+
+        q = "*" + q + "*";
+        boolQueryBuilder.must(QueryBuilders.wildcardQuery("name", q));
+        boolQueryBuilder.should(QueryBuilders.wildcardQuery("addr", q));
+        return this.restHighLevelClientX.randomRecommend(Map.class, "qicz", 3, boolQueryBuilder, highlightBuilder);
+    }
 
     @GetMapping("/add")
     public String addIndex() {
@@ -78,7 +99,7 @@ public class EsRestClientXController {
     public String putDoc(@RequestBody Map user) {
         boolean ret = false;
         IndexRequest indexRequest = new IndexRequest("qicz");
-        indexRequest.id("123");
+        indexRequest.id(user.get("id").toString());
         try {
             indexRequest.source(JacksonKit.toJson(user), XContentType.JSON);
             ret = this.restHighLevelClientX.saveOrUpdate(indexRequest);
