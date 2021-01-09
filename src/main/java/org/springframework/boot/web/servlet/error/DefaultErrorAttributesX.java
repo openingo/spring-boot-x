@@ -59,7 +59,9 @@ public class DefaultErrorAttributesX extends DefaultErrorAttributes {
     private final ThreadLocalX<Object> HANDLER_HOLDER = new ThreadLocalX<>();
     private final ThreadLocalX<Exception> EXCEPTION_HOLDER = new ThreadLocalX<>();
 
-    // using exception instance or not
+    /**
+     * using exception instance or not
+      */
     private final boolean usingException;
 
     /**

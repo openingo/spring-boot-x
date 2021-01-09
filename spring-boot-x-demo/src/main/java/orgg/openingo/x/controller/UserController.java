@@ -83,9 +83,13 @@ public class UserController {
 
     @GetMapping("/save")
     public String save() {
-        KeyNamingKit.set("openingo");
-        stringKeyRedisTemplateX.set("name", "Qicz");
-        return "ok";
+        try {
+            KeyNamingKit.set("openingo");
+            stringKeyRedisTemplateX.set("name", "Qicz");
+            return "ok";
+        } finally {
+            KeyNamingKit.remove();
+        }
     }
 
     @GetMapping("/saveex")

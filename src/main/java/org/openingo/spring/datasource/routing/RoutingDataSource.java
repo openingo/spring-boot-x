@@ -64,10 +64,14 @@ public class RoutingDataSource extends AbstractDataSource implements DataSource,
 	@Nullable
 	private IDataSourceProvider defaultTargetDataSource;
 
-	// auto close the same key dataSource
+	/**
+	 *  auto close the same key dataSource
+	 */
 	private Boolean autoCloseSameKeyDataSource = true;
 
-	// current using dataSource provider
+	/**
+	 * current using dataSource provider
+	 */
 	private IDataSourceProvider currentUsingDataSourceProvider;
 
 	public RoutingDataSource() {

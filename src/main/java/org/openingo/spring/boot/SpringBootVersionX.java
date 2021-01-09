@@ -27,6 +27,9 @@
 
 package org.openingo.spring.boot;
 
+/**
+ * @author Qicz
+ */
 public final class SpringBootVersionX {
 
 	private SpringBootVersionX() {

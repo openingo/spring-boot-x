@@ -42,6 +42,5 @@ public class App {
 
     public static void main(String[] args) throws InterruptedException {
         SpringApplicationX.run(App.class, args);
-        SpringApplicationX.applicationInfo();
     }
 }

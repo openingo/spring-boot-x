@@ -54,20 +54,12 @@ public class Config {
     public Config(Environment environment, ApplicationContext applicationContext) {
         this.environment = environment;
         this.applicationContext = applicationContext;
-        System.out.println("env===="+environment);
-        String endpointBasePath = environment.getProperty("management.endpoints.web.base-path");
-        String address = environment.getProperty("management.server.address");
-        System.out.println("basepth==="+endpointBasePath);
-        System.out.println("address==="+address);
-        System.out.println("env host===="+environment);
-        System.out.println("env port===="+environment.getProperty("local.server.port"));
-        System.out.println("env port===="+environment.getProperty("server.port"));
-        System.out.println("application===="+applicationContext);
         RespData.Config.SC_KEY = "ec";
         RespData.Config.SM_KEY = "em";
         RespData.Config.FAILURE_SC = 111;
-       // RespData.Config.SM_ONLY = true; // set "true" just output message
-        RespData.Config.FRIENDLY_FAILURE_MESSAGE = null;//"friendly message";// set to "null" will using exception's message
+        // RespData.Config.SM_ONLY = true; // set "true" just output message
+        // "friendly message";// set to "null" will using exception's message
+        RespData.Config.FRIENDLY_FAILURE_MESSAGE = null;
     }
 
     @Bean

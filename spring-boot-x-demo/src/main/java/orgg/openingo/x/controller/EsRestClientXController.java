@@ -29,14 +29,10 @@ package orgg.openingo.x.controller;
 
 import lombok.SneakyThrows;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.elasticsearch.action.delete.DeleteRequest;
-import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.openingo.jdkits.json.JacksonKit;
@@ -52,9 +48,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * EsController
+ * EsRestClientXController
  *
- * @author zhucongqi
+ * @author Qicz
  */
 @RestController
 @RequestMapping("/esx")
@@ -122,17 +118,14 @@ public class EsRestClientXController {
     }
 
     @DeleteMapping("/user/{id}")
-    public RestStatus deleteById(@PathVariable("id") Integer id) {
-        DeleteRequest deleteRequest = new DeleteRequest("qicz");
-        deleteRequest.id(id.toString());
-        DeleteResponse response = null;
+    public boolean deleteById(@PathVariable("id") Integer id) {
+        boolean ret = false;
         try {
-            response = this.restHighLevelClientX.client().delete(deleteRequest, RequestOptions.DEFAULT);
+            ret = this.restHighLevelClientX.deleteByDocId("qicz", id.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        assert response != null;
-        return response.status();
+        return ret;
     }
 
     @GetMapping("/user/find")

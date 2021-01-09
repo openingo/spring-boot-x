@@ -30,7 +30,6 @@ package org.openingo.spring.extension.feign.config;
 import com.netflix.hystrix.strategy.concurrency.HystrixConcurrencyStrategy;
 import feign.RequestInterceptor;
 import lombok.extern.slf4j.Slf4j;
-import org.openingo.jdkits.collection.ListKit;
 import org.openingo.jdkits.validate.ValidateKit;
 import org.openingo.spring.extension.feign.hystrix.FeignHystrixConcurrencyStrategy;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -80,11 +79,10 @@ public class FeignConfig {
                 String value = request.getHeader(name);
                 Collection<String> values = requestTemplateHeaders.get(name);
                 // convert to writeable
-                values = new ArrayList<>(values);
+                // first time create new collection, the second time use the created
+                values = Optional.of(new ArrayList<>(values)).orElse(new ArrayList<>());
                 if (!lowerCaseRequestTemplateHeaders.contains(name.toLowerCase())) {
                     // None of the same names exist
-                    // first time create new collection, the second time use the created
-                    values = Optional.ofNullable(values).orElse(ListKit.emptyArrayList());
                     values.add(value);
                     requestTemplateHeaders.put(name, values);
                 } else {

@@ -55,7 +55,9 @@ import java.util.Properties;
  */
 public class DruidDataSourceProvider extends DruidDataSource implements IDataSourceProvider {
 
-    // provider Name
+    /**
+     *  provider Name
+      */
     private String providerName = null;
 
     private String publicKey;

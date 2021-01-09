@@ -29,6 +29,7 @@ package org.openingo.spring.boot;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.openingo.jdkits.validate.ValidateKit;
 import org.openingo.spring.constants.EnvsConstants;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryUtils;
@@ -63,6 +64,11 @@ import java.util.zip.ZipEntry;
 public final class SpringApplicationX {
 
     /**
+     * config copy arg
+     */
+    private static final String CP_CONFIG_ARG = "ccp";
+
+    /**
      * Static helper that can be used to run a {@link SpringApplication} from the
      * specified source using default settings.
      * @param primarySource the primary source to load
@@ -85,10 +91,16 @@ public final class SpringApplicationX {
         SpringApplicationX.springApplication = new SpringApplication(primarySources);
         // auto cp configs
         SpringApplicationX.copyConfigsInJar(SpringApplicationX.springApplication.getMainApplicationClass());
+        // just cp configs
+        if (ValidateKit.isNotEmpty(args) && args.length == 1 && CP_CONFIG_ARG.equals(args[0])) {
+            return null;
+        }
         SpringApplicationX.applicationContext = SpringApplicationX.springApplication.run(args);
         SpringApplicationX.springApplicationX = new SpringApplicationX();
         // init application X
         initSpringApplicationX();
+        // log the application info
+        applicationInfo();
         return applicationContext;
     }
 
@@ -186,7 +198,18 @@ public final class SpringApplicationX {
      * Spring application info
      */
     public static void applicationInfo() {
-        System.out.println(applicationPackage);
+        String infoBuilder = "\n=======Application Info========\n" +
+                String.format(" SpringBootVersion: %s\n", springBootVersion) +
+                String.format(" SpringBootVersionX: %s\n", springBootVersionX) +
+                String.format(" ApplicationPackage: %s\n", applicationPackage) +
+                String.format(" MainApplicationClass: %s\n", mainApplicationClass) +
+                String.format(" RunningAsJar: %s\n", isRunningAsJar) +
+                String.format(" isDebugging: %s\n", isDebugging) +
+                String.format(" Server.port: %s\n", environment.getProperty("server.port")) +
+                String.format(" Client.ip-address: %s\n", environment.getProperty("spring.cloud.client.ip-address")) +
+                String.format(" User.dir: %s\n", environment.getProperty("user.dir")) +
+                "===============================\n";
+        log.info(infoBuilder);
     }
 
     /**
