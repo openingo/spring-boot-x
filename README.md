@@ -4,6 +4,7 @@
 
 ![maven](https://img.shields.io/maven-central/v/org.openingo.spring/spring-boot-x.svg)
 
+[详细使用教程](https://izcqi.com/posts/2021/01/09/spring-boot-x-specify/)
 
 ### [Release Notes](RELEASENOTES.md)
 
