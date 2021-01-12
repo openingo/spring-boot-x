@@ -260,7 +260,7 @@ public class RestHighLevelClientX {
 
                     @Override
                     public void onFailure(Exception e) {
-                        log.error("the bulk request error \"{}\"", e.getLocalizedMessage());
+                        log.error("==the async bulk request error \"{}\"==", e.getLocalizedMessage());
                         ret[0] = false;
                     }
                 });
@@ -292,7 +292,7 @@ public class RestHighLevelClientX {
 
                     @Override
                     public void onFailure(Exception e) {
-                        log.error("the async mget failure => \"{}\"", e.getLocalizedMessage());
+                        log.error("==the async mget failure => \"{}\"==", e.getLocalizedMessage());
                     }
                 });
             }
@@ -379,8 +379,11 @@ public class RestHighLevelClientX {
         SearchRequest searchRequest = new SearchRequest(index);
         searchRequest.source(searchSourceBuilder);
         PageRequest pageable = PageRequest.of(pageNumber, pageSize);
-        SearchResponse response = this.restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-        AggregatedPageImpl<T> aggregatedPage = this.pagination(clazz, ValidateKit.isNotNull(searchSourceBuilder.highlighter()), response, pageable);
+        SearchResponse response = this.doSearch(searchRequest);
+        AggregatedPageImpl<T> aggregatedPage = null;
+        if (ValidateKit.isNotNull(response)) {
+            aggregatedPage = this.pagination(clazz, ValidateKit.isNotNull(searchSourceBuilder.highlighter()), response, pageable);
+        }
         if (ValidateKit.isNull(aggregatedPage)) {
             aggregatedPage = new AggregatedPageImpl<>(ListKit.emptyList(), pageable, 0);
         }
@@ -463,13 +466,50 @@ public class RestHighLevelClientX {
         searchSourceBuilder.query(boolQueryBuilder);
         searchSourceBuilder.highlighter(highlightBuilder);
 
+        // search result
+        List<T> searchRet = ListKit.emptyArrayList();
         // do search action
         SearchRequest searchRequest = new SearchRequest(index);
         searchRequest.source(searchSourceBuilder);
-        SearchResponse response = this.restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-        List<T> searchRet = ListKit.emptyArrayList();
-        this.highlightPageData(clazz, ValidateKit.isNotNull(highlightBuilder), searchRet, response.getHits());
+        SearchResponse response = this.doSearch(searchRequest);
+        if (ValidateKit.isNotNull(response)) {
+            this.highlightPageData(clazz, ValidateKit.isNotNull(highlightBuilder), searchRet, response.getHits());
+        }
         return searchRet;
+    }
+
+    /**
+     * Do search action
+     * @param searchRequest the search request with query and params
+     * @return search response
+     * @throws IOException es io exception
+     */
+    private SearchResponse doSearch(SearchRequest searchRequest) throws IOException {
+        String way = this.getProcessingWay();
+        final SearchResponse[] responses = new SearchResponse[1];
+        switch (way) {
+            case SYNC: {
+                responses[0] = this.restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+            }
+                break;
+            case ASYNC: {
+                this.restHighLevelClient.searchAsync(searchRequest, RequestOptions.DEFAULT, new ActionListener<SearchResponse>() {
+                    @Override
+                    public void onResponse(SearchResponse searchResponse) {
+                        responses[0] = searchResponse;
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        log.error("==the async search failure => \"{}\"==", e.getMessage());
+                    }
+                });
+            }
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + way);
+        }
+        return responses[0];
     }
 
     /**
