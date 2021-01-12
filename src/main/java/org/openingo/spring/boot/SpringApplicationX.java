@@ -234,6 +234,7 @@ public final class SpringApplicationX {
             final String configPath = "config/";
             File config = new File(System.getProperty("user.dir") + "/" + configPath);
             if (config.exists() || !config.mkdir()) {
+                log.info("==the configs is exist or create config path error.==");
                 return;
             }
             log.info("==starting copy configs...==");
