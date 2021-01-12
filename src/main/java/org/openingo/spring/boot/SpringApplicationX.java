@@ -89,10 +89,9 @@ public final class SpringApplicationX {
     @SneakyThrows
     public static ConfigurableApplicationContext run(Class<?>[] primarySources, String[] args) {
         SpringApplicationX.springApplication = new SpringApplication(primarySources);
-        // auto cp configs
-        SpringApplicationX.copyConfigsInJar(SpringApplicationX.springApplication.getMainApplicationClass());
         // just cp configs
         if (ValidateKit.isNotEmpty(args) && args.length == 1 && CP_CONFIG_ARG.equals(args[0])) {
+            SpringApplicationX.copyConfigsInJar(SpringApplicationX.springApplication.getMainApplicationClass());
             return null;
         }
         SpringApplicationX.applicationContext = SpringApplicationX.springApplication.run(args);
