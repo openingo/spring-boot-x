@@ -69,41 +69,6 @@ public final class SpringApplicationX {
     private static final String CP_CONFIG_ARG = "ccp";
 
     /**
-     * Static helper that can be used to run a {@link SpringApplication} from the
-     * specified source using default settings.
-     * @param primarySource the primary source to load
-     * @param args the application arguments (usually passed from a Java main method)
-     * @return the running {@link ApplicationContext}
-     */
-    public static ConfigurableApplicationContext run(Class<?> primarySource, String... args) {
-        return run(new Class[]{primarySource}, args);
-    }
-
-    /**
-     * Static helper that can be used to run a {@link SpringApplication} from the
-     * specified sources using default settings and user supplied arguments.
-     * @param primarySources the primary sources to load
-     * @param args the application arguments (usually passed from a Java main method)
-     * @return the running {@link ApplicationContext}
-     */
-    @SneakyThrows
-    public static ConfigurableApplicationContext run(Class<?>[] primarySources, String[] args) {
-        SpringApplicationX.springApplication = new SpringApplication(primarySources);
-        // just cp configs
-        if (ValidateKit.isNotEmpty(args) && args.length == 1 && CP_CONFIG_ARG.equals(args[0])) {
-            SpringApplicationX.copyConfigsInJar(SpringApplicationX.springApplication.getMainApplicationClass());
-            return null;
-        }
-        SpringApplicationX.applicationContext = SpringApplicationX.springApplication.run(args);
-        SpringApplicationX.springApplicationX = new SpringApplicationX();
-        // init application X
-        initSpringApplicationX();
-        // log the application info
-        applicationInfo();
-        return applicationContext;
-    }
-
-    /**
      * Current Spring ApplicationX
      */
     public static SpringApplicationX springApplicationX;
@@ -150,6 +115,11 @@ public final class SpringApplicationX {
     public static String springBootVersionX = SpringBootVersionX.getVersion();
 
     /**
+     * whether current application running as a jar or yet
+     */
+    public static boolean isRunningAsJar = false;
+
+    /**
      * check current spring application active profile contain 'debug/dev' or not
      * @return <tt>true</tt> if active profile is not 'prod'.
      */
@@ -165,6 +135,119 @@ public final class SpringApplicationX {
         SpringApplicationX.environment = applicationContext.getEnvironment();
         SpringApplicationX.isDebugging = isDebugging();
         SpringApplicationX.initMainApplicationInfo(springApplication.getMainApplicationClass());
+    }
+
+    /**
+     * copy configs that in 'config' path or some 'xml','yaml','yml','properties'
+     * @param source spring boot mainApplicationClass file
+     * @throws IOException io exception
+     */
+    private static void copyConfigsInJar(File source) throws IOException {
+        if (ValidateKit.isNull(source) || !SpringApplicationX.isRunningAsJar) {
+            return;
+        }
+        final String configPath = "config/";
+        File config = new File(System.getProperty("user.dir") + "/" + configPath);
+        if (config.exists() || !config.mkdir()) {
+            log.info("==the configs is exist or create config path error.==");
+            return;
+        }
+        log.info("==starting copy configs...==");
+        JarFile jarFile = new JarFile(source);
+        final Set<String> configFiles = new HashSet<String>(){{
+            add(".properties");
+            add(".yaml");
+            add(".yml");
+            add(".xml");
+        }};
+        int copyFileCount = 0;
+        for (Enumeration<? extends ZipEntry> entries = jarFile.entries(); entries.hasMoreElements(); ) {
+            ZipEntry entry = entries.nextElement();
+            String entryName = entry.getName();
+            boolean isConfig = false;
+            int lastIndexOf = entryName.indexOf(configPath);
+            String outPath = "";
+            // has config dir
+            if (lastIndexOf != -1) {
+                outPath = entryName.substring(lastIndexOf);
+                isConfig = true;
+            } else {
+                lastIndexOf = entryName.lastIndexOf(".");
+                if (lastIndexOf != -1) {
+                    String file = entryName.substring(entryName.lastIndexOf("/") + 1);
+                    boolean pomFile = "pom.properties".equals(file) || "pom.xml".equals(file);
+                    isConfig = configFiles.contains(entryName.substring(lastIndexOf)) && !pomFile;
+                    if (isConfig) {
+                        outPath = String.join("", configPath, file);
+                    }
+                }
+            }
+
+            if (!isConfig) {
+                continue;
+            }
+            InputStream jarFileInputStream = jarFile.getInputStream(entry);
+            File currentFile = new File(outPath.substring(0, outPath.lastIndexOf('/')));;
+            if (!currentFile.exists() && !currentFile.mkdirs()) {
+                continue;
+            }
+            if (new File(outPath).isDirectory()) {
+                continue;
+            }
+            copyFileCount++;
+            log.info("==copy \"{}\" to \"{}\"==", entryName, outPath);
+            FileOutputStream out = new FileOutputStream(outPath);
+            byte[] bytes = new byte[1024];
+            int len;
+            while ((len = jarFileInputStream.read(bytes)) > 0) {
+                out.write(bytes, 0, len);
+            }
+            jarFileInputStream.close();
+            out.close();
+        }
+        log.info("==copy \"{}\" files.==", copyFileCount);
+        log.info("==copy configs finished...==");
+    }
+
+    /**
+     * Static helper that can be used to run a {@link SpringApplication} from the
+     * specified source using default settings.
+     * @param primarySource the primary source to load
+     * @param args the application arguments (usually passed from a Java main method)
+     * @return the running {@link ApplicationContext}
+     */
+    public static ConfigurableApplicationContext run(Class<?> primarySource, String... args) {
+        return run(new Class[]{primarySource}, args);
+    }
+
+    /**
+     * Static helper that can be used to run a {@link SpringApplication} from the
+     * specified sources using default settings and user supplied arguments.
+     * @param primarySources the primary sources to load
+     * @param args the application arguments (usually passed from a Java main method)
+     * @return the running {@link ApplicationContext}
+     */
+    @SneakyThrows
+    public static ConfigurableApplicationContext run(Class<?>[] primarySources, String[] args) {
+        SpringApplicationX.springApplication = new SpringApplication(primarySources);
+        ApplicationHome applicationHome = new ApplicationHome(mainApplicationClass);
+        File source = applicationHome.getSource();
+        if (source != null) {
+            String absolutePath = source.getAbsolutePath();
+            SpringApplicationX.isRunningAsJar = absolutePath.endsWith("jar");
+        }
+        // just cp configs
+        if (ValidateKit.isNotEmpty(args) && args.length == 1 && CP_CONFIG_ARG.equals(args[0])) {
+            SpringApplicationX.copyConfigsInJar(source);
+            return null;
+        }
+        SpringApplicationX.applicationContext = SpringApplicationX.springApplication.run(args);
+        SpringApplicationX.springApplicationX = new SpringApplicationX();
+        // init application X
+        initSpringApplicationX();
+        // log the application info
+        applicationInfo();
+        return applicationContext;
     }
 
     /**
@@ -209,89 +292,5 @@ public final class SpringApplicationX {
                 String.format(" User.dir: %s\n", environment.getProperty("user.dir")) +
                 "===============================\n";
         log.info(infoBuilder);
-    }
-
-    /**
-     * whether current application running as a jar or yet
-     */
-    public static boolean isRunningAsJar = false;
-
-    /**
-     * copy configs that in 'config' path or some 'xml','yaml','yml','properties'
-     * @param mainApplicationClass spring boot mainApplicationClass
-     * @throws IOException io exception
-     */
-    public static void copyConfigsInJar(Class<?> mainApplicationClass) throws IOException {
-        ApplicationHome applicationHome = new ApplicationHome(mainApplicationClass);
-        File source = applicationHome.getSource();
-        if (source != null) {
-            String absolutePath = source.getAbsolutePath();
-            SpringApplicationX.isRunningAsJar = absolutePath.endsWith("jar");
-            if (!SpringApplicationX.isRunningAsJar) {
-                return;
-            }
-
-            final String configPath = "config/";
-            File config = new File(System.getProperty("user.dir") + "/" + configPath);
-            if (config.exists() || !config.mkdir()) {
-                log.info("==the configs is exist or create config path error.==");
-                return;
-            }
-            log.info("==starting copy configs...==");
-            JarFile jarFile = new JarFile(source);
-            final Set<String> configFiles = new HashSet<String>(){{
-                add(".properties");
-                add(".yaml");
-                add(".yml");
-                add(".xml");
-            }};
-            int copyFileCount = 0;
-            for (Enumeration<? extends ZipEntry> entries = jarFile.entries(); entries.hasMoreElements(); ) {
-                ZipEntry entry = entries.nextElement();
-                String entryName = entry.getName();
-                boolean isConfig = false;
-                int lastIndexOf = entryName.indexOf(configPath);
-                String outPath = "";
-                // has config dir
-                if (lastIndexOf != -1) {
-                    outPath = entryName.substring(lastIndexOf);
-                    isConfig = true;
-                } else {
-                    lastIndexOf = entryName.lastIndexOf(".");
-                    if (lastIndexOf != -1) {
-                        String file = entryName.substring(entryName.lastIndexOf("/") + 1);
-                        boolean pomFile = "pom.properties".equals(file) || "pom.xml".equals(file);
-                        isConfig = configFiles.contains(entryName.substring(lastIndexOf)) && !pomFile;
-                        if (isConfig) {
-                            outPath = String.join("", configPath, file);
-                        }
-                    }
-                }
-
-                if (!isConfig) {
-                    continue;
-                }
-                InputStream jarFileInputStream = jarFile.getInputStream(entry);
-                File currentFile = new File(outPath.substring(0, outPath.lastIndexOf('/')));;
-                if (!currentFile.exists() && !currentFile.mkdirs()) {
-                    continue;
-                }
-                if (new File(outPath).isDirectory()) {
-                    continue;
-                }
-                copyFileCount++;
-                log.info("==copy \"{}\" to \"{}\"==", entryName, outPath);
-                FileOutputStream out = new FileOutputStream(outPath);
-                byte[] bytes = new byte[1024];
-                int len;
-                while ((len = jarFileInputStream.read(bytes)) > 0) {
-                    out.write(bytes, 0, len);
-                }
-                jarFileInputStream.close();
-                out.close();
-            }
-            log.info("==copy \"{}\" files.==", copyFileCount);
-            log.info("==copy configs finished...==");
-        }
     }
 }
