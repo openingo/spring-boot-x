@@ -129,12 +129,26 @@ public final class SpringApplicationX {
     }
 
     /**
+     * pre init Spring Application info
+     */
+    private static File preInitSpringApplicationX() {
+        SpringApplicationX.mainApplicationClass = springApplication.getMainApplicationClass();
+        SpringApplicationX.applicationPackage = mainApplicationClass.getPackage().getName();
+        ApplicationHome applicationHome = new ApplicationHome(mainApplicationClass);
+        File source = applicationHome.getSource();
+        if (source != null) {
+            String absolutePath = source.getAbsolutePath();
+            SpringApplicationX.isRunningAsJar = absolutePath.endsWith("jar");
+        }
+        return source;
+    }
+
+    /**
      * Init Spring Application Config
      */
     private static void initSpringApplicationX() {
         SpringApplicationX.environment = applicationContext.getEnvironment();
         SpringApplicationX.isDebugging = isDebugging();
-        SpringApplicationX.initMainApplicationInfo(springApplication.getMainApplicationClass());
     }
 
     /**
@@ -143,7 +157,7 @@ public final class SpringApplicationX {
      * @throws IOException io exception
      */
     private static void copyConfigsInJar(File source) throws IOException {
-        if (ValidateKit.isNull(source) || !SpringApplicationX.isRunningAsJar) {
+        if (!SpringApplicationX.isRunningAsJar) {
             return;
         }
         final String configPath = "config/";
@@ -230,12 +244,8 @@ public final class SpringApplicationX {
     @SneakyThrows
     public static ConfigurableApplicationContext run(Class<?>[] primarySources, String[] args) {
         SpringApplicationX.springApplication = new SpringApplication(primarySources);
-        ApplicationHome applicationHome = new ApplicationHome(mainApplicationClass);
-        File source = applicationHome.getSource();
-        if (source != null) {
-            String absolutePath = source.getAbsolutePath();
-            SpringApplicationX.isRunningAsJar = absolutePath.endsWith("jar");
-        }
+        // pre init application X
+        File source = preInitSpringApplicationX();
         // just cp configs
         if (ValidateKit.isNotEmpty(args) && args.length == 1 && CP_CONFIG_ARG.equals(args[0])) {
             SpringApplicationX.copyConfigsInJar(source);
@@ -248,15 +258,6 @@ public final class SpringApplicationX {
         // log the application info
         applicationInfo();
         return applicationContext;
-    }
-
-    /**
-     * Init main application info: class and package
-     * @param mainApplicationClass
-     */
-    public static void initMainApplicationInfo(Class<?> mainApplicationClass) {
-        SpringApplicationX.mainApplicationClass = mainApplicationClass;
-        SpringApplicationX.applicationPackage = mainApplicationClass.getPackage().getName();
     }
 
     /**

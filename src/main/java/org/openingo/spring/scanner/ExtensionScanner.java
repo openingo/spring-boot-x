@@ -27,14 +27,12 @@
 
 package org.openingo.spring.scanner;
 
-import org.openingo.jdkits.validate.ValidateKit;
 import org.openingo.spring.boot.SpringApplicationX;
 import org.openingo.spring.constants.Constants;
 import org.openingo.spring.constants.PackageConstants;
 import org.springframework.boot.ansi.AnsiColor;
 import org.springframework.boot.ansi.AnsiOutput;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 
 import java.io.PrintStream;
 
@@ -57,36 +55,5 @@ public class ExtensionScanner {
         out.println(String.format(" ( %s )", SpringApplicationX.springBootVersionX));
         out.print(AnsiOutput.toString(AnsiColor.GREEN, Constants.SPRING_APPLICATION_X, AnsiColor.MAGENTA, " is Running..."));
         out.println();
-    }
-
-    @Configuration
-    public static class ExtensionConfig {
-
-        public ExtensionConfig() {
-            Class<?> mainApplicationClass = this.deduceMainApplicationClass();
-            if (ValidateKit.isNotNull(mainApplicationClass)) {
-                SpringApplicationX.initMainApplicationInfo(mainApplicationClass);
-            }
-        }
-
-        /**
-         * Returns deduce MainApplication Class
-         * @return in test env may be return <tt>null</tt>
-         */
-        private Class<?> deduceMainApplicationClass() {
-            try {
-                StackTraceElement[] stackTrace = new RuntimeException().getStackTrace();
-                for (StackTraceElement stackTraceElement : stackTrace) {
-                    String className = stackTraceElement.getClassName();
-                    if ("main".equals(stackTraceElement.getMethodName())
-                            && !className.contains("junit")) {
-                        return Class.forName(className);
-                    }
-                }
-            } catch (ClassNotFoundException ex) {
-                // Swallow and continue
-            }
-            return null;
-        }
     }
 }
