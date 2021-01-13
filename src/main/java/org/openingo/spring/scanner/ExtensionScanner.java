@@ -48,6 +48,13 @@ public class ExtensionScanner {
 
     public ExtensionScanner() {
         PrintStream out = System.out;
+        out.println("  ____                   _                   ____                    _    __  __\n" +
+                " / ___|   _ __    _ __  (_)  _ __     __ _  | __ )    ___     ___   | |_  \\ \\/ /\n" +
+                " \\___ \\  | '_ \\  | '__| | | | '_ \\   / _` | |  _ \\   / _ \\   / _ \\  | __|  \\  / \n" +
+                "  ___) | | |_) | | |    | | | | | | | (_| | | |_) | | (_) | | (_) | | |_   /  \\ \n" +
+                " |____/  | .__/  |_|    |_| |_| |_|  \\__, | |____/   \\___/   \\___/   \\__| /_/\\_\\\n" +
+                "         |_|                         |___/                                      ");
+        out.println(String.format(" ( %s )", SpringApplicationX.springBootVersionX));
         out.print(AnsiOutput.toString(AnsiColor.GREEN, Constants.SPRING_APPLICATION_X, AnsiColor.MAGENTA, " is Running..."));
         out.println();
     }
