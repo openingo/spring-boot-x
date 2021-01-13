@@ -64,16 +64,6 @@ import java.util.zip.ZipEntry;
 public final class SpringApplicationX {
 
     /**
-     * config copy arg
-     */
-    private static final String CP_CONFIG_ARG = "ccp";
-
-    /**
-     * Current Spring ApplicationX
-     */
-    public static SpringApplicationX springApplicationX;
-
-    /**
      * Current Spring Application
      */
     public static SpringApplication springApplication;
@@ -120,6 +110,16 @@ public final class SpringApplicationX {
     public static boolean isRunningAsJar = false;
 
     /**
+     * config copy arg
+     */
+    private static final String CP_CONFIG_ARG = "ccp";
+
+    /**
+     * Provides access to the application home directory.
+     */
+    private static File applicationHomeSource;
+
+    /**
      * check current spring application active profile contain 'debug/dev' or not
      * @return <tt>true</tt> if active profile is not 'prod'.
      */
@@ -131,43 +131,43 @@ public final class SpringApplicationX {
     /**
      * pre init Spring Application info
      */
-    private static File preInitSpringApplicationX() {
-        SpringApplicationX.mainApplicationClass = springApplication.getMainApplicationClass();
-        SpringApplicationX.applicationPackage = mainApplicationClass.getPackage().getName();
+    private static void preInitSpringApplicationX(Class<?>[] primarySources) {
+        springApplication = new SpringApplication(primarySources);
+        mainApplicationClass = springApplication.getMainApplicationClass();
+        applicationPackage = mainApplicationClass.getPackage().getName();
         ApplicationHome applicationHome = new ApplicationHome(mainApplicationClass);
-        File source = applicationHome.getSource();
-        if (source != null) {
-            String absolutePath = source.getAbsolutePath();
-            SpringApplicationX.isRunningAsJar = absolutePath.endsWith("jar");
+        applicationHomeSource = applicationHome.getSource();
+        if (applicationHomeSource != null) {
+            String absolutePath = applicationHomeSource.getAbsolutePath();
+            isRunningAsJar = absolutePath.endsWith("jar");
         }
-        return source;
     }
 
     /**
      * Init Spring Application Config
      */
-    private static void initSpringApplicationX() {
-        SpringApplicationX.environment = applicationContext.getEnvironment();
-        SpringApplicationX.isDebugging = isDebugging();
+    private static void initSpringApplicationX(String[] args) {
+        applicationContext = springApplication.run(args);
+        environment = applicationContext.getEnvironment();
+        isDebugging = isDebugging();
     }
 
     /**
      * copy configs that in 'config' path or some 'xml','yaml','yml','properties'
-     * @param source spring boot mainApplicationClass file
      * @throws IOException io exception
      */
-    private static void copyConfigsInJar(File source) throws IOException {
-        if (!SpringApplicationX.isRunningAsJar) {
+    private static void copyConfigsInJar() throws IOException {
+        if (!isRunningAsJar) {
             return;
         }
         final String configPath = "config/";
         File config = new File(System.getProperty("user.dir") + "/" + configPath);
         if (config.exists() || !config.mkdir()) {
-            log.info("==the configs is exist or create config path error.==");
+            System.out.println("==the configs is exist or create config path error.==");
             return;
         }
-        log.info("==starting copy configs...==");
-        JarFile jarFile = new JarFile(source);
+        System.out.println("==starting copy configs.==");
+        JarFile jarFile = new JarFile(applicationHomeSource);
         final Set<String> configFiles = new HashSet<String>(){{
             add(".properties");
             add(".yaml");
@@ -209,7 +209,7 @@ public final class SpringApplicationX {
                 continue;
             }
             copyFileCount++;
-            log.info("==copy \"{}\" to \"{}\"==", entryName, outPath);
+            System.out.println("==copy \"" + entryName + "\" to \"" + outPath + "\"==");
             FileOutputStream out = new FileOutputStream(outPath);
             byte[] bytes = new byte[1024];
             int len;
@@ -219,8 +219,8 @@ public final class SpringApplicationX {
             jarFileInputStream.close();
             out.close();
         }
-        log.info("==copy \"{}\" files.==", copyFileCount);
-        log.info("==copy configs finished...==");
+        System.out.println("==copy \"" + copyFileCount + "\" files.==");
+        System.out.println("==copy configs finished.==");
     }
 
     /**
@@ -243,18 +243,15 @@ public final class SpringApplicationX {
      */
     @SneakyThrows
     public static ConfigurableApplicationContext run(Class<?>[] primarySources, String[] args) {
-        SpringApplicationX.springApplication = new SpringApplication(primarySources);
         // pre init application X
-        File source = preInitSpringApplicationX();
+        preInitSpringApplicationX(primarySources);
         // just cp configs
         if (ValidateKit.isNotEmpty(args) && args.length == 1 && CP_CONFIG_ARG.equals(args[0])) {
-            SpringApplicationX.copyConfigsInJar(source);
+            SpringApplicationX.copyConfigsInJar();
             return null;
         }
-        SpringApplicationX.applicationContext = SpringApplicationX.springApplication.run(args);
-        SpringApplicationX.springApplicationX = new SpringApplicationX();
         // init application X
-        initSpringApplicationX();
+        initSpringApplicationX(args);
         // log the application info
         applicationInfo();
         return applicationContext;
@@ -274,7 +271,7 @@ public final class SpringApplicationX {
      * @see ListableBeanFactory
      */
     public static <T> T getBean(Class<T> clazz) {
-        return SpringApplicationX.applicationContext.getBean(clazz);
+        return applicationContext.getBean(clazz);
     }
 
     /**
@@ -285,7 +282,7 @@ public final class SpringApplicationX {
                 String.format(" SpringBootVersion: %s\n", springBootVersion) +
                 String.format(" SpringBootVersionX: %s\n", springBootVersionX) +
                 String.format(" ApplicationPackage: %s\n", applicationPackage) +
-                String.format(" MainApplicationClass: %s\n", mainApplicationClass) +
+                String.format(" MainApplicationClass: %s\n", mainApplicationClass.getName()) +
                 String.format(" RunningAsJar: %s\n", isRunningAsJar) +
                 String.format(" isDebugging: %s\n", isDebugging) +
                 String.format(" Server.port: %s\n", environment.getProperty("server.port")) +
