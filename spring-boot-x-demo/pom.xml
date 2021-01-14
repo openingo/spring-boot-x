@@ -38,7 +38,7 @@
     <properties>
         <spring-boot.version>2.1.8.RELEASE</spring-boot.version>
         <springcloud.version>Greenwich.SR2</springcloud.version>
-        <spring-boot-x.version>3.0-SNAPSHOT</spring-boot-x.version>
+        <spring-boot-x.version>2.9.3.RELEASE</spring-boot-x.version>
         <mysql.sersion>8.0.17</mysql.sersion>
         <druid.version>1.1.23</druid.version>
         <hikaricp.version>3.2.0</hikaricp.version>
