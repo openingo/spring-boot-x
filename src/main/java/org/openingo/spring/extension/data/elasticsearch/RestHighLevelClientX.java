@@ -458,7 +458,7 @@ public class RestHighLevelClientX {
         }
         // exclude docs
         if (ValidateKit.isAllNotNull(docIdFieldName, excludeDocIds)) {
-            boolQueryBuilder.must(new TermsQueryBuilder(docIdFieldName, excludeDocIds));
+            boolQueryBuilder.mustNot(new TermsQueryBuilder(docIdFieldName, excludeDocIds));
         }
         // random the query data, must not use custom order
         boolQueryBuilder.must(QueryBuilders.functionScoreQuery(new RandomScoreFunctionBuilder()));
