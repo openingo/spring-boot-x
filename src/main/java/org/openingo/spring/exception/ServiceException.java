@@ -188,4 +188,9 @@ public class ServiceException extends RuntimeException {
     public Object getExceptionCode() {
         return this.exceptionCode;
     }
+
+    @Override
+    public synchronized Throwable fillInStackTrace() {
+        return this;
+    }
 }
