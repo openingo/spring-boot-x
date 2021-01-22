@@ -327,9 +327,9 @@ public class RestHighLevelClientX {
     public List<Map<String, Object>> findAsMapByIds(String index, List<String> docIds) throws IOException {
         MultiGetItemResponse[] multiGetItemResponses = this.findAsResponse(index, docIds);
         if (ValidateKit.isNull(multiGetItemResponses)) {
-            return ListKit.emptyArrayList();
+            return ListKit.emptyList();
         }
-        List<Map<String, Object>> docMaps = ListKit.emptyArrayList();
+        List<Map<String, Object>> docMaps = ListKit.emptyArrayList(multiGetItemResponses.length);
         for (MultiGetItemResponse multiGetItemResponse : multiGetItemResponses) {
             Map<String, Object> sourceAsMap = multiGetItemResponse.getResponse().getSourceAsMap();
             docMaps.add(sourceAsMap);
@@ -340,7 +340,7 @@ public class RestHighLevelClientX {
     public <T> List<T> findByIds(Class<T> clazz, String index, List<String> docIds) throws IOException {
         List<Map<String, Object>> docMaps = this.findAsMapByIds(index, docIds);
         if (ValidateKit.isNull(docMaps)) {
-            return ListKit.emptyArrayList();
+            return ListKit.emptyList();
         }
         return JacksonKit.toList(JacksonKit.toJson(docMaps), clazz);
     }
@@ -467,13 +467,15 @@ public class RestHighLevelClientX {
         searchSourceBuilder.highlighter(highlightBuilder);
 
         // search result
-        List<T> searchRet = ListKit.emptyArrayList();
+        List<T> searchRet = ListKit.emptyList();
         // do search action
         SearchRequest searchRequest = new SearchRequest(index);
         searchRequest.source(searchSourceBuilder);
         SearchResponse response = this.doSearch(searchRequest);
         if (ValidateKit.isNotNull(response)) {
-            this.highlightPageData(clazz, ValidateKit.isNotNull(highlightBuilder), searchRet, response.getHits());
+            SearchHit[] searchHits = response.getHits().getHits();
+            searchRet = ListKit.emptyArrayList(searchHits.length);
+            this.highlightPageData(clazz, ValidateKit.isNotNull(highlightBuilder), searchRet, searchHits);
         }
         return searchRet;
     }
@@ -521,11 +523,12 @@ public class RestHighLevelClientX {
     private <T> AggregatedPageImpl<T> pagination(Class<T> clazz, boolean highlight, SearchResponse response, PageRequest pageable) throws IOException {
         AggregatedPageImpl<T> aggregatedPage = null;
         if (ValidateKit.isNotNull(response) && RestStatus.OK.equals(response.status())) {
-            List<T> searchRet = ListKit.emptyArrayList();
-            SearchHits responseHits = response.getHits();
-            if (this.highlightPageData(clazz, highlight, searchRet, responseHits)) {
+            SearchHits searchHits = response.getHits();
+            SearchHit[] hits = searchHits.getHits();
+            List<T> searchRet = ListKit.emptyArrayList(hits.length);
+            if (this.highlightPageData(clazz, highlight, searchRet, hits)) {
                 long total = 0;
-                TotalHits totalHits = responseHits.getTotalHits();
+                TotalHits totalHits = searchHits.getTotalHits();
                 if (ValidateKit.isNotNull(totalHits)) {
                     total = totalHits.value;
                 }
@@ -540,15 +543,14 @@ public class RestHighLevelClientX {
      * highlight the page data
      * @param highlight highlight or not
      * @param searchRet result
-     * @param responseHits resp hits
+     * @param hits resp hits
      * @throws JsonProcessingException
      */
-    private <T> boolean highlightPageData(Class<T> clazz, boolean highlight, List<T> searchRet, SearchHits responseHits) throws JsonProcessingException {
-        SearchHit[] hits = responseHits.getHits();
+    private <T> boolean highlightPageData(Class<T> clazz, boolean highlight, List<T> searchRet, SearchHit[] hits) throws JsonProcessingException {
         if (ValidateKit.isEmpty(hits)) {
             return false;
         }
-        List<Map<String, Object>> tmpRet = ListKit.emptyArrayList();
+        List<Map<String, Object>> tmpRet = ListKit.emptyArrayList(hits.length);
         if (!highlight) {
             for (SearchHit hit : hits) {
                 Map<String, Object> sourceAsMap = hit.getSourceAsMap();

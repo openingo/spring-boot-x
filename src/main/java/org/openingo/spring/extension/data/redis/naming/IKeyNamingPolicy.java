@@ -74,7 +74,7 @@ public interface IKeyNamingPolicy {
      */
     default List<String> getKeyNames(Collection<String> keys) {
         if (ValidateKit.isNull(keys)) {
-            return ListKit.emptyArrayList();
+            return ListKit.emptyList();
         }
         return keys.stream().map(this::getKeyName).collect(Collectors.toList());
     }
