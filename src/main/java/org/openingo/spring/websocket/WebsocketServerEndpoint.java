@@ -29,6 +29,7 @@ package org.openingo.spring.websocket;
 
 import lombok.extern.slf4j.Slf4j;
 import org.openingo.jdkits.sys.SystemClockKit;
+import org.openingo.jdkits.validate.ValidateKit;
 
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
@@ -41,7 +42,7 @@ import java.io.IOException;
  * @author Qicz
  */
 @Slf4j
-@ServerEndpoint("/instant-notification/{connId}")
+@ServerEndpoint("/instant-ws/{connId}")
 public class WebsocketServerEndpoint {
 
     private static final Long EXPIRE_TIME = 24 * 60 * 60 * 1000L;
@@ -51,7 +52,7 @@ public class WebsocketServerEndpoint {
     private long connTime;
     private long lastActiveTime;
 
-    void fixLastActiveTime() {
+    private void fixLastActiveTime() {
         this.lastActiveTime = SystemClockKit.now();
     }
 
@@ -72,17 +73,25 @@ public class WebsocketServerEndpoint {
 
     @OnError
     private void onError(Session session, Throwable e) {
-        log.error("websocket异常, connId = {}, 空闲时间：{}ms", connId, SystemClockKit.now() - lastActiveTime);
+        log.error("WebsocketServerEndpoint has error, connId = {}, leisure time {} ms.", this.connId, SystemClockKit.now() - this.lastActiveTime);
         log.error("", e);
     }
 
     @OnClose
     private void onClose() throws IOException {
-        log.info("关闭websocket连接, connId = {}, 存活时间：{}ms", connId, SystemClockKit.now() - connTime);
-        if (connId != null) {
-            InstantManager.manager.removeConnection(connId, this);
+        log.info("WebsocketServerEndpoint onClose, connId = {}, live time {} ms.", this.connId, SystemClockKit.now() - this.connTime);
+        if (ValidateKit.isNotNull(this.connId)) {
+            InstantManager.manager.removeConnection(this.connId, this);
         }
     }
 
+    RemoteEndpoint.Basic getBasicRemote() {
+        this.fixLastActiveTime();
+        return this.session.getBasicRemote();
+    }
 
+    RemoteEndpoint.Async getAsyncRemote() {
+        this.fixLastActiveTime();
+        return session.getAsyncRemote();
+    }
 }

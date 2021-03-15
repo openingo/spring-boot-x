@@ -27,6 +27,7 @@
 
 package org.openingo.spring.websocket;
 
+import org.openingo.jdkits.json.JacksonKit;
 import org.openingo.jdkits.validate.ValidateKit;
 
 import javax.websocket.EncodeException;
@@ -84,8 +85,7 @@ public class InstantManager {
     public static void sendText(Integer connId, String text) throws IOException {
         List<WebsocketServerEndpoint> websocketServerEndpoints = manager.listEndpoint(connId);
         for (WebsocketServerEndpoint websocketServerEndpoint : websocketServerEndpoints) {
-            websocketServerEndpoint.fixLastActiveTime();
-            websocketServerEndpoint.session.getBasicRemote().sendText(text);
+            websocketServerEndpoint.getBasicRemote().sendText(text);
         }
     }
 
@@ -100,8 +100,7 @@ public class InstantManager {
     public static void sendBinary(Integer connId, ByteBuffer data) throws IOException {
         List<WebsocketServerEndpoint> websocketServerEndpoints = manager.listEndpoint(connId);
         for (WebsocketServerEndpoint websocketServerEndpoint : websocketServerEndpoints) {
-            websocketServerEndpoint.fixLastActiveTime();
-            websocketServerEndpoint.session.getBasicRemote().sendBinary(data);
+            websocketServerEndpoint.getBasicRemote().sendBinary(data);
         }
     }
 
@@ -121,8 +120,7 @@ public class InstantManager {
     public static void sendText(Integer connId, String fragment, boolean isLast) throws IOException {
         List<WebsocketServerEndpoint> websocketServerEndpoints = manager.listEndpoint(connId);
         for (WebsocketServerEndpoint websocketServerEndpoint : websocketServerEndpoints) {
-            websocketServerEndpoint.fixLastActiveTime();
-            websocketServerEndpoint.session.getBasicRemote().sendText(fragment, isLast);
+            websocketServerEndpoint.getBasicRemote().sendText(fragment, isLast);
         }
     }
 
@@ -143,8 +141,7 @@ public class InstantManager {
     public void sendBinary(Integer connId, ByteBuffer partialByte, boolean isLast) throws IOException {
         List<WebsocketServerEndpoint> websocketServerEndpoints = manager.listEndpoint(connId);
         for (WebsocketServerEndpoint websocketServerEndpoint : websocketServerEndpoints) {
-            websocketServerEndpoint.fixLastActiveTime();
-            websocketServerEndpoint.session.getBasicRemote().sendBinary(partialByte, isLast);
+            websocketServerEndpoint.getBasicRemote().sendBinary(partialByte, isLast);
         }
     }
 
@@ -161,8 +158,7 @@ public class InstantManager {
     public void sendObject(Integer connId, Object data) throws IOException, EncodeException {
         List<WebsocketServerEndpoint> websocketServerEndpoints = manager.listEndpoint(connId);
         for (WebsocketServerEndpoint websocketServerEndpoint : websocketServerEndpoints) {
-            websocketServerEndpoint.fixLastActiveTime();
-            websocketServerEndpoint.session.getBasicRemote().sendObject(data);
+            websocketServerEndpoint.getBasicRemote().sendObject(data);
         }
     }
 
@@ -177,7 +173,7 @@ public class InstantManager {
     public static long getSessionAsyncSendTimeout(Integer connId) {
         List<WebsocketServerEndpoint> websocketServerEndpoints = manager.listEndpoint(connId);
         if (ValidateKit.isNotNull(websocketServerEndpoints)) {
-            return websocketServerEndpoints.get(0).session.getAsyncRemote().getSendTimeout();
+            return websocketServerEndpoints.get(0).getAsyncRemote().getSendTimeout();
         }
         return -1;
     }
@@ -194,8 +190,7 @@ public class InstantManager {
     public static void setAsyncSendTimeout(Integer connId, long timeout) {
         List<WebsocketServerEndpoint> websocketServerEndpoints = manager.listEndpoint(connId);
         for (WebsocketServerEndpoint websocketServerEndpoint : websocketServerEndpoints) {
-            websocketServerEndpoint.fixLastActiveTime();
-            websocketServerEndpoint.session.getAsyncRemote().setSendTimeout(timeout);
+            websocketServerEndpoint.getAsyncRemote().setSendTimeout(timeout);
         }
     }
 
@@ -210,8 +205,7 @@ public class InstantManager {
     public void asyncSendText(Integer connId, String text, SendHandler completion) {
         List<WebsocketServerEndpoint> websocketServerEndpoints = manager.listEndpoint(connId);
         for (WebsocketServerEndpoint websocketServerEndpoint : websocketServerEndpoints) {
-            websocketServerEndpoint.fixLastActiveTime();
-            websocketServerEndpoint.session.getAsyncRemote().sendText(text, completion);
+            websocketServerEndpoint.getAsyncRemote().sendText(text, completion);
         }
     }
 
@@ -226,8 +220,7 @@ public class InstantManager {
         List<WebsocketServerEndpoint> websocketServerEndpoints = manager.listEndpoint(connId);
         List<Future<Void>> futures = new ArrayList<>(websocketServerEndpoints.size());
         for (WebsocketServerEndpoint websocketServerEndpoint : websocketServerEndpoints) {
-            websocketServerEndpoint.fixLastActiveTime();
-            futures.add(websocketServerEndpoint.session.getAsyncRemote().sendText(text));
+            futures.add(websocketServerEndpoint.getAsyncRemote().sendText(text));
         }
         return futures;
     }
@@ -244,8 +237,7 @@ public class InstantManager {
         List<WebsocketServerEndpoint> websocketServerEndpoints = manager.listEndpoint(connId);
         List<Future<Void>> futures = new ArrayList<>(websocketServerEndpoints.size());
         for (WebsocketServerEndpoint websocketServerEndpoint : websocketServerEndpoints) {
-            websocketServerEndpoint.fixLastActiveTime();
-            futures.add(websocketServerEndpoint.session.getAsyncRemote().sendBinary(data));
+            futures.add(websocketServerEndpoint.getAsyncRemote().sendBinary(data));
         }
         return futures;
     }
@@ -263,8 +255,7 @@ public class InstantManager {
     public static void asyncSendBinary(Integer connId, ByteBuffer data, SendHandler completion) {
         List<WebsocketServerEndpoint> websocketServerEndpoints = manager.listEndpoint(connId);
         for (WebsocketServerEndpoint websocketServerEndpoint : websocketServerEndpoints) {
-            websocketServerEndpoint.fixLastActiveTime();
-            websocketServerEndpoint.session.getAsyncRemote().sendBinary(data, completion);
+            websocketServerEndpoint.getAsyncRemote().sendBinary(data, completion);
         }
     }
 
@@ -280,8 +271,7 @@ public class InstantManager {
         List<WebsocketServerEndpoint> websocketServerEndpoints = manager.listEndpoint(connId);
         List<Future<Void>> futures = new ArrayList<>(websocketServerEndpoints.size());
         for (WebsocketServerEndpoint websocketServerEndpoint : websocketServerEndpoints) {
-            websocketServerEndpoint.fixLastActiveTime();
-            futures.add(websocketServerEndpoint.session.getAsyncRemote().sendObject(obj));
+            futures.add(websocketServerEndpoint.getAsyncRemote().sendObject(obj));
         }
         return futures;
     }
@@ -299,8 +289,37 @@ public class InstantManager {
     public static void asyncSendObject(Integer connId, Object obj, SendHandler completion) {
         List<WebsocketServerEndpoint> websocketServerEndpoints = manager.listEndpoint(connId);
         for (WebsocketServerEndpoint websocketServerEndpoint : websocketServerEndpoints) {
-            websocketServerEndpoint.fixLastActiveTime();
-            websocketServerEndpoint.session.getAsyncRemote().sendObject(obj, completion);
+            websocketServerEndpoint.getAsyncRemote().sendObject(obj, completion);
+        }
+    }
+
+    /**
+     * Send the message, blocking until the message is sent.
+     * @param connId connect id
+     * @param obj  The obj to send.
+     * @throws IllegalArgumentException if {@code text} is {@code null}.
+     * @throws IOException if an I/O error occurs during the sending of the
+     *                     message.
+     */
+    public static void sendJson(Integer connId, Object obj) throws IOException {
+        List<WebsocketServerEndpoint> websocketServerEndpoints = manager.listEndpoint(connId);
+        for (WebsocketServerEndpoint websocketServerEndpoint : websocketServerEndpoints) {
+            websocketServerEndpoint.getBasicRemote().sendText(JacksonKit.toJson(obj));
+        }
+    }
+
+    /**
+     * Send the message, blocking until the message is sent.
+     * @param connId connect id
+     * @param obj  The obj to send.
+     * @throws IllegalArgumentException if {@code text} is {@code null}.
+     * @throws IOException if an I/O error occurs during the sending of the
+     *                     message.
+     */
+    public static void asyncSendJson(Integer connId, Object obj) throws IOException {
+        List<WebsocketServerEndpoint> websocketServerEndpoints = manager.listEndpoint(connId);
+        for (WebsocketServerEndpoint websocketServerEndpoint : websocketServerEndpoints) {
+            websocketServerEndpoint.getAsyncRemote().sendText(JacksonKit.toJson(obj));
         }
     }
 

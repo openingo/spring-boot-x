@@ -36,18 +36,38 @@ public final class PropertiesConstants {
 
     private PropertiesConstants(){}
 
-    // redis config properties prefix
+    /**
+     *  redis config properties prefix
+     */
     public static final String REDIS_CONFIG_PROPERTIES_PREFIX = "openingo.redis";
 
-    // http configs
+    /**
+     * http configs
+     */
     private static final String HTTP_REQUEST_CONFIG_PROPERTIES_PREFIX = "openingo.http.request.";
-    // http request log config properties prefix
+
+    /**
+     * http request log config properties prefix
+     */
     public static final String HTTP_REQUEST_LOG_CONFIG_PROPERTIES_PREFIX = HTTP_REQUEST_CONFIG_PROPERTIES_PREFIX + "log";
-    // http request error config properties prefix
+
+    /**
+     * http request error config properties prefix
+     */
     public static final String HTTP_REQUEST_ERROR_CONFIG_PROPERTIES_PREFIX = HTTP_REQUEST_CONFIG_PROPERTIES_PREFIX + "error";
-    // http request cors config properties prefix
+
+    /**
+     * http request cors config properties prefix
+     */
     public static final String HTTP_REQUEST_CORS_CONFIG_PROPERTIES_PREFIX = HTTP_REQUEST_CONFIG_PROPERTIES_PREFIX + "cors";
 
-    // enable
+    /**
+     * websocket config properties prefix
+     */
+    public static final String WEBSOCKET_CONFIG_PROPERTIES_PREFIX = "openingo.websocket";
+
+    /**
+     * enable
+     */
     public static final String ENABLE = "enable";
 }
