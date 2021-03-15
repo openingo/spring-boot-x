@@ -25,7 +25,7 @@
  * SOFTWARE.
  */
 
-package org.openingo.spring.kit;
+package org.openingo.spring.validator;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
