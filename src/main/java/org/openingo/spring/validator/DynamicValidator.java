@@ -70,7 +70,7 @@ public interface DynamicValidator {
      * @param inValid true invalid，false valid
      * @param defaultMessage tips message
      */
-    default void validate(boolean inValid, String defaultMessage) {
+    default void validateField(boolean inValid, String defaultMessage) {
         if (inValid) {
             this.throwValidationException(defaultMessage);
         }
@@ -79,11 +79,12 @@ public interface DynamicValidator {
     /**
      * validate self
      * @param data self
+     * @param groups validate groups
      * @param <T>
      */
-    default <T> void validateSelf(T data) {
+    default <T> void validateSelf(T data, Class<?>... groups) {
         Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-        Set<ConstraintViolation<T>> validate = validator.validate(data);
+        Set<ConstraintViolation<T>> validate = validator.validate(data, groups);
         this.parserValidateRet(validate);
     }
 
@@ -91,14 +92,15 @@ public interface DynamicValidator {
      * validate the data is invalid or not
      * @param data that is validating data
      * @param errorMessage default error message
+     * @param groups validate groups
      * @param <T>
      */
-    default <T extends DynamicValidator> void dynamicValidate(T data, String errorMessage) {
+    default <T extends DynamicValidator> void dynamicValidate(T data, String errorMessage, Class<?>... groups) {
         if (null == data) {
             this.throwValidationException(errorMessage);
             return;
         }
-        this.validateSelf(data);
+        this.validateSelf(data, groups);
         data.dynamicValidate();
     }
 
