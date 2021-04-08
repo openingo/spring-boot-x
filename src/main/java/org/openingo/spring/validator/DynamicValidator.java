@@ -27,10 +27,7 @@
 
 package org.openingo.spring.validator;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validation;
-import javax.validation.Validator;
+import javax.validation.*;
 import java.util.Optional;
 import java.util.Set;
 
@@ -120,5 +117,15 @@ public interface DynamicValidator {
         if (null != validate && validate.size() > 0) {
             throw new ConstraintViolationException(validate);
         }
+    }
+
+    /**
+     * the custom validation add the constraintViolation with message template
+     * @param context validator context
+     * @param messageTemplate message template, eg "{app.message}"
+     */
+    default void addConstraintViolation(ConstraintValidatorContext context, String messageTemplate) {
+        context.disableDefaultConstraintViolation();
+        context.buildConstraintViolationWithTemplate(messageTemplate).addConstraintViolation();
     }
 }
