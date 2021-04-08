@@ -31,6 +31,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.search.TotalHits;
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -41,6 +42,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.WriteRequest;
+import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
@@ -81,7 +83,6 @@ import java.util.Map;
 
 /**
  * RestHighLevelClientX
- * TODO just update
  * @author Qicz
  */
 @Slf4j
@@ -190,12 +191,7 @@ public class RestHighLevelClientX {
     }
 
     public boolean saveOrUpdateDocs(List<IndexRequest> indexRequests, WriteRequest.RefreshPolicy refreshPolicy, RequestOptions options) throws IOException {
-        BulkRequest bulkRequest = new BulkRequest();
-        if (ValidateKit.isNotNull(refreshPolicy)) {
-            bulkRequest.setRefreshPolicy(refreshPolicy);
-        }
-        indexRequests.forEach(bulkRequest::add);
-        return this.bulkRequest(bulkRequest, options);
+        return this.bulkRequest(indexRequests, refreshPolicy, options);
     }
 
     public boolean saveOrUpdateByDocBuilders(List<DocBuilder> builders) throws IOException {
@@ -212,6 +208,89 @@ public class RestHighLevelClientX {
         for (DocBuilder docBuilder : builders) {
             IndexRequest indexRequest = new IndexRequest(docBuilder.getDocIndex()).id(docBuilder.getDocId()).source(docBuilder.getDocSource(), XContentType.JSON);
             bulkRequest.add(indexRequest);
+        }
+        if (ValidateKit.isNotNull(refreshPolicy)) {
+            bulkRequest.setRefreshPolicy(refreshPolicy);
+        }
+        return this.bulkRequest(bulkRequest, options);
+    }
+
+    public boolean partialUpdate(String index, String docId, Map<String, Object> map) throws IOException {
+        return this.partialUpdate(index, docId, map, WriteRequest.RefreshPolicy.NONE);
+    }
+
+    public boolean partialUpdate(String index, String docId, Map<String, Object> map, WriteRequest.RefreshPolicy refreshPolicy) throws IOException {
+        Assert.notNull(map, "the map must not be null!");
+        String json = JacksonKit.toJson(map);
+        return this.partialUpdate(index, docId, json, XContentType.JSON, refreshPolicy);
+    }
+
+    public boolean partialUpdate(String index, String docId, String json) throws IOException {
+        return this.partialUpdate(index, docId, json, XContentType.JSON, WriteRequest.RefreshPolicy.NONE);
+    }
+
+    public boolean partialUpdate(String index, String docId, String json, WriteRequest.RefreshPolicy refreshPolicy) throws IOException {
+        return this.partialUpdate(index, docId, json, XContentType.JSON, refreshPolicy);
+    }
+
+    public boolean partialUpdate(String index, String docId, String source, XContentType xContentType) throws IOException {
+        return this.partialUpdate(index, docId, source, xContentType, WriteRequest.RefreshPolicy.NONE);
+    }
+
+    public boolean partialUpdate(String index, String docId, String source, XContentType xContentType, WriteRequest.RefreshPolicy refreshPolicy) throws IOException {
+        UpdateRequest updateRequest = new UpdateRequest(index, docId).doc(source, xContentType);
+        return this.partialUpdate(updateRequest, refreshPolicy);
+    }
+
+    public boolean partialUpdate(UpdateRequest updateRequest) throws IOException {
+        return this.partialUpdate(updateRequest, WriteRequest.RefreshPolicy.NONE);
+    }
+
+    public boolean partialUpdate(UpdateRequest updateRequest, WriteRequest.RefreshPolicy refreshPolicy) throws IOException {
+        Assert.notNull(updateRequest, "the updateRequest must not be null!");
+        return this.partialUpdate(Collections.singletonList(updateRequest), refreshPolicy);
+    }
+
+    public boolean partialUpdate(List<UpdateRequest> updateRequests) throws IOException {
+        Assert.notNull(updateRequests, "the updateRequests must not be null!");
+        return this.partialUpdate(updateRequests, WriteRequest.RefreshPolicy.NONE);
+    }
+
+    public boolean partialUpdate(List<UpdateRequest> updateRequests, WriteRequest.RefreshPolicy refreshPolicy) throws IOException {
+        return this.partialUpdate(updateRequests, refreshPolicy, RequestOptions.DEFAULT);
+    }
+
+    public boolean partialUpdate(List<UpdateRequest> updateRequests, WriteRequest.RefreshPolicy refreshPolicy, RequestOptions options) throws IOException {
+        return this.bulkRequest(updateRequests, refreshPolicy, options);
+    }
+
+    public boolean partialUpdateDocs(List<UpdateRequest> updateRequests) throws IOException {
+        Assert.notNull(updateRequests, "the updateRequests must not be null!");
+        return this.partialUpdateDocs(updateRequests, WriteRequest.RefreshPolicy.NONE);
+    }
+
+    public boolean partialUpdateDocs(List<UpdateRequest> updateRequests, WriteRequest.RefreshPolicy refreshPolicy) throws IOException {
+        return this.partialUpdateDocs(updateRequests, refreshPolicy, RequestOptions.DEFAULT);
+    }
+
+    public boolean partialUpdateDocs(List<UpdateRequest> updateRequests, WriteRequest.RefreshPolicy refreshPolicy, RequestOptions options) throws IOException {
+        return this.bulkRequest(updateRequests, refreshPolicy, options);
+    }
+
+    public boolean partialUpdateByDocBuilders(List<DocBuilder> builders) throws IOException {
+        return this.partialUpdateByDocBuilders(builders, WriteRequest.RefreshPolicy.NONE, RequestOptions.DEFAULT);
+    }
+
+    public boolean partialUpdateByDocBuilders(List<DocBuilder> builders, WriteRequest.RefreshPolicy refreshPolicy) throws IOException {
+        return this.partialUpdateByDocBuilders(builders, refreshPolicy, RequestOptions.DEFAULT);
+    }
+
+    public boolean partialUpdateByDocBuilders(List<DocBuilder> builders, WriteRequest.RefreshPolicy refreshPolicy, RequestOptions options) throws IOException {
+        Assert.notNull(builders, "the builders must not be null!");
+        BulkRequest bulkRequest = new BulkRequest();
+        for (DocBuilder docBuilder : builders) {
+            UpdateRequest updateRequest = new UpdateRequest(docBuilder.getDocIndex(), docBuilder.getDocId()).doc(docBuilder.getDocSource(), XContentType.JSON);
+            bulkRequest.add(updateRequest);
         }
         if (ValidateKit.isNotNull(refreshPolicy)) {
             bulkRequest.setRefreshPolicy(refreshPolicy);
@@ -239,6 +318,15 @@ public class RestHighLevelClientX {
         BulkRequest bulkRequest = new BulkRequest();
         docIds.forEach(docId -> bulkRequest.add(new DeleteRequest(index, docId)));
         bulkRequest.setRefreshPolicy(refreshPolicy);
+        return this.bulkRequest(bulkRequest, options);
+    }
+    
+    private boolean bulkRequest(List<? extends DocWriteRequest<?>> requests, WriteRequest.RefreshPolicy refreshPolicy, RequestOptions options) throws IOException {
+        BulkRequest bulkRequest = new BulkRequest();
+        if (ValidateKit.isNotNull(refreshPolicy)) {
+            bulkRequest.setRefreshPolicy(refreshPolicy);
+        }
+        requests.forEach(bulkRequest::add);
         return this.bulkRequest(bulkRequest, options);
     }
 
