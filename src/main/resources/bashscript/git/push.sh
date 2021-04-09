@@ -17,9 +17,9 @@ priority_modules=(`echo ${api_module}` `echo ${service_module}`)
 # shellcheck disable=SC2116
 full=($(find . -type d -maxdepth  1  ! \( -name "`echo ${api_module}`" -o -name "`echo ${service_module}`" -o -name ".*" \) -exec ls -d {} \;))
 # shellcheck disable=SC2206
-sorted_modules=(${priority_modules[@]} ${full[*]})
+processed_modules=(${priority_modules[@]} ${full[*]})
 # shellcheck disable=SC2068
-for file in ${sorted_modules[@]};
+for file in ${processed_modules[@]};
 do
 if [ -d "$file" ]
 then 
