@@ -1,5 +1,6 @@
 #!/bin/bash
 echo "Enter checkout branch:"
+# shellcheck disable=SC2162
 read checkout_branch
 echo "The checkout_branch is: $checkout_branch"
 echo "======START CHECKOUT========"
