@@ -33,6 +33,9 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * BeanAccessor
  *
@@ -44,12 +47,27 @@ public class BeanAccessor implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
 
+    private ConcurrentHashMap<Class<?>, Object> beans;
+
+    public BeanAccessor() {
+        this.beans = new ConcurrentHashMap<>();
+    }
+
     @Override
     public void setApplicationContext(@Nullable ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
 
     public <T> T bean(Class<T> clazz) {
+        Object o = this.beans.get(clazz);
+        if (Objects.isNull(o)) {
+            o = this.applicationContext.getBean(clazz);
+            this.beans.put(clazz, o);
+        }
+        return (T) o;
+    }
+
+    public <T> T prototypeBean(Class<T> clazz) {
         return this.applicationContext.getBean(clazz);
     }
 }
