@@ -12,7 +12,7 @@ openingo:
       error:
         enable: true
   websocket:
-    enable: true
+    enable: false
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver

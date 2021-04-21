@@ -43,10 +43,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * AbstractServiceErrorAttributes
@@ -131,8 +128,12 @@ public abstract class AbstractServiceErrorAttributes extends DefaultErrorAttribu
             return this.getErrorMessage(((BindException)exception).getBindingResult());
         }
         if (exception instanceof ConstraintViolationException) {
-            Optional<ConstraintViolation<?>> first = ((ConstraintViolationException)exception).getConstraintViolations().stream().findFirst();
-            return first.map(ConstraintViolation::getMessage).get();
+            Set<ConstraintViolation<?>> constraintViolations = ((ConstraintViolationException) exception).getConstraintViolations();
+            if (Objects.nonNull(constraintViolations)) {
+                Optional<ConstraintViolation<?>> first = constraintViolations.stream().findFirst();
+                return first.map(ConstraintViolation::getMessage).get();
+            }
+            return exception.getMessage();
         }
         return this.decorateExceptionMessage(exception);
     }
