@@ -79,6 +79,9 @@ public class HttpResponseBodyAdvice implements ResponseBodyAdvice<Object> {
      */
     @Override
     public Object beforeBodyWrite(@Nullable Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+        if (body instanceof RespData) {
+            return body;
+        }
         return RespData.success(body);
     }
 }
