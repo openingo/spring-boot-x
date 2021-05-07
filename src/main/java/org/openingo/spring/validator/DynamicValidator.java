@@ -27,9 +27,12 @@
 
 package org.openingo.spring.validator;
 
+import org.apache.commons.lang.StringUtils;
+
 import javax.validation.*;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * dynamic validator
@@ -70,6 +73,19 @@ public interface DynamicValidator {
     default void validateField(boolean inValid, String defaultMessage) {
         if (inValid) {
             this.throwValidationException(defaultMessage);
+        }
+    }
+
+    /**
+     * validate using regex
+     * @param strField the str field
+     * @param regex regex statement
+     * @param defaultMessage tips message
+     */
+    default void validateField(String strField, String regex, String defaultMessage) {
+        boolean matches = StringUtils.isNotEmpty(strField) && Pattern.compile(regex).matcher(strField).matches();
+        if (!matches) {
+            throwValidationException(defaultMessage);
         }
     }
 
