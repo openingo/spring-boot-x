@@ -85,7 +85,7 @@ public interface DynamicValidator {
     default void validateField(String strField, String regex, String defaultMessage) {
         boolean matches = StringUtils.isNotEmpty(strField) && Pattern.compile(regex).matcher(strField).matches();
         if (!matches) {
-            throwValidationException(defaultMessage);
+            this.throwValidationException(defaultMessage);
         }
     }
 
