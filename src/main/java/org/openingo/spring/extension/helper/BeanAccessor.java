@@ -47,7 +47,7 @@ public class BeanAccessor implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
 
-    private ConcurrentHashMap<Class<?>, Object> beans;
+    private final ConcurrentHashMap<Class<?>, Object> beans;
 
     public BeanAccessor() {
         this.beans = new ConcurrentHashMap<>();
