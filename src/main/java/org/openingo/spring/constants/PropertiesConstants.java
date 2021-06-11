@@ -66,6 +66,8 @@ public final class PropertiesConstants {
      */
     public static final String WEBSOCKET_CONFIG_PROPERTIES_PREFIX = "openingo.websocket";
 
+    public static final String MINIO_CONFIG_PROPERTIES_PREFIX = "openingo.minio";
+
     /**
      * enable
      */

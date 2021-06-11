@@ -13,6 +13,15 @@ openingo:
         enable: true
   websocket:
     enable: false
+  minio:
+    access-key: abc
+    secret-key: pass
+    bucket: abc
+    upload-path: abc/abc
+    upload-expire-seconds: 600
+    allow-max-size: 10245
+    allow-min-size: 10
+    allow-file-types: jpg,png
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -33,4 +42,3 @@ spring:
 #    host: localhost
 server:
   port: 18080
-
