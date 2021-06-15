@@ -14,10 +14,12 @@ openingo:
   websocket:
     enable: false
   minio:
-    access-key: abc
-    secret-key: pass
-    bucket: abc
-    upload-path: abc/abc
+    enable: true
+    endpoint: http://minio.openingo.org
+    access-key: Minio
+    secret-key: OpeingO1234#
+    bucket: bucket
+    upload-path: upload/
     upload-expire-seconds: 600
     allow-max-size: 10245
     allow-min-size: 10

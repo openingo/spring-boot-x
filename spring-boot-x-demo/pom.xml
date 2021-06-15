@@ -46,6 +46,7 @@
         <pool>2.2</pool>
         <elasticsearch.version>7.2.0</elasticsearch.version>
         <jdkits.version>3.6.8</jdkits.version>
+        <minio.version>8.2.1</minio.version>
     </properties>
 
     <dependencyManagement>
@@ -114,6 +115,12 @@
                 <groupId>org.openingo.kits</groupId>
                 <artifactId>jdkits</artifactId>
                 <version>${jdkits.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.minio</groupId>
+                <artifactId>minio</artifactId>
+                <version>${minio.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -204,6 +211,12 @@
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
             <optional>true</optional>
+        </dependency>
+
+        <!-- minio https://min.io/ -->
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
         </dependency>
     </dependencies>
 

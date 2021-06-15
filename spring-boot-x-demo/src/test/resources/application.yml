@@ -8,3 +8,13 @@ spring:
 openingo:
   redis:
     enable: true
+  minio:
+    endpoint: http://minio-dev.cecloud-inc.com
+    access-key: Minio
+    secret-key: Cestc1234#
+    bucket: market
+    upload-path: upload-temp/
+    upload-expire-seconds: 600
+    allow-max-size: 10245
+    allow-min-size: 10
+    allow-file-types: jpg,png

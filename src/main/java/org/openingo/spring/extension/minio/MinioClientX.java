@@ -62,8 +62,8 @@ public class MinioClientX extends MinioClient {
 		String allowFileTypes = this.minioConfigProperties.getAllowFileTypes().toLowerCase();
 		int idx = objectName.lastIndexOf(".");
 		Assert.isTrue(-1 != idx, "file extension is unknown");
-		String fileType = objectName.substring(idx).toLowerCase();
-		Assert.isTrue(allowFileTypes.contains(fileType), String.format("the %s file is not allow", fileType));
+		String fileType = objectName.substring(idx + 1).toLowerCase();
+		Assert.isTrue(allowFileTypes.contains(fileType), String.format("the \"%s\" file is not allow", fileType));
 		String bucket = this.minioConfigProperties.getBucket();
 		Integer uploadExpireSeconds = this.minioConfigProperties.getUploadExpireSeconds();
 		Integer allowMinSize = this.minioConfigProperties.getAllowMinSize();
