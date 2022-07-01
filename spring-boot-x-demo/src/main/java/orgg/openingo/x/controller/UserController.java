@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 OpeningO Co.,Ltd.
+ * Copyright (c) 2021 OpeningO Co.,Ltd.
  *
  *    https://openingo.org
  *    contactus(at)openingo.org
@@ -30,13 +30,13 @@ package orgg.openingo.x.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openingo.jdkits.http.RespData;
 import org.openingo.jdkits.sys.SystemClockKit;
-import org.openingo.spring.exception.ServiceException;
-import org.openingo.spring.extension.data.redis.StringKeyRedisTemplateX;
-import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
-import org.openingo.spring.extension.data.redis.naming.KeyNamingKit;
+import org.openingo.spring.boot.exception.ServiceException;
+import org.openingo.spring.boot.extension.data.redis.RedisTemplateX;
+import org.openingo.spring.boot.extension.data.redis.core.query.DefaultStringSortQuery;
+import org.openingo.spring.boot.extension.data.redis.naming.IKeyNamingPolicy;
+import org.openingo.spring.boot.extension.data.redis.naming.KeyNamingKit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.SortParameters;
-import org.springframework.data.redis.core.query.DefaultStringSortQuery;
 import org.springframework.data.redis.core.query.SortQuery;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,7 +61,7 @@ import java.util.Map;
 public class UserController {
 
     @Autowired
-    StringKeyRedisTemplateX stringKeyRedisTemplateX;
+    RedisTemplateX redisTemplateX;
 
     @Autowired
     IKeyNamingPolicy keyNamingPolicy;
@@ -85,7 +85,7 @@ public class UserController {
     public String save() {
         try {
             KeyNamingKit.set("openingo");
-            stringKeyRedisTemplateX.set("name", "Qicz");
+            redisTemplateX.set("name", "Qicz");
             return "ok";
         } finally {
             KeyNamingKit.remove();
@@ -96,11 +96,11 @@ public class UserController {
     public String saveex() {
         try {
             KeyNamingKit.set("openingo");
-            stringKeyRedisTemplateX.setEnableTransactionSupport(true);
-            stringKeyRedisTemplateX.multi();
-            stringKeyRedisTemplateX.set("name", "Qicz");
-            stringKeyRedisTemplateX.expire("name", 48*3600);
-            List exec = stringKeyRedisTemplateX.exec();
+            redisTemplateX.setEnableTransactionSupport(true);
+            redisTemplateX.multi();
+            redisTemplateX.set("name", "Qicz");
+            redisTemplateX.expire("name", 48*3600);
+            List exec = redisTemplateX.exec();
             System.out.println("exec=========="+exec);
             return "ok";
         } finally {
@@ -119,9 +119,14 @@ public class UserController {
 //                }
 //            });
 
-            stringKeyRedisTemplateX.set("name", "Qicz" + SystemClockKit.now());
-            stringKeyRedisTemplateX.expire("name", 48 * 3600);
-            return "ok" + stringKeyRedisTemplateX.get("name");
+            redisTemplateX.mSet(new HashMap<String, Object>(){{
+                put("z", "aaa");
+                put("c", "aaa");
+                put("q", "aaa");
+            }});
+            redisTemplateX.set("name", "Qicz" + SystemClockKit.now());
+            redisTemplateX.expire("name", 48 * 3600);
+            return "ok" + redisTemplateX.get("name");
         } finally {
             KeyNamingKit.remove();
         }

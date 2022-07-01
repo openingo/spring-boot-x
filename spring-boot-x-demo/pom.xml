@@ -2,7 +2,7 @@
 <!--
   ~ MIT License
   ~
-  ~ Copyright (c) 2020 OpeningO Co.,Ltd.
+  ~ Copyright (c) 2021 OpeningO Co.,Ltd.
   ~
   ~    https://openingo.org
   ~    contactus(at)openingo.org
@@ -31,105 +31,48 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.openingo</groupId>
+    <parent>
+        <groupId>org.openingo.boot</groupId>
+        <artifactId>openingo-boot-dependencies</artifactId>
+        <version>1.0.6</version>
+    </parent>
+
     <artifactId>spring-boot-x-demo</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <spring-boot.version>2.1.8.RELEASE</spring-boot.version>
-        <springcloud.version>Greenwich.SR2</springcloud.version>
-        <spring-boot-x.version>3.0.0.RELEASE</spring-boot-x.version>
+        <spring-boot.version>2.2.13.RELEASE</spring-boot.version>
+        <springcloud.version>Hoxton.SR11</springcloud.version>
+        <spring-boot-x.version>5.1.1</spring-boot-x.version>
         <mysql.sersion>8.0.17</mysql.sersion>
         <druid.version>1.1.23</druid.version>
         <hikaricp.version>3.2.0</hikaricp.version>
         <fastjson.version>1.2.68</fastjson.version>
         <pool>2.2</pool>
-        <elasticsearch.version>7.2.0</elasticsearch.version>
-        <jdkits.version>3.6.8</jdkits.version>
+        <elasticsearch.version>7.10.0</elasticsearch.version>
+        <fst.version>2.57</fst.version>
         <minio.version>8.2.1</minio.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <!-- Override es -->
             <dependency>
-                <groupId>org.elasticsearch.client</groupId>
-                <artifactId>transport</artifactId>
-                <version>${elasticsearch.version}</version>
+                <groupId>de.ruedigermoeller</groupId>
+                <artifactId>fst</artifactId>
+                <version>${fst.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.elasticsearch.plugin</groupId>
-                <artifactId>transport-netty4-client</artifactId>
-                <version>${elasticsearch.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.elasticsearch</groupId>
-                <artifactId>elasticsearch</artifactId>
-                <version>${elasticsearch.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.elasticsearch.client</groupId>
-                <artifactId>elasticsearch-rest-client</artifactId>
-                <version>${elasticsearch.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.elasticsearch.client</groupId>
-                <artifactId>elasticsearch-rest-high-level-client</artifactId>
-                <version>${elasticsearch.version}</version>
-            </dependency>
-
-            <dependency>
-                <!-- Import dependency management from Spring Boot,not include plugin
-                    management as the parent import style -->
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <!--spring cloud -->
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${springcloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.openingo.spring</groupId>
+                <groupId>org.openingo.boot</groupId>
                 <artifactId>spring-boot-x</artifactId>
                 <version>${spring-boot-x.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>fastjson</artifactId>
-                <scope>${fastjson.version}</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.openingo.kits</groupId>
-                <artifactId>jdkits</artifactId>
-                <version>${jdkits.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.minio</groupId>
-                <artifactId>minio</artifactId>
-                <version>${minio.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
         <dependency>
-            <groupId>org.openingo.spring</groupId>
+            <groupId>org.openingo.boot</groupId>
             <artifactId>spring-boot-x</artifactId>
-            <version>${spring-boot-x.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -162,22 +105,18 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.sersion}</version>
         </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid-spring-boot-starter</artifactId>
-            <version>${druid.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
-            <version>${pool}</version>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>${hikaricp.version}</version>
         </dependency>
 
         <dependency>
@@ -191,10 +130,9 @@
             <artifactId>spring-cloud-config-server</artifactId>
             <optional>true</optional>
         </dependency>
-
         <dependency>
-            <groupId>org.openingo.kits</groupId>
-            <artifactId>jdkits</artifactId>
+            <groupId>de.ruedigermoeller</groupId>
+            <artifactId>fst</artifactId>
         </dependency>
         <!-- es -->
         <dependency>
@@ -217,6 +155,27 @@
         <dependency>
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.etcd</groupId>
+            <artifactId>jetcd-core</artifactId>
+        </dependency>
+        <!-- zookeeper -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-zookeeper-discovery</artifactId>
+        </dependency>
+
+        <!-- jpa -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openingo.kits</groupId>
+            <artifactId>jdkits</artifactId>
+            <version>3.7.2</version>
         </dependency>
     </dependencies>
 

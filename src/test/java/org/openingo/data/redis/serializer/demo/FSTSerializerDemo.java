@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 OpeningO Co.,Ltd.
+ * Copyright (c) 2021 OpeningO Co.,Ltd.
  *
  *    https://openingo.org
  *    contactus(at)openingo.org
@@ -29,7 +29,7 @@ package org.openingo.data.redis.serializer.demo;
 
 import org.junit.Test;
 import org.openingo.data.redis.serializer.demo.entity.User;
-import org.openingo.spring.extension.data.redis.serializer.FstRedisSerializer;
+import org.openingo.spring.boot.extension.data.redis.serializer.FstRedisSerializer;
 
 /**
  * FSTSerializerDemo

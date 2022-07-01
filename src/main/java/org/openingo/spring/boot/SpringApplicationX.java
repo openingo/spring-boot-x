@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 OpeningO Co.,Ltd.
+ * Copyright (c) 2021 OpeningO Co.,Ltd.
  *
  *    https://openingo.org
  *    contactus(at)openingo.org
@@ -29,8 +29,9 @@ package org.openingo.spring.boot;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.openingo.jdkits.lang.StrKit;
 import org.openingo.jdkits.validate.ValidateKit;
-import org.openingo.spring.constants.EnvsConstants;
+import org.openingo.spring.boot.constants.EnvsConstants;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.ListableBeanFactory;
@@ -285,8 +286,8 @@ public final class SpringApplicationX {
                 String.format(" MainApplicationClass: %s\n", mainApplicationClass.getName()) +
                 String.format(" RunningAsJar: %s\n", isRunningAsJar) +
                 String.format(" isDebugging: %s\n", isDebugging) +
-                String.format(" Server.port: %s\n", environment.getProperty("server.port")) +
-                String.format(" Client.ip-address: %s\n", environment.getProperty("spring.cloud.client.ip-address")) +
+                String.format(" Server.port: %s\n", StrKit.defaultIfBlank(environment.getProperty("server.port"), "8080")) +
+                String.format(" Client.ip-address: %s\n", StrKit.defaultIfBlank(environment.getProperty("spring.cloud.client.ip-address"), "127.0.0.1")) +
                 String.format(" User.dir: %s\n", environment.getProperty("user.dir")) +
                 "===============================\n";
         log.info(infoBuilder);

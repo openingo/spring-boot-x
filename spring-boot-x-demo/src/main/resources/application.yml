@@ -24,23 +24,34 @@ openingo:
     allow-max-size: 10245
     allow-min-size: 10
     allow-file-types: jpg,png
+#  gedid:
+#    engine:
+#      zookeeper:
+#        connect-string: localhost:2182
+#      redis:
+#        cluster:
+#          nodes: localhost:7291,localhost:7292,localhost:7293,localhost:7294,localhost:7295,localhost:7296
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: dbadmin
     url: jdbc:mysql://127.0.0.1/test?useSSL=false&serverTimezone=GMT%2B8
-
-  redis:
-    cluster:
-      nodes: 172.15.33.211:7001,172.15.33.211:7002,172.15.33.211:7003,172.15.33.211:7004,172.15.33.211:7005,172.15.33.211:7006
-    password: 123456
-    lettuce:
-      pool:
-        max-active: 1000
-  elasticsearch:
-    rest:
-      uris: http://172.15.33.36:9200
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+#  redis:
+#    cluster:
+#      nodes: 172.15.33.211:7001,172.15.33.211:7002,172.15.33.211:7003,172.15.33.211:7004,172.15.33.211:7005,172.15.33.211:7006
+#    password: 123456
+#    lettuce:
+#      pool:
+#        max-active: 1000
+#  elasticsearch:
+#    rest:
+#      uris: http://172.15.33.36:9200
 #    host: localhost
 server:
   port: 18080
+debug: true

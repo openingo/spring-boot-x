@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 OpeningO Co.,Ltd.
+ * Copyright (c) 2021 OpeningO Co.,Ltd.
  *
  *    https://openingo.org
  *    contactus(at)openingo.org
@@ -28,7 +28,7 @@
 package orgg.openingo.x;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.openingo.spring.http.request.error.DefaultServiceErrorAttributes;
+import org.openingo.spring.boot.extension.http.request.error.DefaultServiceErrorAttributes;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindException;

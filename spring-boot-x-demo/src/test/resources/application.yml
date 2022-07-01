@@ -9,9 +9,9 @@ openingo:
   redis:
     enable: true
   minio:
-    endpoint: http://minio-dev.cecloud-inc.com
+    endpoint: http://minio.openingo.org
     access-key: Minio
-    secret-key: Cestc1234#
+    secret-key: OpeingO1234#
     bucket: market
     upload-path: upload-temp/
     upload-expire-seconds: 600

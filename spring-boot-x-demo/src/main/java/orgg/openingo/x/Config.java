@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 OpeningO Co.,Ltd.
+ * Copyright (c) 2021 OpeningO Co.,Ltd.
  *
  *    https://openingo.org
  *    contactus(at)openingo.org
@@ -29,13 +29,14 @@ package orgg.openingo.x;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import org.openingo.jdkits.http.RespData;
-import org.openingo.spring.datasource.provider.DruidDataSourceProvider;
-import org.openingo.spring.datasource.routing.RoutingDataSource;
-import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
+import org.openingo.spring.boot.extension.data.redis.naming.IKeyNamingPolicy;
+import org.openingo.spring.boot.extension.datasource.provider.DruidDataSourceProvider;
+import org.openingo.spring.boot.extension.datasource.routing.RoutingDataSource;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -72,6 +73,7 @@ public class Config {
         return new KeyNamingPolicy();
     }
 
+    @Primary
     @Bean(initMethod = "init", destroyMethod = "close")
     @ConfigurationProperties("spring.datasource")
     public DruidDataSource defaultDataSource(){

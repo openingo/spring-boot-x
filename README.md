@@ -2,13 +2,50 @@
 
 > spring-boot-extensions
 
-![maven](https://img.shields.io/maven-central/v/org.openingo.spring/spring-boot-x.svg)
+![maven](https://img.shields.io/maven-central/v/org.openingo.boot/spring-boot-x.svg)
 
-[详细使用教程](https://izcqi.com/posts/2021/01/09/spring-boot-x-specify/)
+[spring-boot-x specification(cn)](https://izcqi.com/posts/2021/01/09/spring-boot-x-specify/)
 
 ### [Release Notes](RELEASENOTES.md)
 
 ### Features
+
+- Manual transaction
+
+  - `ManualTransactionManager`
+
+- GeDid: Distributed id generator.
+  
+  - `RedisIdEngine`
+  - `ZookeeperIdEngine`
+  - `UuidEngine`
+  
+  ```java
+   @Configuration
+   public class IdLoaderConfig implements DidLoaderConfigurer {
+   
+   	@Bean
+   	public ZookeeperIdEngineMode zookeeperIdEngineMode() {
+   		return ZookeeperIdEngineMode.DATA_ZX_MID;
+   	}
+   
+   	@Override
+   	public void configureDidLoader(DidLoader didLoader) {
+   		// business abc
+   		didLoader.follow("redis://abc");
+   		// business a
+   		didLoader.follow("redis", "a");
+   		// business b
+   		didLoader.follow("redis", "b");
+   		// business zk
+   		didLoader.follow("zookeeper", "zk");
+   		// business uuid
+   		didLoader.follow("uuid", "uuid");
+   	}
+   }
+  ```
+    
+   [Read More About GeDid](https://izcqi.com/posts/2021/07/01/gedid/)
 
 - Elasticsearch supports 
 
@@ -46,12 +83,12 @@
       "timestamp": "2020-07-13T05:49:06.071+0000",
       "status": 500,
       "error": "Internal Server Error",
-      "exception": "org.openingo.spring.exception.ServiceException",
+      "exception": "ServiceException",
       "message": "testing exception",
       "path": "/ex",
       "handler": "public java.util.Map org.openingo.x.controller.UserController.ex()",
       "openingo.error": {
-          "ex": "org.openingo.spring.exception.ServiceException: testing exception",
+          "ex": "ServiceException: testing exception",
           "em": "testing exception",
           "error": "Internal Server Error",
           "ec": "ERROR_CODE"
@@ -133,25 +170,13 @@
 
   ```xml
   <dependency>
-    <groupId>org.openingo.spring</groupId>
+    <groupId>org.openingo.boot</groupId>
     <artifactId>spring-boot-x</artifactId>
     <version>new_version</version>
   </dependency>
   ```
 
 - Add `@EnableExtension` in your main application class:
-
-```java
-@SpringBootApplication
-@EnableExtension
-public class App {
-
-    public static void main(String[] args) {
-        SpringApplicationX.run(App.class, args);
-        SpringApplicationX.applicationInfo();
-    }
-}
-```
 
 - Configuration:
 

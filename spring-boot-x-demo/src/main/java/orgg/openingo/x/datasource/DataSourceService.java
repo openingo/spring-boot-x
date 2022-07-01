@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 OpeningO Co.,Ltd.
+ * Copyright (c) 2021 OpeningO Co.,Ltd.
  *
  *    https://openingo.org
  *    contactus(at)openingo.org
@@ -29,9 +29,9 @@ package orgg.openingo.x.datasource;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import lombok.extern.slf4j.Slf4j;
-import org.openingo.spring.datasource.holder.RoutingDataSourceHolder;
-import org.openingo.spring.datasource.provider.DruidDataSourceProvider;
-import org.openingo.spring.datasource.routing.RoutingDataSource;
+import org.openingo.spring.boot.extension.datasource.holder.RoutingDataSourceHolder;
+import org.openingo.spring.boot.extension.datasource.provider.DruidDataSourceProvider;
+import org.openingo.spring.boot.extension.datasource.routing.RoutingDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

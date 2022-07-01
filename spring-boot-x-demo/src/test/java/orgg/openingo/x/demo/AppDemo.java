@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 OpeningO Co.,Ltd.
+ * Copyright (c) 2021 OpeningO Co.,Ltd.
  *
  *    https://openingo.org
  *    contactus(at)openingo.org
@@ -31,12 +31,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openingo.jdkits.collection.ListKit;
 import org.openingo.spring.boot.SpringApplicationX;
-import org.openingo.spring.extension.data.redis.StringKeyRedisTemplateX;
-import org.openingo.spring.extension.data.redis.naming.DefaultKeyNamingPolicy;
-import org.openingo.spring.extension.data.redis.serializer.FstRedisSerializer;
+import org.openingo.spring.boot.extension.data.redis.naming.DefaultKeyNamingPolicy;
+import org.openingo.spring.boot.extension.data.redis.serializer.FstRedisSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import orgg.openingo.x.App;
@@ -58,28 +56,6 @@ import java.util.concurrent.TimeUnit;
 @SpringBootTest
 @ContextConfiguration(classes = App.class)
 public class AppDemo {
-
-    @Autowired
-    StringKeyRedisTemplateX<String> stringKeyRedisTemplateX;
-
-    @Test
-    public void ok() {
-        System.out.println(stringKeyRedisTemplateX);
-    }
-
-    @Test
-    public void testOps() {
-        System.out.println(this.stringKeyRedisTemplateX.opsForList());
-    }
-
-    @Test
-    public void testValue() {
-        ValueOperations<String, String> valueOperations = this.stringKeyRedisTemplateX.opsForValue();
-        valueOperations.set("zcq", "Qicz");
-        valueOperations.append("zcq", "123");
-        String zcq = valueOperations.get("zcq");
-        System.out.println(zcq);
-    }
 
     @Test
     public void testNaming() {

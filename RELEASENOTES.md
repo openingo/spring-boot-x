@@ -1,5 +1,21 @@
 ## Release Notes
 
+### 4.0.0.RELEASE
+
+- refactor all features package
+
+### 3.0.0.RELEASE
+
+- GeDid: Distributed id generator.
+
+  - `RedisIdEngine`
+  - `ZookeeperIdEngine`
+  - `UuidEngine`
+  
+- `Safety` Toolkit
+
+- refactor `RedisTemplateX`
+
 ### 2.9.RELEASE
 
 - copy SpringBoot configs

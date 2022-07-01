@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 OpeningO Co.,Ltd.
+ * Copyright (c) 2021 OpeningO Co.,Ltd.
  *
  *    https://openingo.org
  *    contactus(at)openingo.org
@@ -27,8 +27,8 @@
 
 package orgg.openingo.x;
 
-import org.openingo.spring.annotation.EnableExtension;
 import org.openingo.spring.boot.SpringApplicationX;
+import org.openingo.spring.boot.annotation.EnableExtension;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 OpeningO Co.,Ltd.
+ * Copyright (c) 2021 OpeningO Co.,Ltd.
  *
  *    https://openingo.org
  *    contactus(at)openingo.org
@@ -31,8 +31,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.aspectj.lang.annotation.Pointcut;
 import org.junit.Test;
 import org.openingo.spring.boot.SpringApplicationX;
-import org.openingo.spring.extension.data.elasticsearch.builder.index.MappingsProperties;
-import org.openingo.spring.extension.data.elasticsearch.builder.index.MappingsProperty;
+import org.openingo.spring.boot.extension.data.elasticsearch.builder.index.MappingsProperties;
+import org.openingo.spring.boot.extension.data.elasticsearch.builder.index.MappingsProperty;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
@@ -115,5 +115,25 @@ public class LocalDemo {
         me.add(MappingsProperty.me("addr").type("text").keyword(256));
         me.add(MappingsProperty.me("name").type("text").keyword(256));
         System.out.println(me.toJson());
+    }
+
+    @Test
+    public void integer() {
+
+        Long zeroCount = 0L;
+
+        for (int i = 2; i <= 30; i++) {
+            Integer a = Integer.MAX_VALUE * i;
+            long along = 0;
+            if (a < 0) {
+                zeroCount++;
+                along = (Integer.MIN_VALUE - a) * -1L + Integer.MAX_VALUE * zeroCount + 1L;
+            } else {
+                along = a;
+            }
+            System.out.println("i="+i);
+            System.out.println("max="+Integer.MAX_VALUE);
+            System.out.println("along="+along);
+        }
     }
 }

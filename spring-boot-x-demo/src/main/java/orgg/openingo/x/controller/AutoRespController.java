@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 OpeningO Co.,Ltd.
+ * Copyright (c) 2021 OpeningO Co.,Ltd.
  *
  *    https://openingo.org
  *    contactus(at)openingo.org
@@ -27,8 +27,8 @@
 
 package orgg.openingo.x.controller;
 
-import org.openingo.spring.exception.ServiceException;
-import org.openingo.spring.http.response.annotation.AutoMappingRespResult;
+import org.openingo.spring.boot.exception.ServiceException;
+import org.openingo.spring.boot.extension.http.response.annotation.AutoMappingRespResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

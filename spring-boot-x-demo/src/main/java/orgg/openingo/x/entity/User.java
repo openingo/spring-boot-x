@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 OpeningO Co.,Ltd.
+ * Copyright (c) 2021 OpeningO Co.,Ltd.
  *
  *    https://openingo.org
  *    contactus(at)openingo.org
@@ -29,8 +29,6 @@ package orgg.openingo.x.entity;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
 
 import java.io.Serializable;
 
@@ -40,7 +38,6 @@ import java.io.Serializable;
  * @author Qicz
  */
 @Data
-@Document(indexName = "x-user")
 public class User implements Serializable {
 
     @Id
@@ -50,7 +47,6 @@ public class User implements Serializable {
 
     String addr;
 
-    @Field
     UserDoc userDoc;
 
     @Data

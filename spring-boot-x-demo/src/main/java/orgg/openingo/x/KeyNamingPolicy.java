@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 OpeningO Co.,Ltd.
+ * Copyright (c) 2021 OpeningO Co.,Ltd.
  *
  *    https://openingo.org
  *    contactus(at)openingo.org
@@ -29,8 +29,8 @@ package orgg.openingo.x;
 
 import lombok.Data;
 import org.openingo.jdkits.validate.ValidateKit;
-import org.openingo.spring.extension.data.redis.naming.IKeyNamingPolicy;
-import org.openingo.spring.extension.data.redis.naming.KeyNamingKit;
+import org.openingo.spring.boot.extension.data.redis.naming.IKeyNamingPolicy;
+import org.openingo.spring.boot.extension.data.redis.naming.KeyNamingKit;
 
 /**
  * KeyNamingPolicy
